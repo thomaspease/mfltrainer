@@ -1,0 +1,43 @@
+extends base
+
+block content
+    main.main
+        .card-container
+            h2.heading-secondary Set tasks
+            form.card.create-task-form
+                .card__details
+                    .form__group.col__one
+                        label.form__label No. of sentences
+                        input#sentencesLimit.form__input(type='number', placeholder='Spanish sentence', required, value=10 )
+                    .form__group
+                        label.form__label.triple__radio(for='gapped') Gapped
+                        label.form__label.triple__radio(for='translation') Translation
+                        label.form__label.triple__radio(for='gapped') Transcription
+                        br
+                        input#gapped.form__input.triple__radio.ma-tp-sm(type='radio', name='exercise', value='gapped',checked,  required)
+                        input#gapped.form__input.triple__radio.ma-tp-sm(type='radio', name='exercise', value='translation', required)
+                        input#gapped.form__input.triple__radio.ma-tp-sm(type='radio', name='exercise', value='transcription', required)
+                    .form__group.col__one
+                        label.form__label Level
+                        input#levelGte.form__input(type='number', min=1, max=9, placeholder='Level', value=1, required)
+                        input#levelLte.form__input(type='number', min=1, max=9, placeholder='Level', value=9, required)
+                    select.col__two
+                        each classes in user.class
+                            option(value= classes.id) #{classes.name}
+                    .form__group.col__one
+                        label.form__label Vivaref
+                        input#vivaRefGte.form__input(type='number', step='0.1', min='10', max='60' value='10', required)
+                        input#vivaRefLte.form__input.ma-tp-sm(type='number', step='0.1', min='10', max='60' value='60', required)
+                    .form__group.col__one
+                        label.form__label Tense
+                        input#tense.form__input(type='text', value='All', required)
+                    .form__group.col__one
+                        label.form__label Grammar
+                        input#grammar.form__input(type='text', value='All', required)
+                    .form__group
+                        button.btn.btn--green Submit
+                    script 
+                        window.jobbie = #{user}
+                    
+
+
