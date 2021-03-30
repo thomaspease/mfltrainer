@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const taskSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
   dueDate: Date,
   teacher: [
     {
@@ -16,6 +20,12 @@ const taskSchema = mongoose.Schema({
     {
       type: mongoose.Schema.ObjectId,
       ref: 'Sentence',
+    },
+  ],
+  class: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Class',
     },
   ],
 });

@@ -172,6 +172,7 @@ if (document.querySelector('.triple__radio')) {
     document.querySelector('audio').play();
   });
 
+  //Gapped game
   answerBtn.addEventListener('click', (e) => {
     if (document.querySelector('input').value == missingWord) {
       quNum++;

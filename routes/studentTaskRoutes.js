@@ -1,14 +1,15 @@
 const express = require('express');
-const taskController = require('../controllers/taskController');
+const studentTaskController = require('../controllers/studentTaskController');
 const authController = require('../controllers/authController');
 
 ////// ROUTER
 const router = express.Router({ mergeParams: true });
 
+router.route('/:id').delete(studentTaskController.deleteStudentTaskAndChild);
+
 router
-  .route('/')
-  .get(taskController.getAllTasks)
-  .post(taskController.createTaskAndStudentTasks);
+  .route('/delete-student-child/:id')
+  .delete(studentTaskController.deleteUserTaskChild);
 
 // router.route('/teacher-set').post(taskController.teacherSetTask);
 

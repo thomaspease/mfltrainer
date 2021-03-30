@@ -1,16 +1,13 @@
 header.header
-  nav.nav.nav--tours
-    a.nav__el(href='/') Exercises
-  nav.nav.nav--tours
-    a.nav__el(href='/createsentences') Create sentences
-  nav.nav.nav--tours
-    a.nav__el(href='/settasks') Set tasks
-  .header__logo
-    img(src='/img/brain-logo.png' alt='MFL Trainer logo')
-  nav.nav.nav--user
+  nav.nav
+    a.nav__el.header--logo
+      img(src='/img/brain-logo.png' alt='MFL Trainer logo')
+    a.nav__el(href='/') Train
+    a.nav__el(href='/createsentences') Sentences
+    a.nav__el(href='/settasks') Tasks
     if user
       a.nav__el.nav__el--logout(href='/login') Log out
-      a.nav__el(href='/me')
+      a.nav__el.nav__el--me(href='/me')
         span= user.name.split(' ')[0]
     else
       a.nav__el(href='/login') Log in

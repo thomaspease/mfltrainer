@@ -62,7 +62,9 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getSentenceSet = catchAsync(async (req, res, next) => {
-  const populatedUser = await User.findById(req.user.id).populate('sentences');
+  const populatedUser = await await User.findById(req.user.id).populate(
+    'sentences'
+  );
 
   res.status(200).json({
     status: 'success',

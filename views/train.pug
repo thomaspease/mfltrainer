@@ -1,0 +1,12 @@
+extends base
+
+block content
+    main.main
+        form.card
+            .card__exercise
+                div.card-text.card-text--bold Question text
+                input.form__input(type='text', placeholder='Answer', required)
+                button.btn.btn--green.btn--green__exercise Submit
+                div.card-text Diffed answer
+    script
+        var sentences = !{JSON.stringify(sentences)}

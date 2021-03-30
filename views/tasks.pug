@@ -1,0 +1,20 @@
+extends base
+
+block content
+    main.main
+        form.card
+            .card__exercise-list
+                div.card-text.card-text--bold Tasks
+                div.card-text.card-text--bold Due
+                div.card-text.card-text--bold Completed?
+                each thing in studentTasks
+                    a.card-text.card-text--bold(href=`/train/${thing.id}`) #{thing.task[0].name}
+                    div.card-text.card-text--bold #{thing.task[0].dueDate}
+                    div.card-text.card-text--bold #{JSON.stringify(thing.completed)}
+                div.card-text.card-text--italic
+
+
+                    
+        //- button.btn.btn--green.btn-exercise(id='gapped_questions') Gapped questions
+        //- button.btn.btn--green.btn-exercise(id='translations') Translations
+        //- button.btn.btn--green.btn-exercise(id='transcriptions') Transcription

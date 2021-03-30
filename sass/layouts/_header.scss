@@ -1,0 +1,9 @@
+.header {
+  background-color: #444;
+  padding: 1rem 5rem;
+  //   grid-template-columns: repeat(5, min-content);
+  &--logo img {
+    height: 3.5rem;
+    padding: 0 2rem;
+  }
+}

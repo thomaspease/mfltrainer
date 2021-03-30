@@ -1,18 +1,33 @@
 const User = require('../models/usermodel');
-const Sentence = require('../models/sentencemodel');
+const StudentTask = require('../models/studenttaskmodel');
+const Task = require('../models/taskmodel');
 const Class = require('../models/classmodel');
 const catchAsync = require('../utils/catchAsync');
 //const AppError = require('../utils/appError');
 
-exports.getExercises = catchAsync(async (req, res, next) => {
-  // 1) Get tour data from collection
-  const sentences = await Sentence.find();
+exports.displayTasks = catchAsync(async (req, res, next) => {
+  //At the moment tasks coming from isLoggedin and being stored in locals.studentTasks\
 
-  // 2) Build template
-  // 3) Render that template using tour data from 1)
-  res.status(200).render('exercises', {
-    title: 'Exercises',
-    sentences,
+  res.status(200).render('tasks', {
+    title: 'Tasks',
+  });
+});
+
+exports.doExercise = catchAsync(async (req, res, next) => {
+  // 1) Get task from studentTask ID in URL
+  const studentTask = await StudentTask.findById(req.params.id).populate(
+    'task'
+  );
+
+  // Request the task so sentences can be populated
+  const task = await Task.findById(studentTask.task[0].id).populate(
+    'sentences'
+  );
+
+  //Render template and pass in sentences
+  res.status(200).render('train', {
+    title: 'Train',
+    sentences: task.sentences,
   });
 });
 
@@ -43,12 +58,14 @@ exports.getMyClasses = catchAsync(async (req, res, next) => {
 exports.getClass = catchAsync(async (req, res, next) => {
   //Find class
   const classData = await Class.findById(req.params.class);
+  console.log(classData);
   //Find students
-  const Students = await User.find({ class: '601706693dd4d815c3c8acbe' });
-  console.log(req.params);
+  const students = await User.find(req.params);
 
   res.status(200).render('classoverview', {
     title: 'My classes',
+    classData,
+    students,
   });
 });
 

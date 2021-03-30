@@ -29,7 +29,6 @@ export const axiosReq = async (collection, data, method) => {
     });
 
     if (res.data.status === 'success') {
-      console.log(res);
       return res;
     }
   } catch (err) {

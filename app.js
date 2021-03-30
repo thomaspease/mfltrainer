@@ -18,6 +18,7 @@ const userRouter = require('./routes/userRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const classRouter = require('./routes/classRoutes');
 const taskRouter = require('./routes/taskRoutes');
+const studentTaskRouter = require('./routes/studentTaskRoutes');
 
 const app = express();
 
@@ -75,6 +76,7 @@ app.use('/api/v1/frequency', frequencyRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/classes', classRouter);
 app.use('/api/v1/tasks', taskRouter);
+app.use('/api/v1/studenttasks', studentTaskRouter);
 
 //A req will only reach here if it hasn't been handled by the other handlers
 //The star means all routes

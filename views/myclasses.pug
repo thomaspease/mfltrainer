@@ -8,6 +8,6 @@ block content
           ul.side-nav
             each classes in user.class 
               li(class=`${active ? 'side-nav--active' : ''}`)
-                a(href=`127.0.0.1:4000/my-classes/${classes.id}`) #{classes.name}
+                a(href=`/my-classes/${classes.id}`) #{classes.name}
       block primary
       

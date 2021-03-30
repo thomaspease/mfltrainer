@@ -388,7 +388,7 @@ var store = require('../internals/shared-store');
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.8.2',
+  version: '3.8.3',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
 });
@@ -2880,6 +2880,7 @@ addToUnscopables('flatMap');
 
 },{"../internals/add-to-unscopables":"../../node_modules/core-js/internals/add-to-unscopables.js"}],"../../node_modules/core-js/internals/iterators-core.js":[function(require,module,exports) {
 'use strict';
+var fails = require('../internals/fails');
 var getPrototypeOf = require('../internals/object-get-prototype-of');
 var createNonEnumerableProperty = require('../internals/create-non-enumerable-property');
 var has = require('../internals/has');
@@ -2905,10 +2906,16 @@ if ([].keys) {
   }
 }
 
-if (IteratorPrototype == undefined) IteratorPrototype = {};
+var NEW_ITERATOR_PROTOTYPE = IteratorPrototype == undefined || fails(function () {
+  var test = {};
+  // FF44- legacy iterators case
+  return IteratorPrototype[ITERATOR].call(test) !== test;
+});
+
+if (NEW_ITERATOR_PROTOTYPE) IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-if (!IS_PURE && !has(IteratorPrototype, ITERATOR)) {
+if ((!IS_PURE || NEW_ITERATOR_PROTOTYPE) && !has(IteratorPrototype, ITERATOR)) {
   createNonEnumerableProperty(IteratorPrototype, ITERATOR, returnThis);
 }
 
@@ -2917,7 +2924,7 @@ module.exports = {
   BUGGY_SAFARI_ITERATORS: BUGGY_SAFARI_ITERATORS
 };
 
-},{"../internals/object-get-prototype-of":"../../node_modules/core-js/internals/object-get-prototype-of.js","../internals/create-non-enumerable-property":"../../node_modules/core-js/internals/create-non-enumerable-property.js","../internals/has":"../../node_modules/core-js/internals/has.js","../internals/well-known-symbol":"../../node_modules/core-js/internals/well-known-symbol.js","../internals/is-pure":"../../node_modules/core-js/internals/is-pure.js"}],"../../node_modules/core-js/internals/create-iterator-constructor.js":[function(require,module,exports) {
+},{"../internals/fails":"../../node_modules/core-js/internals/fails.js","../internals/object-get-prototype-of":"../../node_modules/core-js/internals/object-get-prototype-of.js","../internals/create-non-enumerable-property":"../../node_modules/core-js/internals/create-non-enumerable-property.js","../internals/has":"../../node_modules/core-js/internals/has.js","../internals/well-known-symbol":"../../node_modules/core-js/internals/well-known-symbol.js","../internals/is-pure":"../../node_modules/core-js/internals/is-pure.js"}],"../../node_modules/core-js/internals/create-iterator-constructor.js":[function(require,module,exports) {
 'use strict';
 var IteratorPrototype = require('../internals/iterators-core').IteratorPrototype;
 var create = require('../internals/object-create');
@@ -3173,7 +3180,7 @@ var $ = require('../internals/export');
 var global = require('../internals/global');
 
 // `globalThis` object
-// https://github.com/tc39/proposal-global
+// https://tc39.es/ecma262/#sec-globalthis
 $({ global: true }, {
   globalThis: global
 });
@@ -13277,7 +13284,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -13586,7 +13593,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -14198,7 +14205,6 @@ const axiosReq = async (collection, data, method) => {
     });
 
     if (res.data.status === 'success') {
-      console.log(res);
       return res;
     }
   } catch (err) {
@@ -14412,7 +14418,8 @@ if (document.querySelector('.triple__radio')) {
     displayGappedQu(sentences[quNum].sentence);
     audio.src = "/audio/".concat(sentences[quNum].audio);
     document.querySelector('audio').play();
-  });
+  }); //Gapped game
+
   answerBtn.addEventListener('click', e => {
     if (document.querySelector('input').value == missingWord) {
       quNum++;
