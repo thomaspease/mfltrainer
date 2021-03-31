@@ -16,6 +16,16 @@ exports.createTaskAndStudentTasks = catchAsync(async (req, res, next) => {
 
   const doc = await Task.create(req.body);
 
+  //Add task to the class
+  Class.findByIdAndUpdate(
+    { _id: req.body.class },
+    { $push: { tasks: doc.id } },
+    (err, user) => {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
   //Find students in the class
   const taskClass = await Class.findById(req.body.class);
   //For each student, create a studentTask, and push that studenttask to the user tasks
