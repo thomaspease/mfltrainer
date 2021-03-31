@@ -1,14 +1,21 @@
+mixin navitems
+  if (user.role === 'user')
+     a.nav__el(href='/') Train
+  if (user.role === 'teacher')
+    a.nav__el(href='/createsentences') Sentences
+  if (user.role === 'teacher')
+    a.nav__el(href='/settasks') Tasks
+
 header.header
   nav.nav
     a.nav__el.header--logo
       img(src='/img/brain-logo.png' alt='MFL Trainer logo')
-    a.nav__el(href='/') Train
-    a.nav__el(href='/createsentences') Sentences
-    a.nav__el(href='/settasks') Tasks
     if user
-      a.nav__el.nav__el--logout(href='/login') Log out
+      +navitems
+    if user
+      a.nav__el.nav__el--loginout(href='/login') Log out
       a.nav__el.nav__el--me(href='/me')
         span= user.name.split(' ')[0]
     else
-      a.nav__el(href='/login') Log in
-      a.nav__el.nav__el--cta(href='#') Sign up
+      a.nav__el.nav__el--loginout(href='/login') Log in
+      a.nav__el.nav__el--me(href='#') Sign up

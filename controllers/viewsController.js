@@ -28,6 +28,7 @@ exports.doExercise = catchAsync(async (req, res, next) => {
   res.status(200).render('train', {
     title: 'Train',
     sentences: task.sentences,
+    exercise: task.exercise,
   });
 });
 

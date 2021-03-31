@@ -23,3 +23,10 @@
 .form__input::-webkit-input-placeholder {
   color: #bbb;
 }
+
+.form__label {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+}

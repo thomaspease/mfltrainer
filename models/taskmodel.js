@@ -15,6 +15,7 @@ const taskSchema = mongoose.Schema({
   exercise: {
     type: String,
     enum: ['gapped', 'translation', 'transcription'],
+    required: true,
   },
   sentences: [
     {

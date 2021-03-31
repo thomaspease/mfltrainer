@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const studentSentenceSchema = mongoose.Schema({
   sentenceId: {
-    type: String,
+    type: ObjectId,
     required: true,
   },
   studentId: {
-    type: String,
+    type: ObjectId,
     required: true,
   },
   correctAttempts: Number,

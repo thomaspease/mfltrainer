@@ -1,0 +1,81 @@
+/*---Topline selections ---*/
+.number-sentences {
+  grid-area: number;
+}
+
+.select-class {
+  grid-area: class;
+}
+
+.select-exercise-type {
+  grid-area: type;
+}
+
+/*---VIVAREFS ---*/
+
+.label-vivaref-low {
+  grid-area: label-vivaref-low;
+}
+
+.check-vivaref-low {
+  grid-area: check-vivaref-low;
+}
+
+.vivaref-low {
+  grid-area: vivaref-low;
+}
+
+.label-vivaref-high {
+  grid-area: label-vivaref-high;
+}
+
+.check-vivaref-high {
+  grid-area: check-vivaref-high;
+}
+
+.vivaref-high {
+  grid-area: vivaref-high;
+}
+
+/*---LEVELS ---*/
+
+.label-level-low {
+  grid-area: label-level-low;
+}
+
+.check-level-low {
+  grid-area: check-level-low;
+}
+
+.level-low {
+  grid-area: level-low;
+}
+
+.label-level-high {
+  grid-area: label-level-high;
+}
+
+.check-level-high {
+  grid-area: check-level-high;
+}
+
+.level-high {
+  grid-area: level-high;
+}
+
+/*--- GRAMMAR AND TENSE ---*/
+
+.select-grammar {
+  grid-area: grammar;
+}
+
+.select-tense {
+  grid-area: tense;
+}
+
+/*---BUTTON ---*/
+
+.set-tasks-button {
+  grid-area: button;
+  margin: 2rem 10% 0 10%;
+}
