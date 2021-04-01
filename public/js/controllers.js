@@ -1,3 +1,4 @@
+// parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
 }
 
@@ -9,10 +10,7 @@ class LoginController extends Controller {
 		//Login
 		if (loginForm.exists) {
 			console.log('hello from index.js');
-			loginForm.overrideSubmit((e) => {
-				e.preventDefault();
-				const email = document.getElementById('email').value;
-				const password = document.getElementById('password').value;
+			loginForm.overrideSubmit(({email, password}) => {
 				AuthModel.login(email, password);
 			});
 		}
