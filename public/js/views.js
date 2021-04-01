@@ -1,7 +1,7 @@
 class View {
 	constructor(baseElementSelector) {
 		this.element = document.querySelector(baseElementSelector);
-
+		this.subElements = {};
 	}
 
 	get exists() {
@@ -36,5 +36,27 @@ class AlertView extends View {
 		const markup = `<div class="alert alert--${type}">${msg}</div>`;
 		document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
 		window.setTimeout(() => { this.hideAlert() }, 3000);
+	}
+}
+
+class DataParserView {
+	static get(input_name) {
+		return JSON.parse(document.querySelector(`.js-value[name="${input_name}"]`).value)
+	}
+}
+
+class TrainingView extends View {
+	constructor() {
+		super('.card__exercise');
+
+		this.subElements.prompt = this.element.querySelector('.card-title');
+	}
+
+	get prompt() {
+		return this.subElements.prompt.innerText;
+	}
+
+	set prompt(value) {
+		return this.subElements.prompt.innerText = value;
 	}
 }

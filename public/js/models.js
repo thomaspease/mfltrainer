@@ -4,8 +4,11 @@ class Model {
 	}
 
 	static getLocal(name) {
-		const data = JSON.parse(document.querySelector(`.js-value[name="${name}"]`).value)
-		return new this(data);
+		var data = DataParserView.get(name)
+		if (!(data instanceof Array)) {
+			data = [data];
+		}
+		return data.map(single => new this(single));
 	}
 }
 

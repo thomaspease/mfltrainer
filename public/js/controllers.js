@@ -25,6 +25,9 @@ class TrainController extends Controller {
 
 		const sentences = SentenceModel.getLocal('sentences');
 
+		const trainTask = new TrainingView();
+
 		console.log(sentences);
+		trainTask.prompt = sentences[0].data.sentence;
 	}
 }
