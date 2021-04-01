@@ -1,5 +1,8 @@
 extends base
 
+mixin js-value(name, value)
+    input.js-value(type="hidden" name=name value=JSON.stringify(value))
+
 block content
     main.main
         form.card
@@ -8,6 +11,7 @@ block content
                 input.form__input(type='text', placeholder='Answer', required)
                 button.btn.btn--green.btn--green__exercise Submit
                 div.card-text Diffed answer
+    +js-value('sentences', sentences)
     script
         var sentences= !{JSON.stringify(sentences)}
         //The type of exercise is passed in as the pug variable 'exercise' and will be 'gapped', 'translation', or 'transcription'
