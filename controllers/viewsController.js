@@ -50,7 +50,8 @@ exports.getSetTasksForm = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getMyClasses = catchAsync(async (req, res, next) => {
+//TEACHER CLASS MANAGEMENT
+exports.manageMyClasses = catchAsync(async (req, res, next) => {
   res.status(200).render('myclasses', {
     title: 'My classes',
   });
@@ -58,8 +59,8 @@ exports.getMyClasses = catchAsync(async (req, res, next) => {
 
 exports.getClass = catchAsync(async (req, res, next) => {
   //Find class
-  const classData = await Class.findById(req.params.class);
-  console.log(classData);
+  const classData = await Class.findById(req.params.class).populate('tasks');
+
   //Find students
   const students = await User.find(req.params);
 
@@ -67,6 +68,26 @@ exports.getClass = catchAsync(async (req, res, next) => {
     title: 'My classes',
     classData,
     students,
+  });
+});
+
+//TEACHER TASK MANAGEMENT
+exports.manageMyTasks = catchAsync(async (req, res, next) => {});
+
+exports.getTask = catchAsync(async (req, res, next) => {
+  //Find class
+  const task = await Task.findById(req.params.task);
+
+  //Find studentTasks
+  const studentTasks = await StudentTask.find({ task: req.params.task });
+
+  console.log(task);
+  console.log(studentTasks);
+
+  res.status(200).render('classoverview', {
+    title: 'My classes',
+    task,
+    studentTasks,
   });
 });
 

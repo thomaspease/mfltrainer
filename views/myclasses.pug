@@ -3,11 +3,11 @@ extends base
 block content
   main.main
     .user-view
-      block sidebar
-        nav.user-view__menu
-          ul.side-nav
-            each classes in user.class 
-              li(class=`${active ? 'side-nav--active' : ''}`)
-                a(href=`/my-classes/${classes.id}`) #{classes.name}
-      block primary
+        block sidebar
+          nav.user-view__menu
+            ul.side-nav
+              each classes in user.class 
+                li(class=`${active ? 'side-nav--active' : ''}`)
+                  a(href=`/manage-classes/${classes.id}`) #{classes.name}
+        block primary
       

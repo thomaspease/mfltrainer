@@ -9,7 +9,7 @@ block content
                 div.card-text.card-text--bold Completed?
                 each thing in studentTasks
                     a.card-text.card-text--bold(href=`/train/${thing.id}`) #{thing.task[0].name}
-                    div.card-text.card-text--bold #{thing.task[0].dueDate}
+                    div.card-text.card-text--bold #{thing.task[0].dueDate.toDateString()}
                     div.card-text.card-text--bold #{JSON.stringify(thing.completed)}
                 div.card-text.card-text--italic
 

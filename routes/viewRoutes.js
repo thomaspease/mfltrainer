@@ -18,11 +18,27 @@ router.get(
   viewsController.getSetTasksForm
 );
 
-router.get('/my-classes', authController.protect, viewsController.getMyClasses);
 router.get(
-  '/my-classes/:class',
+  '/manage-classes',
+  authController.protect,
+  viewsController.manageMyClasses
+);
+router.get(
+  '/manage-classes/:class',
   authController.protect,
   viewsController.getClass
+);
+
+//This isn't yet implemented or thought through
+router.get(
+  '/manage-tasks',
+  authController.protect,
+  viewsController.manageMyTasks
+);
+router.get(
+  '/manage-tasks/:task',
+  authController.protect,
+  viewsController.getTask
 );
 
 router.get('/me', authController.protect, viewsController.getAccount);
