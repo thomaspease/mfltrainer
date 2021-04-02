@@ -336,9 +336,51 @@ class AuthModel extends Model {
 
 exports.AuthModel = AuthModel;
 
-class SentenceModel extends Model {}
+class SentenceModel extends Model {
+  // type is 'gap' or 'translation'
+  subclassAs(type) {
+    switch (type) {
+      case 'gap':
+        return new GappedSentenceModel(this.data);
+
+      case 'translation':
+        return new TranslationSentenceModel(this.data);
+    }
+  }
+
+  get prompt() {
+    return this.data.sentence;
+  }
+
+  get answer() {
+    return this.data.translation;
+  }
+
+}
 
 exports.SentenceModel = SentenceModel;
+
+class GappedSentenceModel extends SentenceModel {
+  constructor(data) {
+    super(data);
+    const words = this.data.sentence.trim().split(/\s+/g);
+    const gapIndex = Math.floor(Math.random() * words.length); // TODO handle punctuation
+
+    const gapWord = words[gapIndex];
+    words[gapIndex] = '___';
+    this.gapWord = gapWord;
+    this.gappedPrompt = words.join(' ');
+  }
+
+  get prompt() {
+    return this.gappedPrompt;
+  }
+
+  get answer() {
+    return this.gapWord;
+  }
+
+}
 },{"./views.js":"views.js"}],"controllers.js":[function(require,module,exports) {
 "use strict";
 
@@ -382,7 +424,7 @@ class TrainController extends Controller {
     super();
     const desiredReaskLength = 3;
 
-    const sentences = _models.SentenceModel.getLocal('sentences');
+    const sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('gap'));
 
     const finishedSentences = [];
     const trainTask = new _views.TrainingView();
@@ -416,13 +458,14 @@ class TrainController extends Controller {
 
     function doNextSentence() {
       if (!sentences[0]) {
-        trainTask.finish();
+        trainTask.finish(); // TODO send an ajax request to the server
+
         return;
       }
 
-      const sentenceData = sentences[0].data;
-      trainTask.prompt = sentenceData.sentence;
-      trainTask.answer = sentenceData.translation;
+      const sentence = sentences[0];
+      trainTask.prompt = sentence.prompt;
+      trainTask.answer = sentence.answer;
     }
 
     doNextSentence();

@@ -47,5 +47,47 @@ export class AuthModel extends Model {
 }
 
 export class SentenceModel extends Model {
-	
+	// type is 'gap' or 'translation'
+	subclassAs(type) {
+		switch(type) {
+			case 'gap':
+				return new GappedSentenceModel(this.data);
+			case 'translation':
+				return new TranslationSentenceModel(this.data);
+		}
+	}
+	get prompt() {
+		return this.data.sentence;
+	}
+
+	get answer() {
+		return this.data.translation;
+	}
+}
+
+class GappedSentenceModel extends SentenceModel {
+	constructor(data) {
+		super(data);
+
+		const words = this.data.sentence.trim().split(/\s+/g);
+		const gapIndex = Math.floor(Math.random() * words.length);
+
+		// TODO handle punctuation
+		const gapWord = words[gapIndex];
+		words[gapIndex] = '___';
+
+		this.gapWord = gapWord;
+		this.gappedPrompt = words.join(' ');
+	}
+
+	get prompt() {
+		return this.gappedPrompt;
+	}
+
+	get answer() {
+		return this.gapWord;
+	}
+}
+
+class TranslationSentenceModel extends SentenceModel {
 }

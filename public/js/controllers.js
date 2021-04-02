@@ -27,7 +27,7 @@ export class TrainController extends Controller {
 
 		const desiredReaskLength = 3;
 
-		const sentences = SentenceModel.getLocal('sentences');
+		const sentences = SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('gap'));
 		const finishedSentences = [];
 
 		const trainTask = new TrainingView();
@@ -64,10 +64,10 @@ export class TrainController extends Controller {
 				return;
 			}
 
-			const sentenceData = sentences[0].data;
+			const sentence = sentences[0];
 
-			trainTask.prompt = sentenceData.sentence;
-			trainTask.answer = sentenceData.translation;
+			trainTask.prompt = sentence.prompt;
+			trainTask.answer = sentence.answer;
 		}
 
 		doNextSentence();
