@@ -199,13 +199,15 @@ class AlertView extends View {
     const markup = "<div class=\"alert alert--".concat(type, "\">").concat(msg, "</div>");
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
     window.setTimeout(() => {
-      this.hideAlert();
+      this.hide();
     }, 3000);
   }
 
 }
 
 exports.AlertView = AlertView;
+
+window.onerror = err => AlertView.show('error', err);
 
 class DataParserView extends View {
   static get(input_name) {
@@ -221,26 +223,42 @@ class TrainingView extends FormView {
   constructor() {
     super('form.card');
     this.elements.prompt = this.root.querySelector('.card-title');
-    this.elements.input = this.root.querySelector('.student-answer');
+    this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
     this.overrideSubmit((_ref) => {
       let {
         student_answer
       } = _ref;
-      alert(student_answer);
 
       function normalize(str) {
         return str.toLowerCase().trim().replace(/\s+/g, ' ');
-      }
+      } // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
+
 
       const isCorrect = normalize(student_answer) == normalize(this.answer);
       this.elements.answer_feedback.innerText = this.answer;
-      alert(isCorrect);
-      this.trigger('answer', {
-        student_answer,
-        isCorrect
-      });
+      this.elements.input.disabled = 'disabled';
+
+      try {
+        this.trigger('answer', {
+          student_answer,
+          isCorrect
+        });
+      } catch (err) {
+        alert(err);
+      } finally {
+        setTimeout(() => {
+          this.elements.input.disabled = undefined;
+          this.elements.input.value = '';
+          this.trigger('next');
+        }, 1000);
+      }
     });
+  }
+
+  finish() {
+    this.prompt = 'done';
+    this.elements.input.disabled = 'disabled';
   }
 
   get prompt() {
@@ -391,12 +409,17 @@ class TrainController extends Controller {
       } else {
         wrongCount++;
         const insertionIndex = Math.min(sentences.length, desiredReaskLength);
-        sentences.splice(insertionIndex, sentenceObject);
+        sentences.splice(insertionIndex, 0, sentenceObject);
       }
     });
     trainTask.on('next', doNextSentence);
 
     function doNextSentence() {
+      if (!sentences[0]) {
+        trainTask.finish();
+        return;
+      }
+
       const sentenceData = sentences[0].data;
       trainTask.prompt = sentenceData.sentence;
       trainTask.answer = sentenceData.translation;

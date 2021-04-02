@@ -73,9 +73,11 @@ export class AlertView extends View {
 		this.hide();
 		const markup = `<div class="alert alert--${type}">${msg}</div>`;
 		document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-		window.setTimeout(() => { this.hideAlert() }, 3000);
+		window.setTimeout(() => { this.hide() }, 3000);
 	}
 }
+
+window.onerror = (err) => AlertView.show('error', err)
 
 export class DataParserView extends View {
 	static get(input_name) {
@@ -91,11 +93,10 @@ export class TrainingView extends FormView {
 		super('form.card');
 
 		this.elements.prompt = this.root.querySelector('.card-title');
-		this.elements.input = this.root.querySelector('.student-answer');
+		this.elements.input = this.root.querySelector('[name=student_answer]');
 		this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
 
 		this.overrideSubmit(({student_answer}) => {
-			alert(student_answer)
 			function normalize(str) {
 				return str.toLowerCase().trim().replace(/\s+/g, ' ')
 			}
@@ -103,21 +104,26 @@ export class TrainingView extends FormView {
 			const isCorrect = normalize(student_answer) == normalize(this.answer)
 
 			this.elements.answer_feedback.innerText = this.answer;
-			alert(isCorrect)
 
-			this.input.disabled = 'disabled';
-
+			this.elements.input.disabled = 'disabled';
 
 			try {
 				this.trigger('answer', {student_answer, isCorrect});
+			} catch(err) {
+				alert(err);
 			} finally {
 				setTimeout(() => {
-					this.input.disabled = undefined;
-					this.input.value = '';
+					this.elements.input.disabled = undefined;
+					this.elements.input.value = '';
 					this.trigger('next');
 				}, 1000)
 			}
 		})
+	}
+
+	finish() {
+		this.prompt = 'done';
+		this.elements.input.disabled = 'disabled';
 	}
 
 	get prompt() {

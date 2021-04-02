@@ -51,13 +51,19 @@ export class TrainController extends Controller {
 				wrongCount++;
 				const insertionIndex = Math.min(sentences.length, desiredReaskLength);
 
-				sentences.splice(insertionIndex, sentenceObject);
+				sentences.splice(insertionIndex, 0, sentenceObject);
 			}
 		});
 
 		trainTask.on('next', doNextSentence);
 
 		function doNextSentence() {
+			if (!sentences[0]) {
+				trainTask.finish();
+				// TODO send an ajax request to the server
+				return;
+			}
+
 			const sentenceData = sentences[0].data;
 
 			trainTask.prompt = sentenceData.sentence;
