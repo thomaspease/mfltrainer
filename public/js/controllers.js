@@ -27,7 +27,7 @@ export class TrainController extends Controller {
 
 		const desiredReaskLength = 3;
 
-		const sentences = SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('gap'));
+		const sentences = SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
 		const finishedSentences = [];
 
 		const trainTask = new TrainingView();

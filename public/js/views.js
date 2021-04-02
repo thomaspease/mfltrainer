@@ -1,3 +1,5 @@
+import { diffWords} from 'diff'
+
 class View {
 	constructor(baseElementSelector) {
 		this.root = document.querySelector(baseElementSelector);
@@ -103,7 +105,21 @@ export class TrainingView extends FormView {
 			// TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
 			const isCorrect = normalize(student_answer) == normalize(this.answer)
 
-			this.elements.answer_feedback.innerText = this.answer;
+			const diffs = diffWords(this.answer, student_answer, { ignoreCase: true })
+
+			const feedback = diffs.map((diff, index) => {
+				if (diff.added) {
+					return '';
+				}
+
+				const elClass = diff.removed ? 'highlight-wrong' : 'highlight-right';
+				// using some index-juggling in order to avoid having to worry about HTML injection
+				return `<span class="${elClass}">${index}</span>`;
+			})
+			this.elements.answer_feedback.innerHTML = feedback.join('');
+			Array.from(this.elements.answer_feedback.querySelectorAll('span')).forEach(span => {
+				span.innerText = diffs[span.innerText].value;
+			})
 
 			this.elements.input.disabled = 'disabled';
 
