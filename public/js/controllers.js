@@ -25,11 +25,45 @@ export class TrainController extends Controller {
 	constructor() {
 		super();
 
+		const desiredReaskLength = 3;
+
 		const sentences = SentenceModel.getLocal('sentences');
+		const finishedSentences = [];
 
 		const trainTask = new TrainingView();
 
 		console.log(sentences);
-		trainTask.prompt = sentences[0].data.sentence;
+
+		const initialCount = sentences.length;
+		var rightCount = 0;
+		var wrongCount = 0;
+
+		// TODO DESIGN QUESTION:
+		//  should we calculate isCorrect inside the view? That would break separation of concerns, but would involve a smaller amount of back-and-forth data calls
+		//  but, on the flip side, the controller needing to know exactly what to update in the view is *also* a bit of a conceptual leak...
+		trainTask.on('answer', ({student_answer, isCorrect}) => {
+			const sentenceObject = sentences.shift();
+			finishedSentences.push({sentenceObject, isCorrect});
+
+			if (isCorrect) {
+				rightCount++;
+			} else {
+				wrongCount++;
+				const insertionIndex = Math.min(sentences.length, desiredReaskLength);
+
+				sentences.splice(insertionIndex, sentenceObject);
+			}
+		});
+
+		trainTask.on('next', doNextSentence);
+
+		function doNextSentence() {
+			const sentenceData = sentences[0].data;
+
+			trainTask.prompt = sentenceData.sentence;
+			trainTask.answer = sentenceData.translation;
+		}
+
+		doNextSentence();
 	}
 }

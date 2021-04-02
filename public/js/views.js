@@ -2,10 +2,26 @@ class View {
 	constructor(baseElementSelector) {
 		this.root = document.querySelector(baseElementSelector);
 		this.elements = {};
+		this.listeners = {};
 	}
 
 	get exists() {
 		return !!this.root;
+	}
+
+	on(event, callback) {
+		if (!this.listeners[event]) {
+			this.listeners[event] = [];
+		}
+
+		this.listeners[event].push(callback);
+	}
+
+	trigger(event, data) {
+		const listeners = this.listeners[event];
+		if (listeners) {
+			listeners.forEach(callback => callback(data));
+		}
 	}
 }
 
@@ -70,11 +86,38 @@ export class DataParserView extends View {
 
 // SPECIFIC PAGES
 
-export class TrainingView extends View {
+export class TrainingView extends FormView {
 	constructor() {
-		super('.card__exercise');
+		super('form.card');
 
 		this.elements.prompt = this.root.querySelector('.card-title');
+		this.elements.input = this.root.querySelector('.student-answer');
+		this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
+
+		this.overrideSubmit(({student_answer}) => {
+			alert(student_answer)
+			function normalize(str) {
+				return str.toLowerCase().trim().replace(/\s+/g, ' ')
+			}
+			// TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
+			const isCorrect = normalize(student_answer) == normalize(this.answer)
+
+			this.elements.answer_feedback.innerText = this.answer;
+			alert(isCorrect)
+
+			this.input.disabled = 'disabled';
+
+
+			try {
+				this.trigger('answer', {student_answer, isCorrect});
+			} finally {
+				setTimeout(() => {
+					this.input.disabled = undefined;
+					this.input.value = '';
+					this.trigger('next');
+				}, 1000)
+			}
+		})
 	}
 
 	get prompt() {
