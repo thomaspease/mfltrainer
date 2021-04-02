@@ -1,3 +1,5 @@
+import { AlertView, DataParserView } from './views.js'
+
 // parent class for models. includes some utility methods, and such
 // 
 // if we wanted to get fancy, we might consider picking up the mongoose model definitions, and making use of that somehow.
@@ -19,7 +21,7 @@ class Model {
 	}
 }
 
-class AuthModel extends Model {
+export class AuthModel extends Model {
 	static async login(email, password) {
 		try {
 			const res = await fetch('api/v1/users/login', {
@@ -44,6 +46,6 @@ class AuthModel extends Model {
 
 }
 
-class SentenceModel extends Model {
+export class SentenceModel extends Model {
 	
 }

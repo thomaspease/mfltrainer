@@ -37,7 +37,7 @@ class FormView extends View {
 	}
 }
 
-class LoginFormView extends FormView {
+export class LoginFormView extends FormView {
 	constructor() {
 		super('.form--login')
 	}
@@ -46,7 +46,7 @@ class LoginFormView extends FormView {
 
 // GENERIC DOM MANIP
 
-class AlertView extends View {
+export class AlertView extends View {
 	static hide() {
 		const el = document.querySelector('.alert');
 		if (el) el.parentElement.removeChild(el);
@@ -61,7 +61,7 @@ class AlertView extends View {
 	}
 }
 
-class DataParserView extends View {
+export class DataParserView extends View {
 	static get(input_name) {
 		return JSON.parse(document.querySelector(`.js-value[name="${input_name}"]`).value)
 	}
@@ -70,7 +70,7 @@ class DataParserView extends View {
 
 // SPECIFIC PAGES
 
-class TrainingView extends View {
+export class TrainingView extends View {
 	constructor() {
 		super('.card__exercise');
 

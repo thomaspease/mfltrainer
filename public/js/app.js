@@ -1,4 +1,7 @@
-// TODO decide if this needs to be any fancier? (well, other than using proper `require` once I get parcel working)
+import { LoginController, TrainController } from './controllers.js';
+
+// TODO decide if this file needs to be any fancier?
+alert('test')
 
 const loginController = new LoginController();
 const trainController = new TrainController();

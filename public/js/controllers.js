@@ -1,8 +1,12 @@
+import { LoginFormView, TrainingView } from './views.js';
+import { AuthModel, SentenceModel } from './models.js';
+
+
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
 }
 
-class LoginController extends Controller {
+export class LoginController extends Controller {
 	constructor() {
 		super()
 		const loginForm = new LoginFormView();
@@ -17,7 +21,7 @@ class LoginController extends Controller {
 	}
 }
 
-class TrainController extends Controller {
+export class TrainController extends Controller {
 	constructor() {
 		super();
 
