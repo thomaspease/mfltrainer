@@ -107,15 +107,25 @@ export class TrainingView extends FormView {
 		this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
 		this.elements.correct_answer = this.root.querySelector('.correct-answer');
 
-		this.overrideSubmit(({student_answer}) => {
-			function normalize(str) {
-				return str.toLowerCase().trim().replace(/\s+/g, ' ')
-			}
-			// TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
-			const isCorrect = normalize(student_answer) == normalize(this.answer)
+		this.overrideSubmit(data => this.handleStudentAnswer(data));
+	}
 
-			const diffs = diffWords(this.answer, student_answer, { ignoreCase: true })
+	handleStudentAnswer({student_answer}) {
 
+		// CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
+
+		function normalize(str) {
+			return str.toLowerCase().trim().replace(/\s+/g, ' ')
+		}
+
+		// TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
+		const isCorrect = normalize(student_answer) == normalize(this.answer)
+
+		const diffs = diffWords(this.answer, student_answer, { ignoreCase: true })
+		
+
+		// DISPLAY CALCULATED DATA
+		{
 			// NOTE from Heather to Tom:
 			//   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
 			this.setAsHighlightedSpan(
@@ -128,7 +138,11 @@ export class TrainingView extends FormView {
 			)
 
 			this.elements.correct_answer.innerText = this.answer;
+		}
 
+
+		// SET UP DOM STATE
+		{
 			this.elements.input.disabled = 'disabled';
 			this.hideElement('input');
 			this.showElement('answer_feedback');
@@ -146,10 +160,11 @@ export class TrainingView extends FormView {
 					this.trigger('next');
 				}, 1000)
 			}
-		})
-	}
+		}
+	})
 
-	// this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output
+	// this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output.
+	// also, this could live in one of the parent classes, if it ends up being useful elsewhere.
 	//
 	// `elementName` is the string name of some element that this view tracks
 	// `array` is expected to be an array of items with at least a `value` property
