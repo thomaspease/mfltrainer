@@ -4,6 +4,7 @@ class View {
 	constructor(baseElementSelector) {
 		this.root = document.querySelector(baseElementSelector);
 		this.elements = {};
+		this.elementGroups = {};
 		this.listeners = {};
 	}
 
@@ -13,6 +14,16 @@ class View {
 
 	showElement(name) {
 		this.elements[name].style.display = '';
+	}
+
+	defineElementGroup(groupName, elementNameArray) {
+		this.elementGroups[groupName] = elementNameArray;
+	}
+	showGroup(groupName) {
+		this.elementGroups[groupName].forEach(elementName => this.showElement(elementName));
+	}
+	hideGroup(groupName) {
+		this.elementGroups[groupName].forEach(elementName => this.hideElement(elementName));
 	}
 
 	get exists() {
@@ -102,12 +113,37 @@ export class TrainingView extends FormView {
 	constructor() {
 		super('form.card');
 
+		// get our sub-elements
 		this.elements.prompt = this.root.querySelector('.card-title');
 		this.elements.input = this.root.querySelector('[name=student_answer]');
 		this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
 		this.elements.correct_answer = this.root.querySelector('.correct-answer');
+		this.elements.submit_button = this.root.querySelector('button[type=submit]')
+		this.elements.next_button = this.root.querySelector('button[type=button].btn-next')
 
+		// define some groups of elements
+		this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
+		this.defineElementGroup('dataEntry', ['input', 'submit_button']);
+
+		// prep DOM
+		this.hideGroup('feedback');
+		this.clearAnswerText();
+
+		// set up event listeners
 		this.overrideSubmit(data => this.handleStudentAnswer(data));
+		this.elements.next_button.addEventListener('click', () => {
+			this.hideGroup('feedback');
+			this.showGroup('dataEntry');
+
+			this.clearAnswerText();
+
+			this.trigger('next')
+		})
+	}
+
+	clearAnswerText() {
+		this.elements.input.value = '';
+		this.elements.correct_answer.innerText = '';
 	}
 
 	handleStudentAnswer({student_answer}) {
@@ -143,25 +179,12 @@ export class TrainingView extends FormView {
 
 		// SET UP DOM STATE
 		{
-			this.elements.input.disabled = 'disabled';
-			this.hideElement('input');
-			this.showElement('answer_feedback');
+			this.hideGroup('dataEntry');
+			this.showGroup('feedback');
 
-			try {
-				this.trigger('answer', {student_answer, isCorrect});
-			} catch(err) {
-				alert(err);
-			} finally {
-				setTimeout(() => {
-					this.elements.input.disabled = undefined;
-					this.showElement('input');
-					this.hideElement('answer_feedback');
-					this.elements.input.value = '';
-					this.trigger('next');
-				}, 1000)
-			}
+			this.trigger('answer', {student_answer, isCorrect});
 		}
-	})
+	}
 
 	// this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output.
 	// also, this could live in one of the parent classes, if it ends up being useful elsewhere.
@@ -189,7 +212,8 @@ export class TrainingView extends FormView {
 
 	finish() {
 		this.prompt = 'done';
-		this.elements.input.disabled = 'disabled';
+		this.hideGroup('dataEntry');
+		this.hideGroup('feedback');
 	}
 
 	get prompt() {

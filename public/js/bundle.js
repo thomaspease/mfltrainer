@@ -1725,6 +1725,7 @@ class View {
   constructor(baseElementSelector) {
     this.root = document.querySelector(baseElementSelector);
     this.elements = {};
+    this.elementGroups = {};
     this.listeners = {};
   }
 
@@ -1734,6 +1735,18 @@ class View {
 
   showElement(name) {
     this.elements[name].style.display = '';
+  }
+
+  defineElementGroup(groupName, elementNameArray) {
+    this.elementGroups[groupName] = elementNameArray;
+  }
+
+  showGroup(groupName) {
+    this.elementGroups[groupName].forEach(elementName => this.showElement(elementName));
+  }
+
+  hideGroup(groupName) {
+    this.elementGroups[groupName].forEach(elementName => this.hideElement(elementName));
   }
 
   get exists() {
@@ -1825,54 +1838,70 @@ exports.DataParserView = DataParserView;
 
 class TrainingView extends FormView {
   constructor() {
-    super('form.card');
+    super('form.card'); // get our sub-elements
+
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
     this.elements.correct_answer = this.root.querySelector('.correct-answer');
-    this.overrideSubmit((_ref) => {
-      let {
-        student_answer
-      } = _ref;
+    this.elements.submit_button = this.root.querySelector('button[type=submit]');
+    this.elements.next_button = this.root.querySelector('button[type=button].btn-next'); // define some groups of elements
 
-      function normalize(str) {
-        return str.toLowerCase().trim().replace(/\s+/g, ' ');
-      } // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
+    this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
+    this.defineElementGroup('dataEntry', ['input', 'submit_button']); // prep DOM
+
+    this.hideGroup('feedback'); // set up event listeners
+
+    this.overrideSubmit(data => this.handleStudentAnswer(data));
+    this.elements.next_button.addEventListener('click', () => {
+      this.hideGroup('feedback');
+      this.showGroup('dataEntry');
+      this.clearAnswerText();
+      this.trigger('next');
+    });
+  }
+
+  clearAnswerText() {
+    this.elements.input.value = '';
+    this.elements.correct_answer.innerText = '';
+  }
+
+  handleStudentAnswer(_ref) {
+    let {
+      student_answer
+    } = _ref;
+
+    // CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
+    function normalize(str) {
+      return str.toLowerCase().trim().replace(/\s+/g, ' ');
+    } // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
 
 
-      const isCorrect = normalize(student_answer) == normalize(this.answer);
-      const diffs = (0, _diff.diffWords)(this.answer, student_answer, {
-        ignoreCase: true
-      }); // NOTE from Heather to Tom:
+    const isCorrect = normalize(student_answer) == normalize(this.answer);
+    const diffs = (0, _diff.diffWords)(this.answer, student_answer, {
+      ignoreCase: true
+    }); // DISPLAY CALCULATED DATA
+
+    {
+      // NOTE from Heather to Tom:
       //   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
-
       this.setAsHighlightedSpan( // element name
       'answer_feedback', // pass only the diff entries that we want to display
       diffs.filter(diff => !diff.removed), // CSS class name callback
       diff => diff.added ? 'highlight-wrong' : 'highlight-right');
       this.elements.correct_answer.innerText = this.answer;
-      this.elements.input.disabled = 'disabled';
-      this.hideElement('input');
-      this.showElement('answer_feedback');
+    } // SET UP DOM STATE
 
-      try {
-        this.trigger('answer', {
-          student_answer,
-          isCorrect
-        });
-      } catch (err) {
-        alert(err);
-      } finally {
-        setTimeout(() => {
-          this.elements.input.disabled = undefined;
-          this.showElement('input');
-          this.hideElement('answer_feedback');
-          this.elements.input.value = '';
-          this.trigger('next');
-        }, 1000);
-      }
-    });
-  } // this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output
+    {
+      this.hideGroup('dataEntry');
+      this.showGroup('feedback');
+      this.trigger('answer', {
+        student_answer,
+        isCorrect
+      });
+    }
+  } // this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output.
+  // also, this could live in one of the parent classes, if it ends up being useful elsewhere.
   //
   // `elementName` is the string name of some element that this view tracks
   // `array` is expected to be an array of items with at least a `value` property
@@ -1896,7 +1925,8 @@ class TrainingView extends FormView {
 
   finish() {
     this.prompt = 'done';
-    this.elements.input.disabled = 'disabled';
+    this.hideGroup('dataEntry');
+    this.hideGroup('feedback');
   }
 
   get prompt() {

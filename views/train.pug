@@ -11,7 +11,8 @@ block content
                 div.card-title.card-text.card-text--bold Question text
                 input.form__input(type='text', name='student_answer', placeholder='Answer', required)
                 span.answer-feedback.card-text Diffed answer
-                button.btn.btn--green.btn--green__exercise Submit
+                button.btn.btn--green.btn--green__exercise(type="submit") Submit
+                button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
                 div.correct-answer.card-text Correct answer
     +js-value('sentences', sentences)
     script
