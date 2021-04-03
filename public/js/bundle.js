@@ -1728,6 +1728,14 @@ class View {
     this.listeners = {};
   }
 
+  hideElement(name) {
+    this.elements[name].style.display = 'none';
+  }
+
+  showElement(name) {
+    this.elements[name].style.display = '';
+  }
+
   get exists() {
     return !!this.root;
   }
@@ -1821,6 +1829,7 @@ class TrainingView extends FormView {
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
+    this.elements.correct_answer = this.root.querySelector('.correct-answer');
     this.overrideSubmit((_ref) => {
       let {
         student_answer
@@ -1836,11 +1845,11 @@ class TrainingView extends FormView {
         ignoreCase: true
       });
       const feedback = diffs.map((diff, index) => {
-        if (diff.added) {
+        if (diff.removed) {
           return '';
         }
 
-        const elClass = diff.removed ? 'highlight-wrong' : 'highlight-right'; // using some index-juggling in order to avoid having to worry about HTML injection
+        const elClass = diff.added ? 'highlight-wrong' : 'highlight-right'; // using some index-juggling in order to avoid having to worry about HTML injection
 
         return "<span class=\"".concat(elClass, "\">").concat(index, "</span>");
       });
@@ -1848,7 +1857,10 @@ class TrainingView extends FormView {
       Array.from(this.elements.answer_feedback.querySelectorAll('span')).forEach(span => {
         span.innerText = diffs[span.innerText].value;
       });
+      this.elements.correct_answer.innerText = this.answer;
       this.elements.input.disabled = 'disabled';
+      this.hideElement('input');
+      this.showElement('answer_feedback');
 
       try {
         this.trigger('answer', {
@@ -1860,6 +1872,8 @@ class TrainingView extends FormView {
       } finally {
         setTimeout(() => {
           this.elements.input.disabled = undefined;
+          this.showElement('input');
+          this.hideElement('answer_feedback');
           this.elements.input.value = '';
           this.trigger('next');
         }, 1000);

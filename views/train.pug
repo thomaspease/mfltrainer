@@ -9,9 +9,10 @@ block content
         form.card
             .card__exercise
                 div.card-title.card-text.card-text--bold Question text
-                input.form__input(type='text', placeholder='Answer', required)
+                input.form__input(type='text', name='student_answer', placeholder='Answer', required)
+                span.answer-feedback.card-text Diffed answer
                 button.btn.btn--green.btn--green__exercise Submit
-                div.card-text Diffed answer
+                div.correct-answer.card-text Correct answer
     +js-value('sentences', sentences)
     script
         var sentences= !{JSON.stringify(sentences)}
