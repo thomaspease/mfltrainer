@@ -1843,20 +1843,13 @@ class TrainingView extends FormView {
       const isCorrect = normalize(student_answer) == normalize(this.answer);
       const diffs = (0, _diff.diffWords)(this.answer, student_answer, {
         ignoreCase: true
-      });
-      const feedback = diffs.map((diff, index) => {
-        if (diff.removed) {
-          return '';
-        }
+      }); // NOTE from Heather to Tom:
+      //   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
 
-        const elClass = diff.added ? 'highlight-wrong' : 'highlight-right'; // using some index-juggling in order to avoid having to worry about HTML injection
-
-        return "<span class=\"".concat(elClass, "\">").concat(index, "</span>");
-      });
-      this.elements.answer_feedback.innerHTML = feedback.join('');
-      Array.from(this.elements.answer_feedback.querySelectorAll('span')).forEach(span => {
-        span.innerText = diffs[span.innerText].value;
-      });
+      this.setAsHighlightedSpan( // element name
+      'answer_feedback', // pass only the diff entries that we want to display
+      diffs.filter(diff => !diff.removed), // CSS class name callback
+      diff => diff.added ? 'highlight-wrong' : 'highlight-right');
       this.elements.correct_answer.innerText = this.answer;
       this.elements.input.disabled = 'disabled';
       this.hideElement('input');
@@ -1878,6 +1871,26 @@ class TrainingView extends FormView {
           this.trigger('next');
         }, 1000);
       }
+    });
+  } // this method replaces the content of an element with a set of highlighted/styled spans, such as you might want if you're presenting diff output
+  //
+  // `elementName` is the string name of some element that this view tracks
+  // `array` is expected to be an array of items with at least a `value` property
+  // `classNameCallback` is a callback that spits out the CSS classes, space-separated, that go with each entry of the array
+
+
+  setAsHighlightedSpan(elementName, array, classNameCallback) {
+    const baseEl = this.elements[elementName]; // keep track of the index so that we can do a .innerText later (thus bypassing issues with HTML injection / XSS)
+
+    const spans = array.map((entry, index) => {
+      const elClass = classNameCallback(entry); // using some index-juggling in order to avoid having to worry about HTML injection
+
+      return "<span class=\"".concat(elClass, "\">").concat(index, "</span>");
+    });
+    baseEl.innerHTML = spans.join(''); // now we can safely assign user-defined text, via `.innerText` (which doesn't get parsed as HTML)
+
+    Array.from(baseEl.querySelectorAll('span')).forEach(span => {
+      span.innerText = array[span.innerText].value;
     });
   }
 
