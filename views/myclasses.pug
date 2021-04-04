@@ -1,13 +1,14 @@
 extends base
 
+mixin classcard(className, classId)
+  .classlist-card
+    h2.classlist-card__heading #{className}
+    div.classlist-card__footer
+      a.btn.btn--green.btn--green__classlist-card(href=`/manage-classes/${classId}`) Manage class      
+
 block content
   main.main
-    .user-view
-        block sidebar
-          nav.user-view__menu
-            ul.side-nav
-              each classes in user.class 
-                li(class=`${active ? 'side-nav--active' : ''}`)
-                  a(href=`/manage-classes/${classes.id}`) #{classes.name}
-        block primary
-      
+    .classlist-container
+      each classData in user.class
+        +classcard(classData.name, classData.id)
+        

@@ -1,3 +1,12 @@
+mixin content 
+  block content
+  if (user.role === 'teacher')
+    include _sidebar
+    
+    block teacher-content 
+  else if (user.role === 'user')
+    block user-content
+
 doctype html
 html
   head
@@ -15,8 +24,8 @@ html
     
     container.container
       // CONTENT
-      block content
-        h1 This is a placeholder heading
+      if user
+        +content
         
       // FOOTER
       include _footer

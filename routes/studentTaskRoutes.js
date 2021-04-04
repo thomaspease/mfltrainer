@@ -5,11 +5,13 @@ const authController = require('../controllers/authController');
 ////// ROUTER
 const router = express.Router({ mergeParams: true });
 
-router.route('/:id').delete(studentTaskController.deleteStudentTaskAndChild);
+router
+  .route('/:id')
+  .delete(studentTaskController.deleteStudentTaskAndObjectIdRef);
 
 router
-  .route('/delete-student-child/:id')
-  .delete(studentTaskController.deleteUserTaskChild);
+  .route('/delete-reference-in-user-doc/:id')
+  .delete(studentTaskController.deleteObjectIdRef);
 
 // router.route('/teacher-set').post(taskController.teacherSetTask);
 

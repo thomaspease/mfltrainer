@@ -1,0 +1,23 @@
+extends base 
+
+mixin row(name, completed, percentCorrect)
+    tr  
+        td.td-left #{name}
+        td #{completed}
+        td #{due}
+
+block content
+    main.main
+        div.card-container
+            h2.heading-secondary.ma-bt-md #{task.name}
+            div.card
+                table
+                    thead
+                        tr
+                            th Name 
+                            th Completed 
+                            th.td-right Correct %
+                            
+                    tbody
+                        each studentTask in studentTasks
+                            +row(studentTask.student.name, studentTask.completed, studentTask.percentCorrect)

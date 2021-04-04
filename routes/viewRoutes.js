@@ -8,12 +8,12 @@ router.get('/', authController.isLoggedIn, viewsController.displayTasks);
 router.get('/train/:id', authController.isLoggedIn, viewsController.doExercise);
 router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 router.get(
-  '/createsentences',
+  '/create-sentence',
   authController.protect,
   viewsController.getCreateSentenceForm
 );
 router.get(
-  '/settasks',
+  '/create-task',
   authController.protect,
   viewsController.getSetTasksForm
 );

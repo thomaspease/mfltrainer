@@ -7,17 +7,17 @@ const studentTaskSchema = mongoose.Schema({
       ref: 'Task',
     },
   ],
-  student: [
+  user: [
     {
       type: mongoose.Schema.ObjectId,
-      ref: 'Student',
+      ref: 'User',
     },
   ],
   completed: {
     type: Boolean,
     default: false,
   },
-  percentComplete: Number,
+  percentCorrect: Number,
   rightAnswers: Number,
   wrongAnswers: Number,
 });

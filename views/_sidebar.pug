@@ -1,0 +1,13 @@
+mixin navItem(link, text, active)
+  li(class=`${active ? 'side-nav--active' : ''}`)
+    a(href=`${link}`) #{text}
+
+nav.sidebar
+    h5.admin-nav__heading Create
+    ul.side-nav
+        +navItem('/create-sentence', 'Sentences', true)
+        +navItem('/create-task', 'Tasks')
+    h5.admin-nav__heading Manage
+    ul.side-nav
+        +navItem('/manage-classes', 'Classes')
+        +navItem('/manage-tasks', 'Tasks')

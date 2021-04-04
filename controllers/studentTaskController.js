@@ -4,6 +4,7 @@ const StudentTask = require('../models/studenttaskmodel');
 const factory = require('./handlerFactory');
 const User = require('../models/usermodel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 exports.getAllStudentTasks = factory.getAll(StudentTask);
 
@@ -11,7 +12,7 @@ exports.getStudentTasksFromStudentId = catchAsync(async (Id) => {
   return await StudentTask.find({ student: Id });
 });
 
-exports.deleteUserTaskChild = catchAsync(async (req, res, next) => {
+exports.deleteObjectIdRef = catchAsync(async (req, res, next) => {
   const student = await StudentTask.findById(req.params.id);
 
   const doc = User.findByIdAndUpdate(
@@ -34,7 +35,7 @@ exports.deleteUserTaskChild = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteStudentTaskAndChild = catchAsync(async (req, res, next) => {
+exports.deleteStudentTaskAndObjectIdRef = catchAsync(async (req, res, next) => {
   const student = await StudentTask.findById(req.params.id);
   const doc = await StudentTask.findByIdAndDelete(req.params.id);
 

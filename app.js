@@ -13,7 +13,6 @@ const cookieParser = require('cookie-parser');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const sentenceRouter = require('./routes/sentenceRoutes');
-const frequencyRouter = require('./routes/frequencyRoutes');
 const userRouter = require('./routes/userRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const classRouter = require('./routes/classRoutes');
@@ -72,7 +71,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 //ROUTES
 app.use('/', viewRouter);
 app.use('/api/v1/sentences', sentenceRouter);
-app.use('/api/v1/frequency', frequencyRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/classes', classRouter);
 app.use('/api/v1/tasks', taskRouter);

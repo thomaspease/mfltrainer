@@ -49,12 +49,6 @@ const userSchema = new mongoose.Schema(
       default: true,
       select: false,
     },
-    sentences: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Sentence',
-      },
-    ],
     class: [
       {
         type: mongoose.Schema.ObjectId,

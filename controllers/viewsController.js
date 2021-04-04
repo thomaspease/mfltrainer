@@ -61,38 +61,40 @@ exports.getClass = catchAsync(async (req, res, next) => {
   //Find class
   const classData = await Class.findById(req.params.class).populate('tasks');
 
-  //Find students
-  const students = await User.find(req.params);
-
   res.status(200).render('classoverview', {
-    title: 'My classes',
+    title: classData.name,
     classData,
-    students,
   });
 });
 
 //TEACHER TASK MANAGEMENT
-exports.manageMyTasks = catchAsync(async (req, res, next) => {});
+exports.manageMyTasks = catchAsync(async (req, res, next) => {
+  const tasks = await Task.find({ teacher: res.locals.user.id });
+
+  res.status(200).render('mytasks', {
+    title: 'My tasks',
+    tasks,
+  });
+});
 
 exports.getTask = catchAsync(async (req, res, next) => {
   //Find class
   const task = await Task.findById(req.params.task);
 
   //Find studentTasks
-  const studentTasks = await StudentTask.find({ task: req.params.task });
+  const studentTasks = await StudentTask.find({
+    task: req.params.task,
+  }).populate('user');
 
-  console.log(task);
-  console.log(studentTasks);
-
-  res.status(200).render('classoverview', {
-    title: 'My classes',
+  res.status(200).render('taskoverview', {
+    title: task.name,
     task,
     studentTasks,
   });
 });
 
-exports.getAccount = (req, res) => {
+exports.getAccount = catchAsync(async (req, res, next) => {
   res.status(200).render('account', {
     title: 'Your account',
   });
-};
+});

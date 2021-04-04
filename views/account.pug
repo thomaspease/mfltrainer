@@ -1,6 +1,6 @@
 extends base
 
-mixin navItem(link, text, icon, active)
+mixin navItem(link, text, active)
   li(class=`${active ? 'side-nav--active' : ''}`)
     a(href=`${link}`) #{text}
 

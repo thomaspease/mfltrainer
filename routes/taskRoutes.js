@@ -10,6 +10,10 @@ router
   .get(taskController.getAllTasks)
   .post(taskController.createTaskAndStudentTasks);
 
+router
+  .route('/:id')
+  .delete(taskController.deleteTaskStudentTasksAndObjectIdReferences);
+
 // router.route('/teacher-set').post(taskController.teacherSetTask);
 
 module.exports = router;

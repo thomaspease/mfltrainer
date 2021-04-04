@@ -20,6 +20,6 @@ block content
                             th.td-right Due
                             
                     tbody
-                        each task in classData.tasks
+                        each task in tasks
                             +row(task.name, task.completed, task.dueDate.toDateString(), task.id)
 
