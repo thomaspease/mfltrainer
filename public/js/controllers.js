@@ -50,7 +50,7 @@ export class TrainController extends Controller {
 		const desiredReaskLength = 3;
 
 		const sentenceObject = this.sentences.shift();
-		this.finishedSentences.push({sentenceObject, isCorrect});
+		this.finishedSentences.push({sentence: sentenceObject.data, student_answer, isCorrect});
 
 		if (isCorrect) {
 			this.rightCount++;
@@ -61,13 +61,15 @@ export class TrainController extends Controller {
 			this.sentences.splice(insertionIndex, 0, sentenceObject);
 		}
 
-		console.log(arguments);
+		console.log(this.sentences);
+		console.log(this.finishedSentences);
 	}
 
 	doNextSentence() {
 		if (!this.sentences[0]) {
 			this.view.finish();
-			// TODO send an ajax request to the server
+			// empty 'then' just so we trigger the async function
+			this.sendResultsToServer().then(_ => _);
 			return;
 		}
 
@@ -75,5 +77,21 @@ export class TrainController extends Controller {
 
 		this.view.prompt = sentence.prompt;
 		this.view.answer = sentence.answer;
+	}
+
+	async sendResultsToServer() {
+		const payload = {
+			correctCount: this.correctCount,
+			wrongCount: this.wrongCount,
+			studentSentences: this.finishedSentences,
+		}
+
+		const res = await fetch('TODO-PLACEHOLDER', {
+			method:"POST",
+			body:JSON.stringify(payload),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
 	}
 }

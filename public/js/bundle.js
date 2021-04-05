@@ -2114,7 +2114,8 @@ class TrainController extends Controller {
     const desiredReaskLength = 3;
     const sentenceObject = this.sentences.shift();
     this.finishedSentences.push({
-      sentenceObject,
+      sentence: sentenceObject.data,
+      student_answer,
       isCorrect
     });
 
@@ -2126,19 +2127,36 @@ class TrainController extends Controller {
       this.sentences.splice(insertionIndex, 0, sentenceObject);
     }
 
-    console.log(arguments);
+    console.log(this.sentences);
+    console.log(this.finishedSentences);
   }
 
   doNextSentence() {
     if (!this.sentences[0]) {
-      this.view.finish(); // TODO send an ajax request to the server
+      this.view.finish(); // empty 'then' just so we trigger the async function
 
+      this.sendResultsToServer().then(_ => _);
       return;
     }
 
     const sentence = this.sentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
+  }
+
+  async sendResultsToServer() {
+    const payload = {
+      correctCount: this.correctCount,
+      wrongCount: this.wrongCount,
+      studentSentences: this.finishedSentences
+    };
+    const res = await fetch('TODO-PLACEHOLDER', {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
   }
 
 }
@@ -2157,7 +2175,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
   // load controllers dynamically based on what the server-generated HTML requests
   Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
     const controllerClass = controllers[domElement.dataset['controller']];
-    console.log(controllerClass);
     new controllerClass(domElement);
   });
 })();

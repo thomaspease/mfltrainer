@@ -4,7 +4,6 @@ import * as controllers from './controllers.js';
 	// load controllers dynamically based on what the server-generated HTML requests
 	Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
 		const controllerClass = controllers[domElement.dataset['controller']];
-		console.log(controllerClass);
 
 		new controllerClass(domElement);
 	})
