@@ -1722,8 +1722,8 @@ exports.TrainingView = exports.DataParserView = exports.AlertView = exports.Logi
 var _diff = require("diff");
 
 class View {
-  constructor(baseElementSelector) {
-    this.root = document.querySelector(baseElementSelector);
+  constructor(baseElement) {
+    this.root = baseElement;
     this.elements = {};
     this.elementGroups = {};
     this.listeners = {};
@@ -1794,12 +1794,7 @@ class FormView extends View {
 
 }
 
-class LoginFormView extends FormView {
-  constructor() {
-    super('.form--login');
-  }
-
-} // GENERIC DOM MANIP
+class LoginFormView extends FormView {} // GENERIC DOM MANIP
 
 
 exports.LoginFormView = LoginFormView;
@@ -1837,8 +1832,8 @@ class DataParserView extends View {
 exports.DataParserView = DataParserView;
 
 class TrainingView extends FormView {
-  constructor() {
-    super('form.card'); // get our sub-elements
+  constructor(element) {
+    super(element); // get our sub-elements
 
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
@@ -2065,25 +2060,29 @@ var _views = require("./views.js");
 var _models = require("./models.js");
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
-class Controller {}
+class Controller {
+  constructor(viewBaseElement) {
+    const viewClass = this.getViewClass();
+    this.view = new viewClass(viewBaseElement);
+  }
+
+}
 
 class LoginController extends Controller {
+  getViewClass() {
+    return _views.LoginFormView;
+  }
+
   constructor() {
-    super();
-    const loginForm = new _views.LoginFormView(); // DELEGATION
-    //Login
+    super(...arguments);
+    this.view.overrideSubmit((_ref) => {
+      let {
+        email,
+        password
+      } = _ref;
 
-    if (loginForm.exists) {
-      console.log('hello from index.js');
-      loginForm.overrideSubmit((_ref) => {
-        let {
-          email,
-          password
-        } = _ref;
-
-        _models.AuthModel.login(email, password);
-      });
-    }
+      _models.AuthModel.login(email, password);
+    });
   }
 
 }
@@ -2091,11 +2090,14 @@ class LoginController extends Controller {
 exports.LoginController = LoginController;
 
 class TrainController extends Controller {
+  getViewClass() {
+    return _views.TrainingView;
+  }
+
   constructor() {
-    super();
+    super(...arguments);
     this.sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
     this.finishedSentences = [];
-    this.view = new _views.TrainingView();
     this.initialCount = this.sentences.length;
     this.rightCount = 0;
     this.wrongCount = 0;
@@ -2145,10 +2147,19 @@ exports.TrainController = TrainController;
 },{"./views.js":"views.js","./models.js":"models.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
-var _controllers = require("./controllers.js");
+var controllers = _interopRequireWildcard(require("./controllers.js"));
 
-// TODO decide if this file needs to be any fancier?
-const loginController = new _controllers.LoginController();
-const trainController = new _controllers.TrainController();
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+(function () {
+  // load controllers dynamically based on what the server-generated HTML requests
+  Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
+    const controllerClass = controllers[domElement.dataset['controller']];
+    console.log(controllerClass);
+    new controllerClass(domElement);
+  });
+})();
 },{"./controllers.js":"controllers.js"}]},{},["app.js"], null)
 //# sourceMappingURL=/js/bundle.js.map

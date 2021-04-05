@@ -4,31 +4,36 @@ import { AuthModel, SentenceModel } from './models.js';
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
+	constructor(viewBaseElement) {
+		const viewClass = this.getViewClass();
+		this.view = new viewClass(viewBaseElement);
+	}
 }
 
 export class LoginController extends Controller {
-	constructor() {
-		super()
-		const loginForm = new LoginFormView();
-		// DELEGATION
-		//Login
-		if (loginForm.exists) {
-			console.log('hello from index.js');
-			loginForm.overrideSubmit(({email, password}) => {
-				AuthModel.login(email, password);
-			});
-		}
+	getViewClass() {
+		return LoginFormView;
+	}
+
+	constructor(...args) {
+		super(...args)
+
+		this.view.overrideSubmit(({email, password}) => {
+			AuthModel.login(email, password);
+		});
 	}
 }
 
 export class TrainController extends Controller {
-	constructor() {
-		super();
+	getViewClass() {
+		return TrainingView;
+	}
+
+	constructor(...args) {
+		super(...args);
 
 		this.sentences = SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
 		this.finishedSentences = [];
-
-		this.view = new TrainingView();
 
 		this.initialCount = this.sentences.length;
 
