@@ -1,13 +1,20 @@
 extends base
 
+mixin js-value(name, value)
+    -// TODO: move this mixin into a global pug file (maybe `base.pug`? or a mixins helper file?)
+    input.js-value(type="hidden" name=name value=JSON.stringify(value))
+
 block content
     main.main
         form.card
             .card__exercise
-                div.card-text.card-text--bold Question text
-                input.form__input(type='text', placeholder='Answer', required)
-                button.btn.btn--green.btn--green__exercise Submit
-                div.card-text Diffed answer
+                div.card-title.card-text.card-text--bold Question text
+                input.form__input(type='text', name='student_answer', placeholder='Answer', required)
+                span.answer-feedback.card-text Diffed answer
+                button.btn.btn--green.btn--green__exercise(type="submit") Submit
+                button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
+                div.correct-answer.card-text Correct answer
+    +js-value('sentences', sentences)
     script
         var sentences= !{JSON.stringify(sentences)}
         //The type of exercise is passed in as the pug variable 'exercise' and will be 'gapped', 'translation', or 'transcription'
