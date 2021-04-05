@@ -4,8 +4,8 @@
 	"description": "langauges proto",
 	"main": "index.js",
 	"scripts": {
-		"watch:js": "parcel watch --no-hmr /js ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url /js",
-		"build:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
+		"watch:js": "parcel watch --no-hmr /js ./public/js/app.js --out-dir ./public/js --out-file bundle.js --public-url /js",
+		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
 		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
 		"serve": "nodemon server.js"
 	},
