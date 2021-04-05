@@ -1722,8 +1722,8 @@ exports.TrainingView = exports.DataParserView = exports.AlertView = exports.Logi
 var _diff = require("diff");
 
 class View {
-  constructor(baseElementSelector) {
-    this.root = document.querySelector(baseElementSelector);
+  constructor(baseElement) {
+    this.root = baseElement;
     this.elements = {};
     this.elementGroups = {};
     this.listeners = {};
@@ -1794,12 +1794,7 @@ class FormView extends View {
 
 }
 
-class LoginFormView extends FormView {
-  constructor() {
-    super('.form--login');
-  }
-
-} // GENERIC DOM MANIP
+class LoginFormView extends FormView {} // GENERIC DOM MANIP
 
 
 exports.LoginFormView = LoginFormView;
@@ -1837,8 +1832,8 @@ class DataParserView extends View {
 exports.DataParserView = DataParserView;
 
 class TrainingView extends FormView {
-  constructor() {
-    super('form.card'); // get our sub-elements
+  constructor(element) {
+    super(element); // get our sub-elements
 
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
@@ -1850,7 +1845,8 @@ class TrainingView extends FormView {
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']); // prep DOM
 
-    this.hideGroup('feedback'); // set up event listeners
+    this.hideGroup('feedback');
+    this.clearAnswerText(); // set up event listeners
 
     this.overrideSubmit(data => this.handleStudentAnswer(data));
     this.elements.next_button.addEventListener('click', () => {
@@ -2064,25 +2060,29 @@ var _views = require("./views.js");
 var _models = require("./models.js");
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
-class Controller {}
+class Controller {
+  constructor(viewBaseElement) {
+    const viewClass = this.getViewClass();
+    this.view = new viewClass(viewBaseElement);
+  }
+
+}
 
 class LoginController extends Controller {
+  getViewClass() {
+    return _views.LoginFormView;
+  }
+
   constructor() {
-    super();
-    const loginForm = new _views.LoginFormView(); // DELEGATION
-    //Login
+    super(...arguments);
+    this.view.overrideSubmit((_ref) => {
+      let {
+        email,
+        password
+      } = _ref;
 
-    if (loginForm.exists) {
-      console.log('hello from index.js');
-      loginForm.overrideSubmit((_ref) => {
-        let {
-          email,
-          password
-        } = _ref;
-
-        _models.AuthModel.login(email, password);
-      });
-    }
+      _models.AuthModel.login(email, password);
+    });
   }
 
 }
@@ -2090,55 +2090,73 @@ class LoginController extends Controller {
 exports.LoginController = LoginController;
 
 class TrainController extends Controller {
+  getViewClass() {
+    return _views.TrainingView;
+  }
+
   constructor() {
-    super();
+    super(...arguments);
+    this.sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
+    this.finishedSentences = [];
+    this.initialCount = this.sentences.length;
+    this.rightCount = 0;
+    this.wrongCount = 0;
+    this.view.on('answer', this.doAnswer.bind(this));
+    this.view.on('next', this.doNextSentence.bind(this));
+    this.doNextSentence();
+  }
+
+  doAnswer(_ref2) {
+    let {
+      student_answer,
+      isCorrect
+    } = _ref2;
     const desiredReaskLength = 3;
-
-    const sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
-
-    const finishedSentences = [];
-    const trainTask = new _views.TrainingView();
-    console.log(sentences);
-    const initialCount = sentences.length;
-    var rightCount = 0;
-    var wrongCount = 0; // TODO DESIGN QUESTION:
-    //  should we calculate isCorrect inside the view? That would break separation of concerns, but would involve a smaller amount of back-and-forth data calls
-    //  but, on the flip side, the controller needing to know exactly what to update in the view is *also* a bit of a conceptual leak...
-
-    trainTask.on('answer', (_ref2) => {
-      let {
-        student_answer,
-        isCorrect
-      } = _ref2;
-      const sentenceObject = sentences.shift();
-      finishedSentences.push({
-        sentenceObject,
-        isCorrect
-      });
-
-      if (isCorrect) {
-        rightCount++;
-      } else {
-        wrongCount++;
-        const insertionIndex = Math.min(sentences.length, desiredReaskLength);
-        sentences.splice(insertionIndex, 0, sentenceObject);
-      }
+    const sentenceObject = this.sentences.shift();
+    this.finishedSentences.push({
+      sentence: sentenceObject.data,
+      student_answer,
+      isCorrect
     });
-    trainTask.on('next', doNextSentence);
 
-    function doNextSentence() {
-      if (!sentences[0]) {
-        trainTask.finish(); // TODO send an ajax request to the server
-
-        return;
-      }
-
-      const sentence = sentences[0];
-      trainTask.prompt = sentence.prompt;
-      trainTask.answer = sentence.answer;
+    if (isCorrect) {
+      this.rightCount++;
+    } else {
+      this.wrongCount++;
+      const insertionIndex = Math.min(this.sentences.length, desiredReaskLength);
+      this.sentences.splice(insertionIndex, 0, sentenceObject);
     }
 
-    doNextSentence();
+    console.log(this.sentences);
+    console.log(this.finishedSentences);
+  }
+
+  doNextSentence() {
+    if (!this.sentences[0]) {
+      this.view.finish(); // empty 'then' just so we trigger the async function
+
+      this.sendResultsToServer().then(_ => _);
+      return;
+    }
+
+    const sentence = this.sentences[0];
+    this.view.prompt = sentence.prompt;
+    this.view.answer = sentence.answer;
+  }
+
+  async sendResultsToServer() {
+    const payload = {
+      correctCount: this.correctCount,
+      wrongCount: this.wrongCount,
+      studentSentences: this.finishedSentences
+    };
+    const res = await fetch('TODO-PLACEHOLDER', {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
   }
 
 }
@@ -2147,10 +2165,18 @@ exports.TrainController = TrainController;
 },{"./views.js":"views.js","./models.js":"models.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
-var _controllers = require("./controllers.js");
+var controllers = _interopRequireWildcard(require("./controllers.js"));
 
-// TODO decide if this file needs to be any fancier?
-const loginController = new _controllers.LoginController();
-const trainController = new _controllers.TrainController();
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+(function () {
+  // load controllers dynamically based on what the server-generated HTML requests
+  Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
+    const controllerClass = controllers[domElement.dataset['controller']];
+    new controllerClass(domElement);
+  });
+})();
 },{"./controllers.js":"controllers.js"}]},{},["app.js"], null)
 //# sourceMappingURL=/js/bundle.js.map

@@ -6,7 +6,7 @@ mixin js-value(name, value)
 
 block content
     main.main
-        form.card
+        form.card(data-controller="TrainController")
             .card__exercise
                 div.card-title.card-text.card-text--bold Question text
                 input.form__input(type='text', name='student_answer', placeholder='Answer', required)
@@ -14,7 +14,7 @@ block content
                 button.btn.btn--green.btn--green__exercise(type="submit") Submit
                 button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
                 div.correct-answer.card-text Correct answer
-    +js-value('sentences', sentences)
+        +js-value('sentences', sentences)
     script
         var sentences= !{JSON.stringify(sentences)}
         //The type of exercise is passed in as the pug variable 'exercise' and will be 'gapped', 'translation', or 'transcription'

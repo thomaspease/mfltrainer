@@ -1,8 +1,8 @@
 import { diffWords} from 'diff'
 
 class View {
-	constructor(baseElementSelector) {
-		this.root = document.querySelector(baseElementSelector);
+	constructor(baseElement) {
+		this.root = baseElement
 		this.elements = {};
 		this.elementGroups = {};
 		this.listeners = {};
@@ -75,9 +75,6 @@ class FormView extends View {
 }
 
 export class LoginFormView extends FormView {
-	constructor() {
-		super('.form--login')
-	}
 }
 
 
@@ -110,8 +107,8 @@ export class DataParserView extends View {
 // SPECIFIC PAGES
 
 export class TrainingView extends FormView {
-	constructor() {
-		super('form.card');
+	constructor(element) {
+		super(element);
 
 		// get our sub-elements
 		this.elements.prompt = this.root.querySelector('.card-title');

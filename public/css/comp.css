@@ -614,6 +614,12 @@ td {
     align-items: center;
     justify-items: center; }
 
+.highlight-right {
+  color: green; }
+
+.highlight-wrong {
+  color: red; }
+
 .footer {
   background-color: #f7f7f7;
   padding: 3rem 4rem;

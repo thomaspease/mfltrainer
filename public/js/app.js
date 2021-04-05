@@ -1,6 +1,10 @@
-import { LoginController, TrainController } from './controllers.js';
+import * as controllers from './controllers.js';
 
-// TODO decide if this file needs to be any fancier?
+(function() {
+	// load controllers dynamically based on what the server-generated HTML requests
+	Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
+		const controllerClass = controllers[domElement.dataset['controller']];
 
-const loginController = new LoginController();
-const trainController = new TrainController();
+		new controllerClass(domElement);
+	})
+})()
