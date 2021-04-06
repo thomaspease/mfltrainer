@@ -1,6 +1,8 @@
 import { AlertView, DataParserView } from './views.js';
 import axios from 'axios';
 
+class ModelApiError extends Error {}
+
 // parent class for models. includes some utility methods, and such
 //
 // if we wanted to get fancy, we might consider picking up the mongoose model definitions, and making use of that somehow.
@@ -8,6 +10,25 @@ import axios from 'axios';
 class Model {
   constructor(data) {
     this.data = data;
+  }
+
+  // can throw, catch in the Controller layer
+  static async sendApiRequest(url, data) {
+    try {
+      const res = await axios({
+        method: 'POST',
+        url,
+        data,
+      });
+      if (res.data.status == 'success') {
+        return res;
+      }
+
+      // TODO question for Tom: what should we pass as the error message here?
+      throw new ModelApiError("API failure");
+    } catch (err) {
+      throw new ModelApiError(err.response.data.message);
+    }
   }
 
   // returns an array of instantiated objects, based on JSON embedded in a specific DOM element
@@ -24,50 +45,45 @@ class Model {
 
 export class AuthModel extends Model {
   static async login(email, password) {
-    try {
-      const res = await fetch('api/v1/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (res.status == 200) {
-        AlertView.show('success', 'Logged in successfully!');
-        window.setTimeout(() => {
-          location.assign('/');
-        }, 1500);
-      }
-    } catch (err) {
-      // TODO double-check the Fetch equivalent to Axios's `err.response.data.message`
-      AlertView.show('error', err.response.data.message);
-    }
+    return this.sendApiRequest(
+      'api/v1/users/login',
+      { email, password }
+    );
   }
 }
 
 export class CreateSentenceModel extends Model {
+  // can throw, catch in the Controller layer
   static async create(sentence, translation, level, vivaRef, tense, grammar) {
-    try {
-      const res = await axios({
-        method: 'POST',
-        url: '/api/v1/sentences',
-        data: {
-          sentence,
-          translation,
-          level,
-          vivaRef,
-          grammar,
-          tense,
-        },
-      });
-      if (res.data.status == 'success') {
-        AlertView.show('success', 'Sentence created');
-        window.setTimeout(1500);
-      }
-    } catch (err) {
-      AlertView.show('error', err.response.data.message);
-    }
+    const data = {
+      sentence,
+      translation,
+      level,
+      vivaRef,
+      grammar,
+      tense,
+    };
+
+    return this.sendApiRequest(
+      '/api/v1/sentences',
+      data,
+    );
+  }
+}
+
+// TODO maybe move some of the data from the controller into this?
+export class StudentResultsModel extends Model {
+  static async sendResults(correctCount, wrongCount, studentSentences) {
+    const payload = {
+      correctCount: this.correctCount,
+      wrongCount: this.wrongCount,
+      studentSentences: this.finishedSentences,
+    };
+
+    return this.sendApiRequest(
+      'TODO-PLACEHOLDER',
+      payload
+    );
   }
 }
 
