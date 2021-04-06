@@ -27,7 +27,7 @@ export class LoginController extends Controller {
   constructor(...args) {
     super(...args);
 
-    this.view.overrideSubmit(async ({ email, password }) => {
+    this.view.onFormData(async ({ email, password }) => {
       try {
         await AuthModel.login(email, password);
 
@@ -50,7 +50,7 @@ export class CreateSentenceController extends Controller {
   constructor(...args) {
     super(...args);
 
-    this.view.overrideSubmit(
+    this.view.onFormData(
       async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
         try {
           const res = await CreateSentenceModel.create(

@@ -1773,7 +1773,7 @@ class View {
 
 
 class FormView extends View {
-  overrideSubmit(callback) {
+  onFormData(callback) {
     this.root.addEventListener('submit', e => {
       e.preventDefault();
       callback(this.getFormData());
@@ -1859,7 +1859,7 @@ class TrainingView extends FormView {
     this.hideGroup('feedback');
     this.clearAnswerText(); // set up event listeners
 
-    this.overrideSubmit(data => this.handleStudentAnswer(data));
+    this.onFormData(data => this.handleStudentAnswer(data));
     this.elements.next_button.addEventListener('click', () => {
       this.hideGroup('feedback');
       this.showGroup('dataEntry');
@@ -3889,7 +3889,7 @@ class LoginController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.overrideSubmit(async (_ref) => {
+    this.view.onFormData(async (_ref) => {
       let {
         email,
         password
@@ -3920,7 +3920,7 @@ class CreateSentenceController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.overrideSubmit(async (_ref2) => {
+    this.view.onFormData(async (_ref2) => {
       let {
         sentence,
         translation,
