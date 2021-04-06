@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/usermodel');
+const Class = require('../models/classmodel');
 const StudentTask = require('../models/studenttaskmodel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -37,15 +38,17 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  const classData = await Class.find({
+    classCode: req.body.classCode,
+  });
+
+  console.log(classData, req.body.classCode);
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
-    sentences: req.body.sentences,
-    class: req.body.class,
-    students: req.body.students,
+    class: classData[0]._id,
   });
   createSendToken(newUser, 201, res);
 });

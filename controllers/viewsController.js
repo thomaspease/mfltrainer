@@ -38,6 +38,12 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
+exports.getSignupForm = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Sign up for an account',
+  });
+};
+
 exports.getCreateSentenceForm = (req, res) => {
   res.status(200).render('createsentences', {
     title: 'Create sentences',

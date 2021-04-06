@@ -54,6 +54,16 @@ export class AuthModel extends Model {
   static async logout() {
     return this.sendApiRequest('api/v1/users/logout', 'GET');
   }
+
+  static async signup(name, email, password, passwordConfirm, classCode) {
+    return this.sendApiRequest('api/v1/users/signup', 'POST', {
+      name,
+      email,
+      password,
+      passwordConfirm,
+      classCode,
+    });
+  }
 }
 
 export class CreateSentenceModel extends Model {

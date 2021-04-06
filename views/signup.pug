@@ -1,0 +1,24 @@
+extends base
+
+block content
+  main.main
+    .card
+      h2.heading-secondary.ma-bt-lg Create your account!
+      form.form.form--signup(method="POST" data-controller="SignupController")
+        .form__group
+          label.form__label(for='name') Name
+          input#email.form__input(name='name', type='text', placeholder='Juan Pérez', required)
+        .form__group.ma-bt-md
+          label.form__label(for='email') Email
+          input#password.form__input(name='email', type='email', placeholder='***@mca.mossbourne.org', required)
+        .form__group.ma-bt-md
+          label.form__label(for='password') Password
+          input#password.form__input(name='password', type='password', placeholder='••••••••', required, minlength='8')
+        .form__group.ma-bt-md
+          label.form__label(for='passwordConfirm') Confirm password
+          input#password.form__input(name='passwordConfirm', type='password', placeholder='••••••••', required, minlength='8')
+        .form__group.ma-bt-md
+          label.form__label(for='classCode') Class code
+          input#password.form__input(name='classCode', type='text', placeholder='Teacher will provide', required)
+        .form__group
+          button.btn.btn--green Sign up!

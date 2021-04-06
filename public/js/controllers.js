@@ -4,6 +4,7 @@ import {
   CreateSentenceFormView,
   AlertView,
   LogoutView,
+  SignupFormView,
 } from './views.js';
 import {
   AuthModel,
@@ -63,6 +64,37 @@ export class LogoutController extends Controller {
         AlertView.show('error', err.message);
       }
     });
+  }
+}
+
+export class SignupController extends Controller {
+  getViewClass() {
+    return SignupFormView;
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    this.view.onFormData(
+      async ({ name, email, password, passwordConfirm, classCode }) => {
+        try {
+          await AuthModel.signup(
+            name,
+            email,
+            password,
+            passwordConfirm,
+            classCode
+          );
+
+          AlertView.show('success', 'Signed up successfully!');
+          window.setTimeout(() => {
+            location.assign('/');
+          }, 1500);
+        } catch (err) {
+          AlertView.show('error', err.message);
+        }
+      }
+    );
   }
 }
 

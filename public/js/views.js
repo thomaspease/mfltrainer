@@ -92,6 +92,8 @@ class FormView extends View {
 
 export class LoginFormView extends FormView {}
 
+export class SignupFormView extends FormView {}
+
 export class CreateSentenceFormView extends FormView {}
 
 // GENERIC DOM MANIP

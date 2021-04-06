@@ -7,6 +7,7 @@ const router = express.Router();
 router.get('/', authController.isLoggedIn, viewsController.displayTasks);
 router.get('/train/:id', authController.isLoggedIn, viewsController.doExercise);
 router.get('/login', viewsController.getLoginForm);
+router.get('/signup', viewsController.getSignupForm);
 router.get(
   '/create-sentence',
   authController.protect,

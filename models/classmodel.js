@@ -37,6 +37,7 @@ const classSchema = mongoose.Schema(
         ref: 'Task',
       },
     ],
+    classCode: String,
   },
   {
     toJSON: { virtuals: true },

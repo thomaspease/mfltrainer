@@ -1717,7 +1717,7 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.LoginFormView = void 0;
+exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = void 0;
 
 var _diff = require("diff");
 
@@ -1810,6 +1810,10 @@ class FormView extends View {
 class LoginFormView extends FormView {}
 
 exports.LoginFormView = LoginFormView;
+
+class SignupFormView extends FormView {}
+
+exports.SignupFormView = SignupFormView;
 
 class CreateSentenceFormView extends FormView {} // GENERIC DOM MANIP
 
@@ -3791,6 +3795,16 @@ class AuthModel extends Model {
     return this.sendApiRequest('api/v1/users/logout', 'GET');
   }
 
+  static async signup(name, email, password, passwordConfirm, classCode) {
+    return this.sendApiRequest('api/v1/users/signup', 'POST', {
+      name,
+      email,
+      password,
+      passwordConfirm,
+      classCode
+    });
+  }
+
 }
 
 exports.AuthModel = AuthModel;
@@ -3881,7 +3895,7 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainController = exports.CreateSentenceController = exports.LogoutController = exports.LoginController = void 0;
+exports.TrainController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -3953,6 +3967,40 @@ class LogoutController extends Controller {
 
 exports.LogoutController = LogoutController;
 
+class SignupController extends Controller {
+  getViewClass() {
+    return _views.SignupFormView;
+  }
+
+  constructor() {
+    super(...arguments);
+    this.view.onFormData(async (_ref2) => {
+      let {
+        name,
+        email,
+        password,
+        passwordConfirm,
+        classCode
+      } = _ref2;
+
+      try {
+        await _models.AuthModel.signup(name, email, password, passwordConfirm, classCode);
+
+        _views.AlertView.show('success', 'Signed up successfully!');
+
+        window.setTimeout(() => {
+          location.assign('/');
+        }, 1500);
+      } catch (err) {
+        _views.AlertView.show('error', err.message);
+      }
+    });
+  }
+
+}
+
+exports.SignupController = SignupController;
+
 class CreateSentenceController extends Controller {
   getViewClass() {
     return _views.CreateSentenceFormView;
@@ -3960,7 +4008,7 @@ class CreateSentenceController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.onFormData(async (_ref2) => {
+    this.view.onFormData(async (_ref3) => {
       let {
         sentence,
         translation,
@@ -3968,7 +4016,7 @@ class CreateSentenceController extends Controller {
         vivaRef,
         tense,
         grammar
-      } = _ref2;
+      } = _ref3;
 
       try {
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar);
@@ -4002,11 +4050,11 @@ class TrainController extends Controller {
     this.doNextSentence();
   }
 
-  doAnswer(_ref3) {
+  doAnswer(_ref4) {
     let {
       student_answer,
       isCorrect
-    } = _ref3;
+    } = _ref4;
     const desiredReaskLength = 3;
     const sentenceObject = this.sentences.shift();
     this.finishedSentences.push({
