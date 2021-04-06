@@ -1,5 +1,4 @@
-mixin content 
-  block content
+mixin sidebar-toggle 
   if (user.role === 'teacher')
     include _sidebar
     
@@ -24,8 +23,9 @@ html
     
     container.container
       // CONTENT
+      block content
       if user
-        +content
+        +sidebar-toggle
         
       // FOOTER
       include _footer

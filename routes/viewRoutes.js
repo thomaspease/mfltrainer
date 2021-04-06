@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/', authController.isLoggedIn, viewsController.displayTasks);
 router.get('/train/:id', authController.isLoggedIn, viewsController.doExercise);
-router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
+router.get('/login', viewsController.getLoginForm);
 router.get(
   '/create-sentence',
   authController.protect,
