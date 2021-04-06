@@ -1717,7 +1717,7 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainingView = exports.DataParserView = exports.AlertView = exports.CreateSentenceFormView = exports.LoginFormView = void 0;
+exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.LoginFormView = void 0;
 
 var _diff = require("diff");
 
@@ -1769,6 +1769,12 @@ class View {
     }
   }
 
+  eventOnRoot(event, callback) {
+    this.root.addEventListener(event, e => {
+      callback();
+    });
+  }
+
 } // FORMS
 
 
@@ -1809,6 +1815,10 @@ class CreateSentenceFormView extends FormView {} // GENERIC DOM MANIP
 
 
 exports.CreateSentenceFormView = CreateSentenceFormView;
+
+class LogoutView extends View {}
+
+exports.LogoutView = LogoutView;
 
 class AlertView extends View {
   static hide() {
@@ -2983,7 +2993,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3292,7 +3302,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -3736,10 +3746,10 @@ class Model {
   } // can throw, catch in the Controller layer
 
 
-  static async sendApiRequest(url, data) {
+  static async sendApiRequest(url, method, data) {
     try {
       const res = await (0, _axios.default)({
-        method: 'POST',
+        method,
         url,
         data
       });
@@ -3749,7 +3759,7 @@ class Model {
       } // TODO question for Tom: what should we pass as the error message here?
 
 
-      throw new ModelApiError("API failure");
+      throw new ModelApiError('API failure');
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }
@@ -3771,10 +3781,14 @@ class Model {
 
 class AuthModel extends Model {
   static async login(email, password) {
-    return this.sendApiRequest('api/v1/users/login', {
+    return this.sendApiRequest('api/v1/users/login', 'POST', {
       email,
       password
     });
+  }
+
+  static async logout() {
+    return this.sendApiRequest('api/v1/users/logout', 'GET');
   }
 
 }
@@ -3792,7 +3806,7 @@ class CreateSentenceModel extends Model {
       grammar,
       tense
     };
-    return this.sendApiRequest('/api/v1/sentences', data);
+    return this.sendApiRequest('/api/v1/sentences', 'POST', data);
   }
 
 } // TODO maybe move some of the data from the controller into this?
@@ -3807,7 +3821,7 @@ class StudentResultsModel extends Model {
       wrongCount: this.wrongCount,
       studentSentences: this.finishedSentences
     };
-    return this.sendApiRequest('TODO-PLACEHOLDER', payload);
+    return this.sendApiRequest('TODO-PLACEHOLDER', 'POST', payload);
   }
 
 }
@@ -3867,7 +3881,7 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainController = exports.CreateSentenceController = exports.LoginController = void 0;
+exports.TrainController = exports.CreateSentenceController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -3912,6 +3926,32 @@ class LoginController extends Controller {
 }
 
 exports.LoginController = LoginController;
+
+class LogoutController extends Controller {
+  getViewClass() {
+    return _views.LogoutView;
+  }
+
+  constructor() {
+    super(...arguments);
+    this.view.eventOnRoot('click', async () => {
+      try {
+        await _models.AuthModel.logout();
+
+        _views.AlertView.show('success', 'Logged out!');
+
+        window.setTimeout(() => {
+          location.assign('/login');
+        }, 1500);
+      } catch (err) {
+        _views.AlertView.show('error', err.message);
+      }
+    });
+  }
+
+}
+
+exports.LogoutController = LogoutController;
 
 class CreateSentenceController extends Controller {
   getViewClass() {

@@ -3,6 +3,7 @@ import {
   TrainingView,
   CreateSentenceFormView,
   AlertView,
+  LogoutView,
 } from './views.js';
 import {
   AuthModel,
@@ -35,7 +36,30 @@ export class LoginController extends Controller {
         window.setTimeout(() => {
           location.assign('/');
         }, 1500);
-      } catch(err) {
+      } catch (err) {
+        AlertView.show('error', err.message);
+      }
+    });
+  }
+}
+
+export class LogoutController extends Controller {
+  getViewClass() {
+    return LogoutView;
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    this.view.eventOnRoot('click', async () => {
+      try {
+        await AuthModel.logout();
+
+        AlertView.show('success', 'Logged out!');
+        window.setTimeout(() => {
+          location.assign('/login');
+        }, 1500);
+      } catch (err) {
         AlertView.show('error', err.message);
       }
     });
@@ -63,7 +87,7 @@ export class CreateSentenceController extends Controller {
           );
           this.view.clearFormData();
           AlertView.show('success', 'Sentence created');
-        } catch(err) {
+        } catch (err) {
           AlertView.show('error', err.message);
         }
       }
@@ -137,9 +161,13 @@ export class TrainController extends Controller {
 
   async sendResultsToServer() {
     try {
-      StudentResultsModel.send(this.correctCount, this.wrongCount, this.finishedSentences)
+      StudentResultsModel.send(
+        this.correctCount,
+        this.wrongCount,
+        this.finishedSentences
+      );
       // do we need to show feedback or anything?
-    } catch(err) {
+    } catch (err) {
       AlertView.show('error', err.message);
     }
   }

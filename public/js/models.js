@@ -13,10 +13,10 @@ class Model {
   }
 
   // can throw, catch in the Controller layer
-  static async sendApiRequest(url, data) {
+  static async sendApiRequest(url, method, data) {
     try {
       const res = await axios({
-        method: 'POST',
+        method,
         url,
         data,
       });
@@ -25,7 +25,7 @@ class Model {
       }
 
       // TODO question for Tom: what should we pass as the error message here?
-      throw new ModelApiError("API failure");
+      throw new ModelApiError('API failure');
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }
@@ -45,10 +45,14 @@ class Model {
 
 export class AuthModel extends Model {
   static async login(email, password) {
-    return this.sendApiRequest(
-      'api/v1/users/login',
-      { email, password }
-    );
+    return this.sendApiRequest('api/v1/users/login', 'POST', {
+      email,
+      password,
+    });
+  }
+
+  static async logout() {
+    return this.sendApiRequest('api/v1/users/logout', 'GET');
   }
 }
 
@@ -64,10 +68,7 @@ export class CreateSentenceModel extends Model {
       tense,
     };
 
-    return this.sendApiRequest(
-      '/api/v1/sentences',
-      data,
-    );
+    return this.sendApiRequest('/api/v1/sentences', 'POST', data);
   }
 }
 
@@ -80,10 +81,7 @@ export class StudentResultsModel extends Model {
       studentSentences: this.finishedSentences,
     };
 
-    return this.sendApiRequest(
-      'TODO-PLACEHOLDER',
-      payload
-    );
+    return this.sendApiRequest('TODO-PLACEHOLDER', 'POST', payload);
   }
 }
 

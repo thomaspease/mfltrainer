@@ -3,7 +3,7 @@ header.header
     a.nav__el.header--logo
       img(src='/img/brain-logo.png' alt='MFL Trainer logo')
     if user
-      a.nav__el.nav__el--loginout(href='/login') Log out
+      a.nav__el.nav__el--loginout(data-controller="LogoutController") Log out
       a.nav__el.nav__el--me(href='/me')
         span= user.name.split(' ')[0]
     else

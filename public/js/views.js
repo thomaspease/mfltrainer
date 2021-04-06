@@ -48,6 +48,12 @@ class View {
       listeners.forEach((callback) => callback(data));
     }
   }
+
+  eventOnRoot(event, callback) {
+    this.root.addEventListener(event, (e) => {
+      callback();
+    });
+  }
 }
 
 // FORMS
@@ -89,6 +95,8 @@ export class LoginFormView extends FormView {}
 export class CreateSentenceFormView extends FormView {}
 
 // GENERIC DOM MANIP
+
+export class LogoutView extends View {}
 
 export class AlertView extends View {
   static hide() {
