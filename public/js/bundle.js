@@ -1773,7 +1773,7 @@ class View {
 
 
 class FormView extends View {
-  overrideSubmit(callback) {
+  onFormData(callback) {
     this.root.addEventListener('submit', e => {
       e.preventDefault();
       callback(this.getFormData());
@@ -1859,7 +1859,7 @@ class TrainingView extends FormView {
     this.hideGroup('feedback');
     this.clearAnswerText(); // set up event listeners
 
-    this.overrideSubmit(data => this.handleStudentAnswer(data));
+    this.onFormData(data => this.handleStudentAnswer(data));
     this.elements.next_button.addEventListener('click', () => {
       this.hideGroup('feedback');
       this.showGroup('dataEntry');
@@ -2983,7 +2983,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3292,7 +3292,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -3716,7 +3716,7 @@ module.exports = require('./lib/axios');
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SentenceModel = exports.CreateSentenceModel = exports.AuthModel = void 0;
+exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.AuthModel = void 0;
 
 var _views = require("./views.js");
 
@@ -3724,13 +3724,35 @@ var _axios = _interopRequireDefault(require("axios"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// parent class for models. includes some utility methods, and such
+class ModelApiError extends Error {} // parent class for models. includes some utility methods, and such
 //
 // if we wanted to get fancy, we might consider picking up the mongoose model definitions, and making use of that somehow.
 // but, that seems like it might take more effort than it's worth, at least until we start needing client-side validation
+
+
 class Model {
   constructor(data) {
     this.data = data;
+  } // can throw, catch in the Controller layer
+
+
+  static async sendApiRequest(url, data) {
+    try {
+      const res = await (0, _axios.default)({
+        method: 'POST',
+        url,
+        data
+      });
+
+      if (res.data.status == 'success') {
+        return res;
+      } // TODO question for Tom: what should we pass as the error message here?
+
+
+      throw new ModelApiError("API failure");
+    } catch (err) {
+      throw new ModelApiError(err.response.data.message);
+    }
   } // returns an array of instantiated objects, based on JSON embedded in a specific DOM element
 
 
@@ -3749,29 +3771,10 @@ class Model {
 
 class AuthModel extends Model {
   static async login(email, password) {
-    try {
-      const res = await fetch('api/v1/users/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          email,
-          password
-        }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.status == 200) {
-        _views.AlertView.show('success', 'Logged in successfully!');
-
-        window.setTimeout(() => {
-          location.assign('/');
-        }, 1500);
-      }
-    } catch (err) {
-      // TODO double-check the Fetch equivalent to Axios's `err.response.data.message`
-      _views.AlertView.show('error', err.response.data.message);
-    }
+    return this.sendApiRequest('api/v1/users/login', {
+      email,
+      password
+    });
   }
 
 }
@@ -3779,34 +3782,37 @@ class AuthModel extends Model {
 exports.AuthModel = AuthModel;
 
 class CreateSentenceModel extends Model {
+  // can throw, catch in the Controller layer
   static async create(sentence, translation, level, vivaRef, tense, grammar) {
-    try {
-      const res = await (0, _axios.default)({
-        method: 'POST',
-        url: '/api/v1/sentences',
-        data: {
-          sentence,
-          translation,
-          level,
-          vivaRef,
-          grammar,
-          tense
-        }
-      });
+    const data = {
+      sentence,
+      translation,
+      level,
+      vivaRef,
+      grammar,
+      tense
+    };
+    return this.sendApiRequest('/api/v1/sentences', data);
+  }
 
-      if (res.data.status == 'success') {
-        _views.AlertView.show('success', 'Sentence created');
+} // TODO maybe move some of the data from the controller into this?
 
-        window.setTimeout(1500);
-      }
-    } catch (err) {
-      _views.AlertView.show('error', err.response.data.message);
-    }
+
+exports.CreateSentenceModel = CreateSentenceModel;
+
+class StudentResultsModel extends Model {
+  static async sendResults(correctCount, wrongCount, studentSentences) {
+    const payload = {
+      correctCount: this.correctCount,
+      wrongCount: this.wrongCount,
+      studentSentences: this.finishedSentences
+    };
+    return this.sendApiRequest('TODO-PLACEHOLDER', payload);
   }
 
 }
 
-exports.CreateSentenceModel = CreateSentenceModel;
+exports.StudentResultsModel = StudentResultsModel;
 
 class SentenceModel extends Model {
   // type is 'gap' or 'translation'
@@ -3883,13 +3889,23 @@ class LoginController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.overrideSubmit((_ref) => {
+    this.view.onFormData(async (_ref) => {
       let {
         email,
         password
       } = _ref;
 
-      _models.AuthModel.login(email, password);
+      try {
+        await _models.AuthModel.login(email, password);
+
+        _views.AlertView.show('success', 'Logged in successfully!');
+
+        window.setTimeout(() => {
+          location.assign('/');
+        }, 1500);
+      } catch (err) {
+        _views.AlertView.show('error', err.message);
+      }
     });
   }
 
@@ -3904,7 +3920,7 @@ class CreateSentenceController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.overrideSubmit((_ref2) => {
+    this.view.onFormData(async (_ref2) => {
       let {
         sentence,
         translation,
@@ -3914,9 +3930,14 @@ class CreateSentenceController extends Controller {
         grammar
       } = _ref2;
 
-      const res = _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar);
+      try {
+        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar);
+        this.view.clearFormData();
 
-      this.view.clearFormData();
+        _views.AlertView.show('success', 'Sentence created');
+      } catch (err) {
+        _views.AlertView.show('error', err.message);
+      }
     });
   }
 
@@ -3980,18 +4001,12 @@ class TrainController extends Controller {
   }
 
   async sendResultsToServer() {
-    const payload = {
-      correctCount: this.correctCount,
-      wrongCount: this.wrongCount,
-      studentSentences: this.finishedSentences
-    };
-    const res = await fetch('TODO-PLACEHOLDER', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    try {
+      _models.StudentResultsModel.send(this.correctCount, this.wrongCount, this.finishedSentences); // do we need to show feedback or anything?
+
+    } catch (err) {
+      _views.AlertView.show('error', err.message);
+    }
   }
 
 }

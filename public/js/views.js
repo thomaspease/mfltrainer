@@ -53,7 +53,7 @@ class View {
 // FORMS
 
 class FormView extends View {
-  overrideSubmit(callback) {
+  onFormData(callback) {
     this.root.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -144,7 +144,7 @@ export class TrainingView extends FormView {
     this.clearAnswerText();
 
     // set up event listeners
-    this.overrideSubmit((data) => this.handleStudentAnswer(data));
+    this.onFormData((data) => this.handleStudentAnswer(data));
     this.elements.next_button.addEventListener('click', () => {
       this.hideGroup('feedback');
       this.showGroup('dataEntry');

@@ -4,7 +4,12 @@ import {
   CreateSentenceFormView,
   AlertView,
 } from './views.js';
-import { AuthModel, SentenceModel, CreateSentenceModel } from './models.js';
+import {
+  AuthModel,
+  SentenceModel,
+  CreateSentenceModel,
+  StudentResultsModel,
+} from './models.js';
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
@@ -22,8 +27,17 @@ export class LoginController extends Controller {
   constructor(...args) {
     super(...args);
 
-    this.view.overrideSubmit(({ email, password }) => {
-      AuthModel.login(email, password);
+    this.view.onFormData(async ({ email, password }) => {
+      try {
+        await AuthModel.login(email, password);
+
+        AlertView.show('success', 'Logged in successfully!');
+        window.setTimeout(() => {
+          location.assign('/');
+        }, 1500);
+      } catch(err) {
+        AlertView.show('error', err.message);
+      }
     });
   }
 }
@@ -36,17 +50,22 @@ export class CreateSentenceController extends Controller {
   constructor(...args) {
     super(...args);
 
-    this.view.overrideSubmit(
-      ({ sentence, translation, level, vivaRef, tense, grammar }) => {
-        const res = CreateSentenceModel.create(
-          sentence,
-          translation,
-          level,
-          vivaRef,
-          tense,
-          grammar
-        );
-        this.view.clearFormData();
+    this.view.onFormData(
+      async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
+        try {
+          const res = await CreateSentenceModel.create(
+            sentence,
+            translation,
+            level,
+            vivaRef,
+            tense,
+            grammar
+          );
+          this.view.clearFormData();
+          AlertView.show('success', 'Sentence created');
+        } catch(err) {
+          AlertView.show('error', err.message);
+        }
       }
     );
   }
@@ -117,18 +136,11 @@ export class TrainController extends Controller {
   }
 
   async sendResultsToServer() {
-    const payload = {
-      correctCount: this.correctCount,
-      wrongCount: this.wrongCount,
-      studentSentences: this.finishedSentences,
-    };
-
-    const res = await fetch('TODO-PLACEHOLDER', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      StudentResultsModel.send(this.correctCount, this.wrongCount, this.finishedSentences)
+      // do we need to show feedback or anything?
+    } catch(err) {
+      AlertView.show('error', err.message);
+    }
   }
 }
