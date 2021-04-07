@@ -6,6 +6,7 @@
 	"scripts": {
 		"watch:js": "parcel watch --no-hmr /js ./public/js/app.js --out-dir ./public/js --out-file bundle.js --public-url /js",
 		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
+    "build:frontend-pug": "./node_modules/pug-cli/index.js -c --name-after-file -o public/js/templates/ frontend-views/",
 		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
 		"serve": "nodemon server.js"
 	},
@@ -38,8 +39,10 @@
 		"nodemailer": "^6.4.17",
 		"nodemon": "^2.0.6",
 		"pug": "^3.0.0",
+		"pug-cli": "^1.0.0-alpha6",
 		"regenerator-runtime": "^0.13.7",
 		"slugify": "^1.4.6",
+		"templates": "^1.2.9",
 		"validator": "^13.5.2",
 		"xss-clean": "^0.1.1"
 	}
