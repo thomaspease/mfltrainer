@@ -1717,7 +1717,7 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = void 0;
+exports.CreateTaskView = exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = void 0;
 
 var _diff = require("diff");
 
@@ -1961,6 +1961,55 @@ class TrainingView extends FormView {
 }
 
 exports.TrainingView = TrainingView;
+
+class CreateTaskView extends View {
+  constructor(element) {
+    super(element);
+    this.elements.table = this.root.querySelector('table.sentence-table');
+    this.elements.saveButton = this.root.querySelector('button.set-tasks-button');
+    this.getFilterElements().forEach(el => {
+      el.addEventListener('change', this.updateFilters.bind(this));
+    });
+    this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.table.addEventListener('change', evt => {
+      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
+        const sentenceId = evt.target.dataset.sentence_id;
+
+        if (sentenceId) {
+          const triggerType = evt.target.checked ? 'add_sentence' : 'remove_sentence';
+          this.trigger(triggerType, {
+            sentenceId
+          });
+        }
+      }
+    });
+  }
+
+  getFilterElements() {
+    return Array.from(this.root.querySelectorAll('.filter-selector'));
+  }
+
+  updateFilters() {
+    const filterState = {};
+    this.getFilterElements().forEach(el => filterState[el.name] = el.value);
+    this.trigger('filter_update', filterState);
+  }
+
+  updateDisplay(sentences, toSave) {
+    const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
+    const rows = sentences.map(sentence => {
+      this.elements.table.innerHTML = '';
+      const maybeChecked = toSave.some(other => other.data._id == sentence.data._id) ? 'checked="checked"' : ''; // TODO, OH JEEZ DO NOT PUSH THIS PUBLIC, THIS IS HORRIBLY INSECURE (and also kind of janky *as well*)
+
+      const html = "<td><input type=\"checkbox\" ".concat(maybeChecked, " data-sentence_id=").concat(sentence.data._id, "></td>") + fields.map(field => "<td>".concat(sentence.data[field], "</td>")).join('\n');
+      return "<tr>".concat(html, "</tr>");
+    });
+    this.elements.table.innerHTML = rows.join('\n');
+  }
+
+}
+
+exports.CreateTaskView = CreateTaskView;
 },{"diff":"../../node_modules/diff/dist/diff.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
@@ -2997,7 +3046,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3306,7 +3355,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -3862,6 +3911,12 @@ class SentenceModel extends Model {
     return this.data.translation;
   }
 
+  static async fetchAll() {
+    const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
+    const sentences = res.data.data.data;
+    return sentences.map(sentenceData => new this(sentenceData));
+  }
+
 }
 
 exports.SentenceModel = SentenceModel;
@@ -3895,7 +3950,7 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.CreateTaskController = exports.TrainController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -4100,6 +4155,72 @@ class TrainController extends Controller {
 }
 
 exports.TrainController = TrainController;
+
+class CreateTaskController extends Controller {
+  getViewClass() {
+    return _views.CreateTaskView;
+  }
+
+  constructor(viewBaseElement) {
+    super(viewBaseElement);
+    this.view.on('filter_update', filterData => {
+      const tmp = this.sentences.filter(sent => {
+        for (let key in filterData) {
+          if (filterData[key] == '') {
+            continue;
+          }
+
+          if (sent.data[key] instanceof Array) {
+            if (!sent.data[key].includes(filterData[key])) {
+              return false;
+            }
+          } else {
+            if (sent.data[key] != filterData[key]) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      });
+
+      _views.AlertView.show('success', JSON.stringify({
+        filterData,
+        sentenceCount: tmp.length
+      }));
+
+      this.view.updateDisplay(tmp, this.sentencesToSave);
+    });
+    this.sentencesToSave = [];
+    this.view.on('add_sentence', (_ref5) => {
+      let {
+        sentenceId
+      } = _ref5;
+      this.sentencesToSave.push(this.sentences.find(sent => sent.data._id == sentenceId));
+    });
+    this.view.on('remove_sentence', (_ref6) => {
+      let {
+        sentenceId
+      } = _ref6;
+      this.sentencesToSave = this.sentencesToSave.filter(sent => sent.data._id != sentenceId);
+    });
+    this.view.on('save', () => {
+      _views.AlertView.show('success', 'placeholder'); // TODO chuck an API call to task creation in here
+
+    });
+    this.sentences = [];
+
+    _models.SentenceModel.fetchAll().then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+  }
+
+  updateSentences(sentences) {
+    this.sentences = sentences;
+    this.view.updateDisplay(sentences, this.sentencesToSave); //AlertView.show('success', Object.keys(sentences[0].data))
+  }
+
+}
+
+exports.CreateTaskController = CreateTaskController;
 },{"./views.js":"views.js","./models.js":"models.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
