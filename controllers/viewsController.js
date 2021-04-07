@@ -2,6 +2,7 @@ const User = require('../models/usermodel');
 const StudentTask = require('../models/studenttaskmodel');
 const Task = require('../models/taskmodel');
 const Class = require('../models/classmodel');
+const Sentence = require('../models/sentencemodel');
 const catchAsync = require('../utils/catchAsync');
 //const AppError = require('../utils/appError');
 
@@ -51,8 +52,18 @@ exports.getCreateSentenceForm = (req, res) => {
 };
 
 exports.getSetTasksForm = catchAsync(async (req, res, next) => {
+  const fieldValues = {};
+
+  // doing an `await Promise.all` so that we can get each DB query in-flight at the same time (less chance of bottlenecking), rather than having to stagger them
+  await Promise.all([
+    Sentence.distinct('grammar').then(values => fieldValues.grammar = values),
+    Sentence.distinct('vivaRef').then(values => fieldValues.vivaRef = values),
+    Sentence.distinct('tense').then(values => fieldValues.tense = values),
+  ])
+
   res.status(200).render('settasks', {
     title: 'Create tasks',
+    fieldValues,
   });
 });
 
