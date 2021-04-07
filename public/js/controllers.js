@@ -216,6 +216,9 @@ export class CreateTaskController extends Controller {
 
     this.view.on('filter_update', filterData => {
       const tmp = this.sentences.filter(sent => {
+        if (this.sentencesToSave.some(other => other.data._id == sent.data._id)) {
+          return true;
+        }
         for (let key in filterData) {
           if (filterData[key] == '') {
             continue;
@@ -233,8 +236,6 @@ export class CreateTaskController extends Controller {
 
         return true;
       })
-
-      AlertView.show('success', JSON.stringify({filterData, sentenceCount: tmp.length}));
 
       this.view.updateDisplay(tmp, this.sentencesToSave);
     });
@@ -260,6 +261,5 @@ export class CreateTaskController extends Controller {
     this.sentences = sentences;
 
     this.view.updateDisplay(sentences, this.sentencesToSave);
-    //AlertView.show('success', Object.keys(sentences[0].data))
   }
 }
