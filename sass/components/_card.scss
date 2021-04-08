@@ -23,6 +23,17 @@
     grid-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 'task-name task-name due-date' 'number class type';
+    .grid {
+      display: grid;
+      grid-gap: 1rem;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .grid-top {
+      grid-template-areas: 'number class type';
+    }
+    .grid-filters {
+      grid-template-areas: 'vivaRef tense grammar';
+    }
   }
   &__create-task-secondary {
     display: grid;

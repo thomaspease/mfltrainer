@@ -6,6 +6,7 @@ import {
   LogoutView,
   SignupFormView,
   CreateTaskRandomView,
+  CreateTaskView,
 } from './views.js';
 import {
   AuthModel,
@@ -240,5 +241,71 @@ export class TrainController extends Controller {
     } catch (err) {
       AlertView.show('error', err.message);
     }
+  }
+}
+
+export class CreateTaskController extends Controller {
+  getViewClass() {
+    return CreateTaskView;
+  }
+
+  constructor(viewBaseElement) {
+    super(viewBaseElement);
+
+    this.view.on('filter_update', (filterData) => {
+      const tmp = this.sentences.filter((sent) => {
+        if (
+          this.sentencesToSave.some((other) => other.data._id == sent.data._id)
+        ) {
+          return true;
+        }
+        for (let key in filterData) {
+          if (filterData[key] == '') {
+            continue;
+          }
+          if (sent.data[key] instanceof Array) {
+            if (!sent.data[key].includes(filterData[key])) {
+              return false;
+            }
+          } else {
+            if (sent.data[key] != filterData[key]) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      });
+
+      this.view.updateDisplay(tmp, this.sentencesToSave);
+    });
+
+    this.sentencesToSave = [];
+    this.view.on('add_sentence', ({ sentenceId }) => {
+      this.sentencesToSave.push(
+        this.sentences.find((sent) => sent.data._id == sentenceId)
+      );
+    });
+    this.view.on('remove_sentence', ({ sentenceId }) => {
+      this.sentencesToSave = this.sentencesToSave.filter(
+        (sent) => sent.data._id != sentenceId
+      );
+    });
+
+    this.view.on('save', () => {
+      AlertView.show('success', 'placeholder');
+      // TODO chuck an API call to task creation in here
+    });
+
+    this.sentences = [];
+    SentenceModel.fetchAll()
+      .then((sent) => this.updateSentences(sent))
+      .catch((err) => AlertView.show('error', err));
+  }
+
+  updateSentences(sentences) {
+    this.sentences = sentences;
+
+    this.view.updateDisplay(sentences, this.sentencesToSave);
   }
 }

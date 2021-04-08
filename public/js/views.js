@@ -1,5 +1,7 @@
 import { diffWords } from 'diff';
 
+import { sentencetableTemplate } from './templates/sentencetable';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -347,5 +349,47 @@ export class TrainingView extends FormView {
 
   set prompt(value) {
     return (this.elements.prompt.innerText = value);
+  }
+}
+
+export class CreateTaskView extends View {
+  constructor(element) {
+    super(element);
+
+    this.elements.table = this.root.querySelector('table.sentence-table')
+    this.elements.saveButton = this.root.querySelector('button.set-tasks-button')
+
+    this.getFilterElements().forEach(el => {
+      el.addEventListener('change', this.updateFilters.bind(this));
+    })
+
+    this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+
+    this.elements.table.addEventListener('change', evt => {
+      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
+        const sentenceId = evt.target.dataset.sentence_id
+        if (sentenceId) {
+          const triggerType = evt.target.checked ? 'add_sentence' : 'remove_sentence';
+          this.trigger(triggerType, {sentenceId})
+        }
+      }
+    })
+  }
+
+  getFilterElements() {
+    return Array.from(this.root.querySelectorAll('.filter-selector'));
+  }
+
+  updateFilters() {
+    const filterState = {};
+    this.getFilterElements().forEach(el => filterState[el.name] = el.value);
+
+    this.trigger('filter_update', filterState);
+  }
+
+  updateDisplay(sentences, toSave) {
+    const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
+
+    this.elements.table.innerHTML = sentencetableTemplate({fields, sentences})
   }
 }

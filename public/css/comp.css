@@ -260,6 +260,14 @@ a:hover {
     grid-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 'task-name task-name due-date' 'number class type'; }
+    .card__create-task-main .grid {
+      display: grid;
+      grid-gap: 1rem;
+      grid-template-columns: 1fr 1fr 1fr; }
+    .card__create-task-main .grid-top {
+      grid-template-areas: 'number class type'; }
+    .card__create-task-main .grid-filters {
+      grid-template-areas: 'vivaRef tense grammar'; }
   .card__create-task-secondary {
     display: grid;
     grid-gap: 1rem;
@@ -590,11 +598,15 @@ input {
 .select-tense {
   grid-area: tense; }
 
+.selct-vivaRef {
+  grid-area: vivaRef; }
+
 /*---BUTTON ---*/
 .set-tasks-button {
   grid-area: button;
   margin: 2rem 10% 0 10%; }
 
+/*--- HEATHER'S QUICK PATCHES ---*/
 .user-view {
   background-color: #fff;
   max-width: 120rem;

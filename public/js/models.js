@@ -114,6 +114,12 @@ export class SentenceModel extends Model {
   get answer() {
     return this.data.translation;
   }
+
+  static async fetchAll() {
+    const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
+    const sentences = res.data.data.data;
+    return sentences.map(sentenceData => new this(sentenceData));
+  }
 }
 
 class GappedSentenceModel extends SentenceModel {
