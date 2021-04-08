@@ -259,7 +259,7 @@ a:hover {
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: 'number class type'; }
+    grid-template-areas: 'task-name task-name due-date' 'number class type'; }
   .card__create-task-secondary {
     display: grid;
     grid-gap: 1rem;
@@ -511,7 +511,31 @@ td {
 .alert--error {
   background-color: #eb4d4b; }
 
+[type='date'] {
+  background: #fff 97% 50% no-repeat; }
+
+[type='date']::inner-spin-button {
+  display: none; }
+
+[type='date']::calendar-picker-indicator {
+  opacity: 0; }
+
+/* custom styles */
+input {
+  border: 1px solid #c4c4c4;
+  border-radius: 5px;
+  background-color: #fff;
+  padding: 3px 5px;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+  width: 190px; }
+
 /*---Topline selections ---*/
+.task-name {
+  grid-area: task-name; }
+
+.due-date {
+  grid-area: due-date; }
+
 .number-sentences {
   grid-area: number; }
 

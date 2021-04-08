@@ -66,6 +66,8 @@ export class AuthModel extends Model {
   }
 }
 
+export class CreateTaskModel extends Model {}
+
 export class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
   static async create(sentence, translation, level, vivaRef, tense, grammar) {

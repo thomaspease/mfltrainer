@@ -1,4 +1,12 @@
 /*---Topline selections ---*/
+.task-name {
+  grid-area: task-name;
+}
+
+.due-date {
+  grid-area: due-date;
+}
+
 .number-sentences {
   grid-area: number;
 }

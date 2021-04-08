@@ -90,12 +90,6 @@ class FormView extends View {
   }
 }
 
-export class LoginFormView extends FormView {}
-
-export class SignupFormView extends FormView {}
-
-export class CreateSentenceFormView extends FormView {}
-
 // GENERIC DOM MANIP
 
 export class LogoutView extends View {}
@@ -128,6 +122,116 @@ export class DataParserView extends View {
 }
 
 // SPECIFIC PAGES
+
+export class LoginFormView extends FormView {}
+
+export class SignupFormView extends FormView {}
+
+export class CreateSentenceFormView extends FormView {}
+
+export class CreateTaskRandomView extends FormView {
+  constructor(element) {
+    super(element);
+
+    //Get inputs (.elements name must match their corresponding switch's name)
+    this.elements.vivaRefLow = this.root.querySelector('.vivaref-low');
+    this.elements.vivaRefHigh = this.root.querySelector('.vivaref-high');
+    this.elements.levelLow = this.root.querySelector('.level-low');
+    this.elements.levelHigh = this.root.querySelector('.level-high');
+
+    this.elements.switches = {};
+    this.elements.switches.vivaRefLow = this.root
+      .querySelector('.check-vivaref-low')
+      .getElementsByTagName('input');
+    this.elements.switches.vivaRefHigh = this.root
+      .querySelector('.check-vivaref-high')
+      .getElementsByTagName('input');
+    this.elements.switches.levelLow = this.root
+      .querySelector('.check-level-low')
+      .getElementsByTagName('input');
+    this.elements.switches.levelHigh = this.root
+      .querySelector('.check-level-high')
+      .getElementsByTagName('input');
+
+    const switches = Array.from(
+      this.root.querySelectorAll('input[type=checkbox]')
+    );
+
+    //Prep DOM
+    switches.forEach((e) => this.showHide(e));
+
+    //Add event listener for change
+    switches.forEach((e) => {
+      e.addEventListener('change', (e) => this.showHide(e.srcElement));
+    });
+  }
+
+  //Function to return form data on submit
+
+  onCreateTaskRandomValues = (callback) => {
+    this.root.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vivaRefRes = this.getUpperLower(
+        this.elements.switches.vivaRefLow[0],
+        this.elements.switches.vivaRefHigh[0],
+        'vivaRef'
+      );
+      const levelRes = this.getUpperLower(
+        this.elements.switches.levelLow[0],
+        this.elements.switches.levelHigh[0],
+        'level'
+      );
+      const nonToggleValues = this.getValues('.sentence-details');
+      const paramsObject = { ...vivaRefRes, ...levelRes, ...nonToggleValues };
+      const params = new URLSearchParams(paramsObject);
+
+      const searchParams = decodeURIComponent(params.toString());
+      const taskDetails = this.getValues('.task-details');
+
+      callback(searchParams, taskDetails);
+    });
+  };
+
+  getValues(selector) {
+    const nonToggleInputs = Array.from(
+      this.root.querySelectorAll(`${selector}`)
+    );
+    const data = {};
+
+    nonToggleInputs.forEach((el) => {
+      const name = el.name;
+      if (el.value) {
+        data[name] = el.value;
+      }
+    });
+
+    return data;
+  }
+
+  getUpperLower(checkOne, checkTwo, searchParam) {
+    const lowerValue = this.elements[checkOne.name].value;
+    const higherValue = this.elements[checkTwo.name].value;
+
+    if (checkTwo.checked) {
+      const res = `{"${searchParam}[gte]": ${lowerValue},
+		  "${searchParam}[lte]": ${higherValue}}`;
+      return JSON.parse(res);
+    } else if (checkOne.checked) {
+      const res = JSON.parse(`{"${searchParam}" : ${lowerValue}}`);
+      return res;
+    } else {
+      return null;
+    }
+  }
+
+  showHide = (el) => {
+    if (el.checked) {
+      this.showElement(el.name);
+    } else {
+      this.hideElement(el.name);
+    }
+  };
+}
 
 export class TrainingView extends FormView {
   constructor(element) {

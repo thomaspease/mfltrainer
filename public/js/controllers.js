@@ -5,12 +5,14 @@ import {
   AlertView,
   LogoutView,
   SignupFormView,
+  CreateTaskRandomView,
 } from './views.js';
 import {
   AuthModel,
   SentenceModel,
   CreateSentenceModel,
   StudentResultsModel,
+  CreateTaskModel,
 } from './models.js';
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
@@ -118,12 +120,48 @@ export class CreateSentenceController extends Controller {
             grammar
           );
           this.view.clearFormData();
-          AlertView.show('success', 'Sentence created');
+          if (res) {
+            AlertView.show('success', 'Sentence created');
+          }
         } catch (err) {
           AlertView.show('error', err.message);
         }
       }
     );
+  }
+}
+
+export class CreateTaskRandomController extends Controller {
+  getViewClass() {
+    return CreateTaskRandomView;
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    this.view.onCreateTaskRandomValues(async (searchParams, taskDetails) => {
+      try {
+        //Get sentences from API
+        const sentencesRes = await CreateTaskModel.sendApiRequest(
+          `/api/v1/sentences?${searchParams}`,
+          'GET'
+        );
+        // Add sentence ID array to req.body for task creation
+        taskDetails.sentences = sentencesRes.data.data.data.map((e) => e._id);
+
+        //Create task
+        const createTask = await CreateTaskModel.sendApiRequest(
+          '/api/v1/tasks',
+          'POST',
+          taskDetails
+        );
+        if (createTask) {
+          AlertView.show('success', 'Task created');
+        }
+      } catch (err) {
+        AlertView.show('error', err.message);
+      }
+    });
   }
 }
 

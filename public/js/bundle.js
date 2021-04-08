@@ -1717,9 +1717,15 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainingView = exports.DataParserView = exports.AlertView = exports.LogoutView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = void 0;
+exports.TrainingView = exports.CreateTaskRandomView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
 
 var _diff = require("diff");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 class View {
   constructor(baseElement) {
@@ -1805,20 +1811,8 @@ class FormView extends View {
     });
   }
 
-}
+} // GENERIC DOM MANIP
 
-class LoginFormView extends FormView {}
-
-exports.LoginFormView = LoginFormView;
-
-class SignupFormView extends FormView {}
-
-exports.SignupFormView = SignupFormView;
-
-class CreateSentenceFormView extends FormView {} // GENERIC DOM MANIP
-
-
-exports.CreateSentenceFormView = CreateSentenceFormView;
 
 class LogoutView extends View {}
 
@@ -1855,6 +1849,97 @@ class DataParserView extends View {
 
 
 exports.DataParserView = DataParserView;
+
+class LoginFormView extends FormView {}
+
+exports.LoginFormView = LoginFormView;
+
+class SignupFormView extends FormView {}
+
+exports.SignupFormView = SignupFormView;
+
+class CreateSentenceFormView extends FormView {}
+
+exports.CreateSentenceFormView = CreateSentenceFormView;
+
+class CreateTaskRandomView extends FormView {
+  constructor(element) {
+    super(element); //Get inputs (.elements name must match their corresponding switch's name)
+
+    _defineProperty(this, "onCreateTaskRandomValues", callback => {
+      this.root.addEventListener('submit', e => {
+        e.preventDefault();
+        const vivaRefRes = this.getUpperLower(this.elements.switches.vivaRefLow[0], this.elements.switches.vivaRefHigh[0], 'vivaRef');
+        const levelRes = this.getUpperLower(this.elements.switches.levelLow[0], this.elements.switches.levelHigh[0], 'level');
+        const nonToggleValues = this.getValues('.sentence-details');
+
+        const paramsObject = _objectSpread(_objectSpread(_objectSpread({}, vivaRefRes), levelRes), nonToggleValues);
+
+        const params = new URLSearchParams(paramsObject);
+        const searchParams = decodeURIComponent(params.toString());
+        const taskDetails = this.getValues('.task-details');
+        callback(searchParams, taskDetails);
+      });
+    });
+
+    _defineProperty(this, "showHide", el => {
+      if (el.checked) {
+        this.showElement(el.name);
+      } else {
+        this.hideElement(el.name);
+      }
+    });
+
+    this.elements.vivaRefLow = this.root.querySelector('.vivaref-low');
+    this.elements.vivaRefHigh = this.root.querySelector('.vivaref-high');
+    this.elements.levelLow = this.root.querySelector('.level-low');
+    this.elements.levelHigh = this.root.querySelector('.level-high');
+    this.elements.switches = {};
+    this.elements.switches.vivaRefLow = this.root.querySelector('.check-vivaref-low').getElementsByTagName('input');
+    this.elements.switches.vivaRefHigh = this.root.querySelector('.check-vivaref-high').getElementsByTagName('input');
+    this.elements.switches.levelLow = this.root.querySelector('.check-level-low').getElementsByTagName('input');
+    this.elements.switches.levelHigh = this.root.querySelector('.check-level-high').getElementsByTagName('input');
+    const switches = Array.from(this.root.querySelectorAll('input[type=checkbox]')); //Prep DOM
+
+    switches.forEach(e => this.showHide(e)); //Add event listener for change
+
+    switches.forEach(e => {
+      e.addEventListener('change', e => this.showHide(e.srcElement));
+    });
+  } //Function to return form data on submit
+
+
+  getValues(selector) {
+    const nonToggleInputs = Array.from(this.root.querySelectorAll("".concat(selector)));
+    const data = {};
+    nonToggleInputs.forEach(el => {
+      const name = el.name;
+
+      if (el.value) {
+        data[name] = el.value;
+      }
+    });
+    return data;
+  }
+
+  getUpperLower(checkOne, checkTwo, searchParam) {
+    const lowerValue = this.elements[checkOne.name].value;
+    const higherValue = this.elements[checkTwo.name].value;
+
+    if (checkTwo.checked) {
+      const res = "{\"".concat(searchParam, "[gte]\": ").concat(lowerValue, ",\n\t\t  \"").concat(searchParam, "[lte]\": ").concat(higherValue, "}");
+      return JSON.parse(res);
+    } else if (checkOne.checked) {
+      const res = JSON.parse("{\"".concat(searchParam, "\" : ").concat(lowerValue, "}"));
+      return res;
+    } else {
+      return null;
+    }
+  }
+
+}
+
+exports.CreateTaskRandomView = CreateTaskRandomView;
 
 class TrainingView extends FormView {
   constructor(element) {
@@ -3730,7 +3815,7 @@ module.exports = require('./lib/axios');
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.AuthModel = void 0;
+exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.CreateTaskModel = exports.AuthModel = void 0;
 
 var _views = require("./views.js");
 
@@ -3808,6 +3893,10 @@ class AuthModel extends Model {
 }
 
 exports.AuthModel = AuthModel;
+
+class CreateTaskModel extends Model {}
+
+exports.CreateTaskModel = CreateTaskModel;
 
 class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
@@ -3895,7 +3984,7 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.TrainController = exports.CreateTaskRandomController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -4022,7 +4111,9 @@ class CreateSentenceController extends Controller {
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar);
         this.view.clearFormData();
 
-        _views.AlertView.show('success', 'Sentence created');
+        if (res) {
+          _views.AlertView.show('success', 'Sentence created');
+        }
       } catch (err) {
         _views.AlertView.show('error', err.message);
       }
@@ -4032,6 +4123,35 @@ class CreateSentenceController extends Controller {
 }
 
 exports.CreateSentenceController = CreateSentenceController;
+
+class CreateTaskRandomController extends Controller {
+  getViewClass() {
+    return _views.CreateTaskRandomView;
+  }
+
+  constructor() {
+    super(...arguments);
+    this.view.onCreateTaskRandomValues(async (searchParams, taskDetails) => {
+      try {
+        //Get sentences from API
+        const sentencesRes = await _models.CreateTaskModel.sendApiRequest("/api/v1/sentences?".concat(searchParams), 'GET'); // Add sentence ID array to req.body for task creation
+
+        taskDetails.sentences = sentencesRes.data.data.data.map(e => e._id); //Create task
+
+        const createTask = await _models.CreateTaskModel.sendApiRequest('/api/v1/tasks', 'POST', taskDetails);
+
+        if (createTask) {
+          _views.AlertView.show('success', 'Task created');
+        }
+      } catch (err) {
+        _views.AlertView.show('error', err.message);
+      }
+    });
+  }
+
+}
+
+exports.CreateTaskRandomController = CreateTaskRandomController;
 
 class TrainController extends Controller {
   getViewClass() {
