@@ -20,6 +20,12 @@ router.get(
 );
 
 router.get(
+  '/create-task-random',
+  authController.protect,
+  viewsController.getSetTasksRandomForm
+);
+
+router.get(
   '/manage-classes',
   authController.protect,
   viewsController.manageMyClasses

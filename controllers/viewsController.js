@@ -56,6 +56,12 @@ exports.getSetTasksForm = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getSetTasksRandomForm = catchAsync(async (req, res, next) => {
+  res.status(200).render('settasksrandom', {
+    title: 'Create tasks',
+  });
+});
+
 //TEACHER CLASS MANAGEMENT
 exports.manageMyClasses = catchAsync(async (req, res, next) => {
   res.status(200).render('myclasses', {
