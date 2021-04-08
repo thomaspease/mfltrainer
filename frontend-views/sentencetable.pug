@@ -1,9 +1,15 @@
 table
+    tr
+        th
+            -// empty
+        each field in fields
+            th
+                =field
     each sentence in sentences
         tr
             td
                 input(type="checkbox" checked="" data-sentence_id=sentence.data._id)
             each field in fields
-              td
-                =sentence.data[field]
+                td
+                    =sentence.data[field]
             
