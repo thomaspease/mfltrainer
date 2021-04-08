@@ -1,5 +1,7 @@
 import { diffWords } from 'diff';
 
+import { sentencetableTemplate } from './templates/sentencetable';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -283,14 +285,7 @@ export class CreateTaskView extends View {
 
   updateDisplay(sentences, toSave) {
     const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
-    const rows = sentences.map(sentence => {
-      this.elements.table.innerHTML = '';
-      const maybeChecked = toSave.some(other => other.data._id == sentence.data._id) ? 'checked="checked"' : '';
-      // TODO, OH JEEZ DO NOT PUSH THIS PUBLIC, THIS IS HORRIBLY INSECURE (and also kind of janky *as well*)
-      const html = `<td><input type="checkbox" ${maybeChecked} data-sentence_id=${sentence.data._id}></td>` + fields.map(field => `<td>${sentence.data[field]}</td>`).join('\n')
 
-      return `<tr>${html}</tr>`;
-    })
-    this.elements.table.innerHTML = rows.join('\n')
+    this.elements.table.innerHTML = sentencetableTemplate({fields, sentences})
   }
 }
