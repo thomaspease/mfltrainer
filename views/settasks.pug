@@ -5,6 +5,8 @@ block content
         .card-container(data-controller="CreateTaskController")
             h2.heading-secondary Set tasks
             form.card.card__create-task-main
+                div.form-row
+                    button.btn.btn--green.set-tasks-button(type="button") Submit
                 div.grid.grid-top
                     div.number-sentences
                         label.form__label No. of sentences
@@ -39,9 +41,7 @@ block content
                             option=""
                             each value in fieldValues.tense
                               option= value
-                div.form-row
-                    button.btn.btn--green.set-tasks-button(type="button") Submit
-            table.sentence-table
+                table.sentence-table
             if false
                 form.card.card__create-task-secondary
                     label.form__label.label-vivaref-low Viva
