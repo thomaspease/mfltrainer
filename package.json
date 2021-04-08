@@ -6,7 +6,7 @@
 	"scripts": {
 		"watch:js": "parcel watch --no-hmr /js ./public/js/app.js --out-dir ./public/js --out-file bundle.js --public-url /js",
 		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
-    "build:frontend-pug": "./node_modules/pug-cli/index.js -c --name-after-file -o public/js/templates/ frontend-views/",
+    "build:frontend-pug": "./node_modules/pug-cli/index.js -c --name-after-file -o public/js/templates/ frontend-views/ && perl -pi -e 's/(function \\w+Template)/export $1/g' public/js/templates/*",
 		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
 		"serve": "nodemon server.js"
 	},
