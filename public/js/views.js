@@ -391,7 +391,11 @@ export class TrainingView extends FormView {
         (diff) => (diff.added ? 'highlight-wrong' : 'highlight-right')
       );
 
-      this.elements.correct_answer_inner.innerText = this.answer;
+      this.setAsHighlightedSpan(
+        'correct_answer_inner',
+        diffs.filter((diff) => !diff.added),
+        (diff) => (diff.removed ? 'highlight-wrong' : 'highlight-right')
+      );
     }
 
     // SET UP DOM STATE

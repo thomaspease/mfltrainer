@@ -2395,7 +2395,7 @@ class TrainingView extends FormView {
       'answer_feedback_inner', // pass only the diff entries that we want to display
       diffs.filter(diff => !diff.removed), // CSS class name callback
       diff => diff.added ? 'highlight-wrong' : 'highlight-right');
-      this.elements.correct_answer_inner.innerText = this.answer;
+      this.setAsHighlightedSpan('correct_answer_inner', diffs.filter(diff => !diff.added), diff => diff.removed ? 'highlight-wrong' : 'highlight-right');
     } // SET UP DOM STATE
 
     {

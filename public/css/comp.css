@@ -666,11 +666,14 @@ input {
     align-items: center;
     justify-items: center; }
 
-.highlight-right {
+.answer-feedback .highlight-right {
   color: green; }
 
-.highlight-wrong {
+.answer-feedback .highlight-wrong {
   color: red; }
+
+.correct-answer .highlight-wrong {
+  color: orange; }
 
 .answer-feedback-inner,
 .correct-answer-inner {
