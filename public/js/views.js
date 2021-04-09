@@ -103,13 +103,17 @@ export class AlertView extends View {
   }
 
   // type is 'success' or 'error'
+  // returns a promise (that resolves when the alert is hidden by timeout)
   static show(type, msg) {
     this.hide();
     const markup = `<div class="alert alert--${type}">${msg}</div>`;
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-    window.setTimeout(() => {
-      this.hide();
-    }, 3000);
+    return new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.hide();
+        resolve();
+      }, 3000);
+    })
   }
 }
 

@@ -2161,15 +2161,19 @@ class AlertView extends View {
     const el = document.querySelector('.alert');
     if (el) el.parentElement.removeChild(el);
   } // type is 'success' or 'error'
+  // returns a promise (that resolves when the alert is hidden by timeout)
 
 
   static show(type, msg) {
     this.hide();
     const markup = "<div class=\"alert alert--".concat(type, "\">").concat(msg, "</div>");
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-    window.setTimeout(() => {
-      this.hide();
-    }, 3000);
+    return new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.hide();
+        resolve();
+      }, 3000);
+    });
   }
 
 }
@@ -4618,13 +4622,14 @@ class TrainController extends Controller {
   }
 
   doNextSentence() {
-    console.log(this.sentences.length);
-    console.log(this.sentences[0]);
-
     if (!this.sentences[0]) {
-      this.view.finish(); // empty 'then' just so we trigger the async function
+      this.view.finish(); // wait to show the AlertView until *after* the data has hit the server successfully
 
-      this.sendResultsToServer().then(_ => _);
+      this.sendResultsToServer().then(() => {
+        return _views.AlertView.show('success', 'Task Completed');
+      }).then(() => {
+        window.location = '/';
+      });
       return;
     }
 

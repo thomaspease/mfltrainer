@@ -223,12 +223,14 @@ export class TrainController extends Controller {
   }
 
   doNextSentence() {
-    console.log(this.sentences.length);
-    console.log(this.sentences[0]);
     if (!this.sentences[0]) {
       this.view.finish();
-      // empty 'then' just so we trigger the async function
-      this.sendResultsToServer().then((_) => _);
+      // wait to show the AlertView until *after* the data has hit the server successfully
+      this.sendResultsToServer().then(() => {
+        return AlertView.show('success', 'Task Completed');
+      }).then(() => {
+        window.location = '/';
+      });
       return;
     }
 
