@@ -1,5 +1,5 @@
 node_modules/
-config.env
+*.env
 dev-data/data
 Resources/
 .cache/
