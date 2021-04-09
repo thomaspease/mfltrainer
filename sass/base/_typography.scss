@@ -29,9 +29,11 @@ a:link,
 a:visited {
   text-decoration: none;
   color: #0e79c9;
+  font-weight: bold;
 }
 
 a:hover {
   color: #004696;
   cursor: pointer;
+  font-weight: bold;
 }

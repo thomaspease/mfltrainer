@@ -148,8 +148,9 @@ export class CreateTaskRandomController extends Controller {
           `/api/v1/sentences?${searchParams}`,
           'GET'
         );
-        // Add sentence ID array to req.body for task creation
+        // Add sentence ID array and teacher to req.body for task creation
         taskDetails.sentences = sentencesRes.data.data.data.map((e) => e._id);
+        taskDetails.teacher = DataParserView.get('user');
 
         //Create task
         const createTask = await CreateTaskModel.sendApiRequest(
@@ -226,11 +227,13 @@ export class TrainController extends Controller {
     if (!this.sentences[0]) {
       this.view.finish();
       // wait to show the AlertView until *after* the data has hit the server successfully
-      this.sendResultsToServer().then(() => {
-        return AlertView.show('success', 'Task Completed');
-      }).then(() => {
-        window.location = '/';
-      });
+      this.sendResultsToServer()
+        .then(() => {
+          return AlertView.show('success', 'Task Completed');
+        })
+        .then(() => {
+          window.location = '/';
+        });
       return;
     }
 
@@ -322,6 +325,7 @@ export class CreateTaskChooseSentenceController extends Controller {
 
       const taskDetails = this.view.getValues('.task-details');
       taskDetails.sentences = sentences;
+      taskDetails.teacher = DataParserView.get('user');
 
       const createTask = await CreateTaskModel.sendApiRequest(
         '/api/v1/tasks',

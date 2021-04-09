@@ -56,10 +56,14 @@ exports.getSetTasksForm = catchAsync(async (req, res, next) => {
 
   // doing an `await Promise.all` so that we can get each DB query in-flight at the same time (less chance of bottlenecking), rather than having to stagger them
   await Promise.all([
-    Sentence.distinct('grammar').then(values => fieldValues.grammar = values),
-    Sentence.distinct('vivaRef').then(values => fieldValues.vivaRef = values),
-    Sentence.distinct('tense').then(values => fieldValues.tense = values),
-  ])
+    Sentence.distinct('grammar').then(
+      (values) => (fieldValues.grammar = values)
+    ),
+    Sentence.distinct('vivaRef').then(
+      (values) => (fieldValues.vivaRef = values)
+    ),
+    Sentence.distinct('tense').then((values) => (fieldValues.tense = values)),
+  ]);
 
   res.status(200).render('settasks', {
     title: 'Create tasks',
@@ -92,7 +96,7 @@ exports.getClass = catchAsync(async (req, res, next) => {
 
 //TEACHER TASK MANAGEMENT
 exports.manageMyTasks = catchAsync(async (req, res, next) => {
-  const tasks = await Task.find({ teacher: res.locals.user.id });
+  const tasks = await Task.find({ teacher: res.locals.user._id });
 
   res.status(200).render('mytasks', {
     title: 'My tasks',

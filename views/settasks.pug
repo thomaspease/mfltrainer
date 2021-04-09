@@ -1,5 +1,9 @@
 extends base
 
+mixin js-value(name, value)
+    -// TODO: move this mixin into a global pug file (maybe `base.pug`? or a mixins helper file?)
+    input.js-value(type="hidden" name=name value=JSON.stringify(value))
+
 block content
     main.main
         .card-container(data-controller="CreateTaskChooseSentenceController")
@@ -47,56 +51,4 @@ block content
                             each value in fieldValues.tense
                               option= value
                 div.sentence-table-holder
-            if false
-                form.card.card__create-task-secondary
-                    label.form__label.label-vivaref-low Viva
-                    div.check-vivaref-low
-                        div.switch
-                            input#switch-vivaref-low.switch-input(type='checkbox')
-                            label.switch-label(for='switch-vivaref-low')
-                    div.vivaref-low
-                        input.form__input(type='number', min=10, max=60, placeholder='Viva lower limit', value=10, required)
-                    label.form__label.label-vivaref-high Viva upper limit
-                    div.check-vivaref-high
-                        div.switch
-                            input#switch-vivaref-high.switch-input(type='checkbox')
-                            label.switch-label(for='switch-vivaref-high')
-                    div.vivaref-high
-                        input.form__input(type='number', min=10, max=60, placeholder='Viva upper limit', value=60, required)
-                    
-                    //Levels--------------------
-                    label.form__label.label-level-low GCSE level 
-                    div.check-level-low
-                        div.switch
-                            input#switch-level-low.switch-input(type='checkbox')
-                            label.switch-label(for='switch-level-low')
-                    div.level-low
-                        input.form__input(type='number', min=1, max=9, placeholder='Viva lower limit', value=1, required)
-                    label.form__label.label-level-high GCSE level upper limit 
-                    div.check-level-high
-                        div.switch
-                            input#switch-level-high.switch-input(type='checkbox')
-                            label.switch-label(for='switch-level-high')
-                    div.level-high
-                        input.form__input(type='number', min=1, max=9, placeholder='Viva upper limit', value=9, required)
-                    
-                    //Tense and grammar
-                    div.select-tense
-                        label.form__label Tense
-                        select.select-css
-                            option All 
-                            option Present
-                            option Preterite
-                            option Imperfect
-                            option Future
-                    div.select-grammar
-                        label.form__label Type of exercise
-                        select.select-css
-                            option All 
-                            option To be filled in
-                    
-                    button.btn.btn--green.set-tasks-button Submit
-                    
-                    
-
-
+            +js-value('user', user._id)

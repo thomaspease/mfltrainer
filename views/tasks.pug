@@ -1,17 +1,27 @@
 extends base
 
+mixin row(name, completed, due, id)
+    tr  
+        td.td-left
+            a.truncate-text(href=`/train/${id}`) #{name}
+        td #{completed}
+        td #{due}
+
 block user-content
     main.main
-        form.card
-            .card__exercise-list
-                div.card-text.card-text--bold Tasks
-                div.card-text.card-text--bold Due
-                div.card-text.card-text--bold Completed?
-                each thing in studentTasks
-                    a.card-text.card-text--bold(href=`/train/${thing.id}`) #{thing.task[0].name}
-                    div.card-text.card-text--bold #{thing.task[0].dueDate.toDateString()}
-                    div.card-text.card-text--bold #{JSON.stringify(thing.completed)}
-                div.card-text.card-text--italic
+        div.card-container
+            h2.heading-secondary.ma-bt-md My tasks
+            div.card
+                table
+                    thead
+                        tr
+                            th Task 
+                            th Completed 
+                            th.td-right Due
+                            
+                    tbody
+                        each task in studentTasks
+                            +row(task.task[0].name, task.completed, task.task[0].dueDate.toDateString(), task.id)
 
 
                     
