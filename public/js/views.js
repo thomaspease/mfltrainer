@@ -350,6 +350,8 @@ export class TrainingView extends FormView {
 
       this.clearAnswerText();
 
+      this.elements.input.focus();
+
       this.trigger('next');
     });
   }

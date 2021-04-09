@@ -2356,6 +2356,7 @@ class TrainingView extends FormView {
       this.hideGroup('feedback');
       this.showGroup('dataEntry');
       this.clearAnswerText();
+      this.elements.input.focus();
       this.trigger('next');
     });
   }
