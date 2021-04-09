@@ -151,7 +151,7 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
 
     //Populate with student tasks
     const studentTasks = await StudentTask.find({
-      student: decoded.id,
+      user: decoded.id,
     }).populate('task');
     res.locals.studentTasks = studentTasks;
 

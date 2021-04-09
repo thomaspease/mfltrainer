@@ -87,9 +87,21 @@
 
 /*---BUTTON ---*/
 
-.set-tasks-button {
+.set-tasks-button-random-sentences {
   grid-area: button;
   margin: 2rem 10% 0 10%;
 }
 
+.set-tasks-button-choose-sentences {
+  grid-area: button;
+}
+
+// Banner
+
+.banner {
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  height: 2rem;
+  grid-area: banner;
+  margin-bottom: 1rem;
+}
 /*--- HEATHER'S QUICK PATCHES ---*/

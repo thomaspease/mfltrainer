@@ -270,7 +270,7 @@ a:hover {
     grid-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr; }
   .card__create-task-chosen .grid-top {
-    grid-template-areas: 'number class type'; }
+    grid-template-areas: 'task-name task-name due-date' 'class type button' 'banner banner banner'; }
   .card__create-task-chosen .grid-filters {
     grid-template-areas: 'vivaRef tense grammar'; }
 
@@ -609,9 +609,18 @@ input {
   grid-area: vivaRef; }
 
 /*---BUTTON ---*/
-.set-tasks-button {
+.set-tasks-button-random-sentences {
   grid-area: button;
   margin: 2rem 10% 0 10%; }
+
+.set-tasks-button-choose-sentences {
+  grid-area: button; }
+
+.banner {
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  height: 2rem;
+  grid-area: banner;
+  margin-bottom: 1rem; }
 
 /*--- HEATHER'S QUICK PATCHES ---*/
 .user-view {
