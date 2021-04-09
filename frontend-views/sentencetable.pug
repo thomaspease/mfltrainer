@@ -1,15 +1,20 @@
-table
-    tr
-        th
-            -// empty
+table.sentence-table
+    colgroup
+        col.selected-toggle.narrow
         each field in fields
-            th
-                =field
-    each sentence in sentences
+            col(class=(fieldClasses[field] || ''))
+    tbody
         tr
-            td
-                input(type="checkbox" checked="" data-sentence_id=sentence.data._id)
+            th
+                -// empty
             each field in fields
+                th
+                    =field
+        each sentence in sentences
+            tr
                 td
-                    =sentence.data[field]
-            
+                    input(type="checkbox" checked="" data-sentence_id=sentence.data._id)
+                each field in fields
+                    td
+                        =sentence.data[field]
+                

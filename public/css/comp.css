@@ -260,19 +260,26 @@ a:hover {
     grid-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 'task-name task-name due-date' 'number class type'; }
-    .card__create-task-main .grid {
-      display: grid;
-      grid-gap: 1rem;
-      grid-template-columns: 1fr 1fr 1fr; }
-    .card__create-task-main .grid-top {
-      grid-template-areas: 'number class type'; }
-    .card__create-task-main .grid-filters {
-      grid-template-areas: 'vivaRef tense grammar'; }
   .card__create-task-secondary {
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: 1fr 6fr 1fr 6fr;
     grid-template-areas: 'label-vivaref-low label-vivaref-low label-vivaref-high label-vivaref-high' 'check-vivaref-low vivaref-low check-vivaref-high vivaref-high' 'label-level-low label-level-low label-level-high label-level-high' 'check-level-low level-low check-level-high level-high' 'tense tense grammar grammar' 'button button button button'; }
+  .card__create-task-chosen .grid {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 1fr 1fr 1fr; }
+  .card__create-task-chosen .grid-top {
+    grid-template-areas: 'number class type'; }
+  .card__create-task-chosen .grid-filters {
+    grid-template-areas: 'vivaRef tense grammar'; }
+
+.sentence-table {
+  table-layout: fixed; }
+  .sentence-table .narrow {
+    min-width: 85px;
+    width: 85px;
+    max-width: 85px; }
 
 @media only screen and (max-width: 40em) {
   .card__exercise {

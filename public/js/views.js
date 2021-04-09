@@ -356,7 +356,7 @@ export class CreateTaskView extends View {
   constructor(element) {
     super(element);
 
-    this.elements.table = this.root.querySelector('table.sentence-table')
+    this.elements.tableParent = this.root.querySelector('.sentence-table-holder')
     this.elements.saveButton = this.root.querySelector('button.set-tasks-button')
 
     this.getFilterElements().forEach(el => {
@@ -365,7 +365,7 @@ export class CreateTaskView extends View {
 
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
 
-    this.elements.table.addEventListener('change', evt => {
+    this.elements.tableParent.addEventListener('change', evt => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
         const sentenceId = evt.target.dataset.sentence_id
         if (sentenceId) {
@@ -389,7 +389,13 @@ export class CreateTaskView extends View {
 
   updateDisplay(sentences, toSave) {
     const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
+    const fieldClasses = {
+      grammar: 'narrow',
+      vivaRef: 'narrow',
+      tense: 'narrow',
+      level: 'narrow',
+    }
 
-    this.elements.table.innerHTML = sentencetableTemplate({fields, sentences})
+    this.elements.tableParent.innerHTML = sentencetableTemplate({fields, sentences, fieldClasses})
   }
 }
