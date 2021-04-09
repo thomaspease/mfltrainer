@@ -1711,16 +1711,8 @@ var global = arguments[3];
     value: true
   });
 });
-},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
-
 },{}],"templates/sentencetable.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.sentencetableTemplate = sentencetableTemplate;
-
+var global = arguments[3];
 function pug_attr(t, e, n, r) {
   if (!1 === e || null == e || !e && ("class" === t || "style" === t)) return "";
   if (!0 === e) return " " + (r ? t : t + '="' + t + '"');
@@ -1792,7 +1784,7 @@ function pug_rethrow(n, e, r, t) {
   if (!("undefined" == typeof window && e || t)) throw n.message += " on line " + r, n;
 
   try {
-    t = t || require("fs").readFileSync(e, "utf8");
+    t = t || global["require"]("fs").readFileSync(e, "utf8");
   } catch (e) {
     pug_rethrow(n, null, r);
   }
@@ -2048,7 +2040,7 @@ function sentencetableTemplate(locals) {
   ;
   return pug_html;
 }
-},{"fs":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"views.js":[function(require,module,exports) {
+},{}],"views.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2327,7 +2319,11 @@ class TrainingView extends FormView {
 
     // CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
     function normalize(str) {
-      return str.toLowerCase().trim().replace(/\s+/g, ' ');
+      // compare, ignoring:
+      //   - case differences
+      //   - all punctuation
+      //   - whitespace (we're currently stripping *all*, maybe we should just strip adjacent?) 
+      return str.toLowerCase().trim().replace(/\s+/g, '').replace(/\W/g, '');
     } // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
 
 
