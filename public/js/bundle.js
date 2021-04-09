@@ -2287,7 +2287,11 @@ class TrainingView extends FormView {
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
+    this.elements.answer_feedback_inner = this.root.querySelector('.answer-feedback-inner');
     this.elements.correct_answer = this.root.querySelector('.correct-answer');
+    this.elements.correct_answer_inner = this.root.querySelector('.correct-answer-inner');
+    this.elements.right_count = this.root.querySelector('.right-count');
+    this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector('button[type=submit]');
     this.elements.next_button = this.root.querySelector('button[type=button].btn-next'); // define some groups of elements
 
@@ -2306,9 +2310,14 @@ class TrainingView extends FormView {
     });
   }
 
+  updateCounts(right, total) {
+    this.elements.right_count.innerText = right;
+    this.elements.total_count.innerText = total;
+  }
+
   clearAnswerText() {
     this.elements.input.value = '';
-    this.elements.correct_answer.innerText = '';
+    this.elements.correct_answer_inner.innerText = '';
   }
 
   handleStudentAnswer(_ref) {
@@ -2331,10 +2340,10 @@ class TrainingView extends FormView {
       // NOTE from Heather to Tom:
       //   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
       this.setAsHighlightedSpan( // element name
-      'answer_feedback', // pass only the diff entries that we want to display
+      'answer_feedback_inner', // pass only the diff entries that we want to display
       diffs.filter(diff => !diff.removed), // CSS class name callback
       diff => diff.added ? 'highlight-wrong' : 'highlight-right');
-      this.elements.correct_answer.innerText = this.answer;
+      this.elements.correct_answer_inner.innerText = this.answer;
     } // SET UP DOM STATE
 
     {
@@ -4562,6 +4571,7 @@ class TrainController extends Controller {
     this.initialCount = this.sentences.length;
     this.rightCount = 0;
     this.wrongCount = 0;
+    this.view.updateCounts(this.rightCount, this.initialCount);
     this.view.on('answer', this.doAnswer.bind(this));
     this.view.on('next', this.doNextSentence.bind(this));
     this.doNextSentence();
@@ -4581,15 +4591,18 @@ class TrainController extends Controller {
     });
 
     if (isCorrect) {
+      _views.AlertView.show('success', 'Correct Answer');
+
       this.rightCount++;
     } else {
+      _views.AlertView.show('error', 'Incorrect Answer');
+
       this.wrongCount++;
       const insertionIndex = Math.min(this.sentences.length, desiredReaskLength);
       this.sentences.splice(insertionIndex, 0, sentenceObject);
     }
 
-    console.log(this.sentences);
-    console.log(this.finishedSentences);
+    this.view.updateCounts(this.rightCount, this.initialCount);
   }
 
   doNextSentence() {
@@ -4607,8 +4620,7 @@ class TrainController extends Controller {
 
   async sendResultsToServer() {
     try {
-      _models.StudentResultsModel.send(this.correctCount, this.wrongCount, this.finishedSentences); // do we need to show feedback or anything?
-
+      await _models.StudentResultsModel.send(this.correctCount, this.wrongCount, this.finishedSentences); // do we need to show feedback or anything?
     } catch (err) {
       _views.AlertView.show('error', err.message);
     }

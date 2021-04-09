@@ -184,6 +184,8 @@ export class TrainController extends Controller {
     this.rightCount = 0;
     this.wrongCount = 0;
 
+    this.view.updateCounts(this.rightCount, this.initialCount);
+
     this.view.on('answer', this.doAnswer.bind(this));
     this.view.on('next', this.doNextSentence.bind(this));
 
@@ -201,8 +203,10 @@ export class TrainController extends Controller {
     });
 
     if (isCorrect) {
+      AlertView.show('success', 'Correct Answer');
       this.rightCount++;
     } else {
+      AlertView.show('error', 'Incorrect Answer');
       this.wrongCount++;
 
       const insertionIndex = Math.min(
@@ -212,8 +216,7 @@ export class TrainController extends Controller {
       this.sentences.splice(insertionIndex, 0, sentenceObject);
     }
 
-    console.log(this.sentences);
-    console.log(this.finishedSentences);
+    this.view.updateCounts(this.rightCount, this.initialCount);
   }
 
   doNextSentence() {
@@ -232,7 +235,7 @@ export class TrainController extends Controller {
 
   async sendResultsToServer() {
     try {
-      StudentResultsModel.send(
+      await StudentResultsModel.send(
         this.correctCount,
         this.wrongCount,
         this.finishedSentences

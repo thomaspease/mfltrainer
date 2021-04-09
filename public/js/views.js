@@ -243,7 +243,11 @@ export class TrainingView extends FormView {
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
+    this.elements.answer_feedback_inner = this.root.querySelector('.answer-feedback-inner');
     this.elements.correct_answer = this.root.querySelector('.correct-answer');
+    this.elements.correct_answer_inner = this.root.querySelector('.correct-answer-inner');
+    this.elements.right_count = this.root.querySelector('.right-count');
+    this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector(
       'button[type=submit]'
     );
@@ -271,9 +275,14 @@ export class TrainingView extends FormView {
     });
   }
 
+  updateCounts(right, total) {
+    this.elements.right_count.innerText = right;
+    this.elements.total_count.innerText = total;
+  }
+
   clearAnswerText() {
     this.elements.input.value = '';
-    this.elements.correct_answer.innerText = '';
+    this.elements.correct_answer_inner.innerText = '';
   }
 
   handleStudentAnswer({ student_answer }) {
@@ -294,14 +303,14 @@ export class TrainingView extends FormView {
       //   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
       this.setAsHighlightedSpan(
         // element name
-        'answer_feedback',
+        'answer_feedback_inner',
         // pass only the diff entries that we want to display
         diffs.filter((diff) => !diff.removed),
         // CSS class name callback
         (diff) => (diff.added ? 'highlight-wrong' : 'highlight-right')
       );
 
-      this.elements.correct_answer.innerText = this.answer;
+      this.elements.correct_answer_inner.innerText = this.answer;
     }
 
     // SET UP DOM STATE
