@@ -318,10 +318,8 @@ export class CreateTaskChooseSentenceController extends Controller {
     try {
       const sentences = this.sentencesToSave.map((e) => e.data._id);
 
-      const taskDetails = {
-        ...this.view.getValues('.task-details'),
-        ...sentences,
-      };
+      const taskDetails = this.view.getValues('.task-details');
+      taskDetails.sentences = sentences;
 
       const createTask = await CreateTaskModel.sendApiRequest(
         '/api/v1/tasks',

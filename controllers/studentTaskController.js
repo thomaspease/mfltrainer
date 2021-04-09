@@ -7,7 +7,12 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.getAllStudentTasks = factory.getAll(StudentTask);
+exports.createStudentTask = factory.createOne(StudentTask);
+exports.getStudentTask = factory.getOne(StudentTask);
+exports.updateStudentTask = factory.updateOne(StudentTask);
+exports.deleteStudentTask = factory.deleteOne(StudentTask);
 
+///Unfinished
 exports.getStudentTasksFromStudentId = catchAsync(async (Id) => {
   return await StudentTask.find({ student: Id });
 });

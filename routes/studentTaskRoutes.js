@@ -6,6 +6,16 @@ const authController = require('../controllers/authController');
 const router = express.Router({ mergeParams: true });
 
 router
+  .route('/')
+  .get(studentTaskController.getAllStudentTasks)
+  .post(studentTaskController.createStudentTask);
+
+router
+  .route('/:id')
+  .get(studentTaskController.getStudentTask)
+  .patch(studentTaskController.updateStudentTask);
+
+router
   .route('/:id')
   .delete(studentTaskController.deleteStudentTaskAndObjectIdRef);
 

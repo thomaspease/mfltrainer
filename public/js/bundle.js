@@ -4397,12 +4397,6 @@ var _views = require("./views.js");
 
 var _models = require("./models.js");
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
   constructor(viewBaseElement) {
@@ -4703,9 +4697,8 @@ class CreateTaskChooseSentenceController extends Controller {
   async save() {
     try {
       const sentences = this.sentencesToSave.map(e => e.data._id);
-
-      const taskDetails = _objectSpread(_objectSpread({}, this.view.getValues('.task-details')), sentences);
-
+      const taskDetails = this.view.getValues('.task-details');
+      taskDetails.sentences = sentences;
       const createTask = await _models.CreateTaskModel.sendApiRequest('/api/v1/tasks', 'POST', taskDetails);
 
       if (createTask) {
