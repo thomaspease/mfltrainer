@@ -280,6 +280,9 @@ a:hover {
     min-width: 85px;
     width: 85px;
     max-width: 85px; }
+  .sentence-table input[type=checkbox] {
+    width: 25px;
+    height: 25px; }
 
 @media only screen and (max-width: 40em) {
   .card__exercise {
@@ -666,11 +669,17 @@ input {
     align-items: center;
     justify-items: center; }
 
-.highlight-right {
+.answer-feedback .highlight-right {
   color: green; }
 
-.highlight-wrong {
+.answer-feedback .highlight-wrong {
   color: red; }
+
+.correct-answer .highlight-wrong {
+  color: orange; }
+
+.card-text.standin-for-input {
+  padding: 10px; }
 
 .answer-feedback-inner,
 .correct-answer-inner {

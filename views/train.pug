@@ -10,7 +10,7 @@ block content
             .card__exercise
                 div.card-title.card-text.card-text--bold Question text
                 input.form__input(type='text', name='student_answer', placeholder='Answer', required)
-                span.answer-feedback.card-text
+                span.answer-feedback.card-text.standin-for-input
                     ="Your answer: " /* JS string so that the trailing space is easier to spot */
                     span.answer-feedback-inner
                 button.btn.btn--green.btn--green__exercise(type="submit") Submit
@@ -24,6 +24,7 @@ block content
                     span.total-count
                     =" sentences answered"
         +js-value('sentences', sentences)
+        +js-value('exercise', exercise)
     script
         var sentences= !{JSON.stringify(sentences)}
         //The type of exercise is passed in as the pug variable 'exercise' and will be 'gapped', 'translation', or 'transcription'

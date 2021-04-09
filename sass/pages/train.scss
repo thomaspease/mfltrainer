@@ -1,8 +1,23 @@
-.highlight-right {
-  color: green;
+.answer-feedback {
+  .highlight-right {
+    color: green;
+  }
+  .highlight-wrong {
+    color: red;
+  }
 }
-.highlight-wrong {
-  color: red;
+
+.correct-answer {
+  .highlight-right {
+    // leave the default style
+  }
+  .highlight-wrong {
+    color: orange;
+  }
+}
+
+.card-text.standin-for-input {
+  padding: 10px;
 }
 
 .answer-feedback-inner,

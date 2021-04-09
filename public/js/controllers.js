@@ -2,6 +2,7 @@ import {
   LoginFormView,
   TrainingView,
   CreateSentenceFormView,
+  DataParserView,
   AlertView,
   LogoutView,
   SignupFormView,
@@ -174,8 +175,10 @@ export class TrainController extends Controller {
   constructor(...args) {
     super(...args);
 
+    const exerciseType = DataParserView.get('exercise');
+
     this.sentences = SentenceModel.getLocal('sentences').map((sent) =>
-      sent.subclassAs('translation')
+      sent.subclassAs(exerciseType)
     );
     this.finishedSentences = [];
 
@@ -222,8 +225,12 @@ export class TrainController extends Controller {
   doNextSentence() {
     if (!this.sentences[0]) {
       this.view.finish();
-      // empty 'then' just so we trigger the async function
-      this.sendResultsToServer().then((_) => _);
+      // wait to show the AlertView until *after* the data has hit the server successfully
+      this.sendResultsToServer().then(() => {
+        return AlertView.show('success', 'Task Completed');
+      }).then(() => {
+        window.location = '/';
+      });
       return;
     }
 

@@ -103,13 +103,17 @@ export class AlertView extends View {
   }
 
   // type is 'success' or 'error'
+  // returns a promise (that resolves when the alert is hidden by timeout)
   static show(type, msg) {
     this.hide();
     const markup = `<div class="alert alert--${type}">${msg}</div>`;
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-    window.setTimeout(() => {
-      this.hide();
-    }, 3000);
+    return new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.hide();
+        resolve();
+      }, 3000);
+    })
   }
 }
 
@@ -350,6 +354,8 @@ export class TrainingView extends FormView {
 
       this.clearAnswerText();
 
+      this.elements.input.focus();
+
       this.trigger('next');
     });
   }
@@ -368,7 +374,9 @@ export class TrainingView extends FormView {
     // CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
 
     function normalize(str) {
-      return str.toLowerCase().trim().replace(/\s+/g, ' ');
+      // normalize to ONLY letters and numbers (cross-language), lowercase
+      // this'll require fairly modern JS, incidentally 
+      return str.replace(/[^\p{Letter}\p{Number}]/ugi, '').toLowerCase()
     }
 
     // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
@@ -389,13 +397,19 @@ export class TrainingView extends FormView {
         (diff) => (diff.added ? 'highlight-wrong' : 'highlight-right')
       );
 
-      this.elements.correct_answer_inner.innerText = this.answer;
+      this.setAsHighlightedSpan(
+        'correct_answer_inner',
+        diffs.filter((diff) => !diff.added),
+        (diff) => (diff.removed ? 'highlight-wrong' : 'highlight-right')
+      );
     }
 
     // SET UP DOM STATE
     {
       this.hideGroup('dataEntry');
       this.showGroup('feedback');
+
+      this.elements.next_button.focus();
 
       this.trigger('answer', { student_answer, isCorrect });
     }

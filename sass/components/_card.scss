@@ -55,6 +55,12 @@
     width: $narrow-width;
     max-width: $narrow-width;
   }
+
+  input[type=checkbox] {
+    $size: 25px;
+    width: $size;
+    height: $size;
+  }
 }
 
 //These media queries (also one in button) presumably need to be done better

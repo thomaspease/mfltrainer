@@ -86,7 +86,7 @@ export class CreateSentenceModel extends Model {
 
 // TODO maybe move some of the data from the controller into this?
 export class StudentResultsModel extends Model {
-  static async sendResults(correctCount, wrongCount, studentSentences) {
+  static async send(correctCount, wrongCount, studentSentences) {
     const payload = {
       correctCount: this.correctCount,
       wrongCount: this.wrongCount,
@@ -98,10 +98,10 @@ export class StudentResultsModel extends Model {
 }
 
 export class SentenceModel extends Model {
-  // type is 'gap' or 'translation'
+  // type is 'gapped' or 'translation'
   subclassAs(type) {
     switch (type) {
-      case 'gap':
+      case 'gapped':
         return new GappedSentenceModel(this.data);
       case 'translation':
         return new TranslationSentenceModel(this.data);
