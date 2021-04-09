@@ -98,10 +98,10 @@ export class StudentResultsModel extends Model {
 }
 
 export class SentenceModel extends Model {
-  // type is 'gap' or 'translation'
+  // type is 'gapped' or 'translation'
   subclassAs(type) {
     switch (type) {
-      case 'gap':
+      case 'gapped':
         return new GappedSentenceModel(this.data);
       case 'translation':
         return new TranslationSentenceModel(this.data);

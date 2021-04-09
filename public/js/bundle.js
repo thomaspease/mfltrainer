@@ -4333,10 +4333,10 @@ class StudentResultsModel extends Model {
 exports.StudentResultsModel = StudentResultsModel;
 
 class SentenceModel extends Model {
-  // type is 'gap' or 'translation'
+  // type is 'gapped' or 'translation'
   subclassAs(type) {
     switch (type) {
-      case 'gap':
+      case 'gapped':
         return new GappedSentenceModel(this.data);
 
       case 'translation':
@@ -4573,7 +4573,10 @@ class TrainController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs('translation'));
+
+    const exerciseType = _views.DataParserView.get('exercise');
+
+    this.sentences = _models.SentenceModel.getLocal('sentences').map(sent => sent.subclassAs(exerciseType));
     this.finishedSentences = [];
     this.initialCount = this.sentences.length;
     this.rightCount = 0;
@@ -4613,6 +4616,9 @@ class TrainController extends Controller {
   }
 
   doNextSentence() {
+    console.log(this.sentences.length);
+    console.log(this.sentences[0]);
+
     if (!this.sentences[0]) {
       this.view.finish(); // empty 'then' just so we trigger the async function
 

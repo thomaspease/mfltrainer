@@ -24,6 +24,4 @@ block content
                     span.total-count
                     =" sentences answered"
         +js-value('sentences', sentences)
-    script
-        var sentences= !{JSON.stringify(sentences)}
-        //The type of exercise is passed in as the pug variable 'exercise' and will be 'gapped', 'translation', or 'transcription'
+        +js-value('exercise', exercise)
