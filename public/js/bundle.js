@@ -1713,6 +1713,13 @@ var global = arguments[3];
 });
 },{}],"templates/sentencetable.js":[function(require,module,exports) {
 var global = arguments[3];
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sentencetableTemplate = sentencetableTemplate;
+
 function pug_attr(t, e, n, r) {
   if (!1 === e || null == e || !e && ("class" === t || "style" === t)) return "";
   if (!0 === e) return " " + (r ? t : t + '="' + t + '"');
