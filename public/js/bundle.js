@@ -2349,6 +2349,7 @@ class TrainingView extends FormView {
     {
       this.hideGroup('dataEntry');
       this.showGroup('feedback');
+      this.elements.next_button.focus();
       this.trigger('answer', {
         student_answer,
         isCorrect
