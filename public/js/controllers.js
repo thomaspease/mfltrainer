@@ -6,7 +6,7 @@ import {
   LogoutView,
   SignupFormView,
   CreateTaskRandomView,
-  CreateTaskView,
+  CreateTaskChooseSentenceView,
 } from './views.js';
 import {
   AuthModel,
@@ -247,9 +247,9 @@ export class TrainController extends Controller {
   }
 }
 
-export class CreateTaskController extends Controller {
+export class CreateTaskChooseSentenceController extends Controller {
   getViewClass() {
-    return CreateTaskView;
+    return CreateTaskChooseSentenceView;
   }
 
   constructor(viewBaseElement) {
@@ -309,10 +309,26 @@ export class CreateTaskController extends Controller {
     this.view.updateDisplay(sentences, this.sentencesToSave);
   }
 
-  save() {
-    const sentences = this.sentencesToSave;
+  async save() {
+    try {
+      const sentences = this.sentencesToSave.map((e) => e.data._id);
 
-    // TODO put actualy save logic here
-    AlertView.show('success', 'placeholder');
+      const taskDetails = {
+        ...this.view.getValues('.task-details'),
+        ...sentences,
+      };
+
+      const createTask = await CreateTaskModel.sendApiRequest(
+        '/api/v1/tasks',
+        'POST',
+        taskDetails
+      );
+
+      if (createTask) {
+        AlertView.show('success', 'Task created!');
+      }
+    } catch (err) {
+      AlertView.show('error', err.message);
+    }
   }
 }

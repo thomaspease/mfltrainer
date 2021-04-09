@@ -123,15 +123,37 @@ export class DataParserView extends View {
   }
 }
 
-// SPECIFIC PAGES
+// AUTH VIEWS -----------
 
 export class LoginFormView extends FormView {}
 
 export class SignupFormView extends FormView {}
 
+// CREATE SENTENCE VIEWS --------
+
 export class CreateSentenceFormView extends FormView {}
 
-export class CreateTaskRandomView extends FormView {
+// CREATE TASK VIEWS --------
+
+class CreateTaskView extends View {
+  getValues(selector) {
+    const nonToggleInputs = Array.from(
+      this.root.querySelectorAll(`${selector}`)
+    );
+    const data = {};
+
+    nonToggleInputs.forEach((el) => {
+      const name = el.name;
+      if (el.value) {
+        data[name] = el.value;
+      }
+    });
+
+    return data;
+  }
+}
+
+export class CreateTaskRandomView extends CreateTaskView {
   constructor(element) {
     super(element);
 
@@ -194,22 +216,6 @@ export class CreateTaskRandomView extends FormView {
     });
   };
 
-  getValues(selector) {
-    const nonToggleInputs = Array.from(
-      this.root.querySelectorAll(`${selector}`)
-    );
-    const data = {};
-
-    nonToggleInputs.forEach((el) => {
-      const name = el.name;
-      if (el.value) {
-        data[name] = el.value;
-      }
-    });
-
-    return data;
-  }
-
   getUpperLower(checkOne, checkTwo, searchParam) {
     const lowerValue = this.elements[checkOne.name].value;
     const higherValue = this.elements[checkTwo.name].value;
@@ -235,6 +241,75 @@ export class CreateTaskRandomView extends FormView {
   };
 }
 
+export class CreateTaskChooseSentenceView extends CreateTaskView {
+  constructor(element) {
+    super(element);
+
+    this.elements.tableParent = this.root.querySelector(
+      '.sentence-table-holder'
+    );
+    this.elements.saveButton = this.root.querySelector(
+      'button.set-tasks-button-choose-sentences'
+    );
+
+    this.getFilterElements().forEach((el) => {
+      el.addEventListener('change', this.updateFilters.bind(this));
+    });
+
+    this.elements.saveButton.addEventListener('click', () =>
+      this.trigger('save', {})
+    );
+
+    this.elements.tableParent.addEventListener('change', (evt) => {
+      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
+        const sentenceId = evt.target.dataset.sentence_id;
+        if (sentenceId) {
+          const triggerType = evt.target.checked
+            ? 'add_sentence'
+            : 'remove_sentence';
+          this.trigger(triggerType, { sentenceId });
+        }
+      }
+    });
+  }
+
+  getFilterElements() {
+    return Array.from(this.root.querySelectorAll('.filter-selector'));
+  }
+
+  updateFilters() {
+    const filterState = {};
+    this.getFilterElements().forEach((el) => (filterState[el.name] = el.value));
+
+    this.trigger('filter_update', filterState);
+  }
+
+  updateDisplay(sentences, toSave) {
+    const fields = [
+      'grammar',
+      'vivaRef',
+      'tense',
+      'level',
+      'sentence',
+      'translation',
+    ];
+    const fieldClasses = {
+      grammar: 'narrow',
+      vivaRef: 'narrow',
+      tense: 'narrow',
+      level: 'narrow',
+    };
+
+    this.elements.tableParent.innerHTML = sentencetableTemplate({
+      fields,
+      sentences,
+      fieldClasses,
+    });
+  }
+}
+
+// TRAINING VIEW
+
 export class TrainingView extends FormView {
   constructor(element) {
     super(element);
@@ -243,9 +318,13 @@ export class TrainingView extends FormView {
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
-    this.elements.answer_feedback_inner = this.root.querySelector('.answer-feedback-inner');
+    this.elements.answer_feedback_inner = this.root.querySelector(
+      '.answer-feedback-inner'
+    );
     this.elements.correct_answer = this.root.querySelector('.correct-answer');
-    this.elements.correct_answer_inner = this.root.querySelector('.correct-answer-inner');
+    this.elements.correct_answer_inner = this.root.querySelector(
+      '.correct-answer-inner'
+    );
     this.elements.right_count = this.root.querySelector('.right-count');
     this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector(
@@ -358,53 +437,5 @@ export class TrainingView extends FormView {
 
   set prompt(value) {
     return (this.elements.prompt.innerText = value);
-  }
-}
-
-export class CreateTaskView extends View {
-  constructor(element) {
-    super(element);
-
-    this.elements.tableParent = this.root.querySelector('.sentence-table-holder')
-    this.elements.saveButton = this.root.querySelector('button.set-tasks-button')
-
-    this.getFilterElements().forEach(el => {
-      el.addEventListener('change', this.updateFilters.bind(this));
-    })
-
-    this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
-
-    this.elements.tableParent.addEventListener('change', evt => {
-      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
-        const sentenceId = evt.target.dataset.sentence_id
-        if (sentenceId) {
-          const triggerType = evt.target.checked ? 'add_sentence' : 'remove_sentence';
-          this.trigger(triggerType, {sentenceId})
-        }
-      }
-    })
-  }
-
-  getFilterElements() {
-    return Array.from(this.root.querySelectorAll('.filter-selector'));
-  }
-
-  updateFilters() {
-    const filterState = {};
-    this.getFilterElements().forEach(el => filterState[el.name] = el.value);
-
-    this.trigger('filter_update', filterState);
-  }
-
-  updateDisplay(sentences, toSave) {
-    const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
-    const fieldClasses = {
-      grammar: 'narrow',
-      vivaRef: 'narrow',
-      tense: 'narrow',
-      level: 'narrow',
-    }
-
-    this.elements.tableParent.innerHTML = sentencetableTemplate({fields, sentences, fieldClasses})
   }
 }

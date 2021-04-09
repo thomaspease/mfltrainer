@@ -52,11 +52,11 @@ export class AuthModel extends Model {
   }
 
   static async logout() {
-    return this.sendApiRequest('api/v1/users/logout', 'GET');
+    return this.sendApiRequest('/api/v1/users/logout', 'GET');
   }
 
   static async signup(name, email, password, passwordConfirm, classCode) {
-    return this.sendApiRequest('api/v1/users/signup', 'POST', {
+    return this.sendApiRequest('/api/v1/users/signup', 'POST', {
       name,
       email,
       password,
@@ -118,7 +118,7 @@ export class SentenceModel extends Model {
   static async fetchAll() {
     const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
     const sentences = res.data.data.data;
-    return sentences.map(sentenceData => new this(sentenceData));
+    return sentences.map((sentenceData) => new this(sentenceData));
   }
 }
 

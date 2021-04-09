@@ -39,7 +39,7 @@
       grid-template-columns: 1fr 1fr 1fr;
     }
     .grid-top {
-      grid-template-areas: 'number class type';
+      grid-template-areas: 'task-name task-name due-date' 'class type button' 'banner banner banner';
     }
     .grid-filters {
       grid-template-areas: 'vivaRef tense grammar';

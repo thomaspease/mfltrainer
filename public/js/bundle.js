@@ -1711,7 +1711,7 @@ var global = arguments[3];
     value: true
   });
 });
-},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"templates/sentencetable.js":[function(require,module,exports) {
 "use strict";
@@ -2048,13 +2048,13 @@ function sentencetableTemplate(locals) {
   ;
   return pug_html;
 }
-},{"fs":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"views.js":[function(require,module,exports) {
+},{"fs":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"views.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CreateTaskView = exports.TrainingView = exports.CreateTaskRandomView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
+exports.TrainingView = exports.CreateTaskChooseSentenceView = exports.CreateTaskRandomView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
 
 var _diff = require("diff");
 
@@ -2184,7 +2184,7 @@ class DataParserView extends View {
     return JSON.parse(document.querySelector(".js-value[name=\"".concat(input_name, "\"]")).value);
   }
 
-} // SPECIFIC PAGES
+} // AUTH VIEWS -----------
 
 
 exports.DataParserView = DataParserView;
@@ -2193,15 +2193,33 @@ class LoginFormView extends FormView {}
 
 exports.LoginFormView = LoginFormView;
 
-class SignupFormView extends FormView {}
+class SignupFormView extends FormView {} // CREATE SENTENCE VIEWS --------
+
 
 exports.SignupFormView = SignupFormView;
 
-class CreateSentenceFormView extends FormView {}
+class CreateSentenceFormView extends FormView {} // CREATE TASK VIEWS --------
+
 
 exports.CreateSentenceFormView = CreateSentenceFormView;
 
-class CreateTaskRandomView extends FormView {
+class CreateTaskView extends View {
+  getValues(selector) {
+    const nonToggleInputs = Array.from(this.root.querySelectorAll("".concat(selector)));
+    const data = {};
+    nonToggleInputs.forEach(el => {
+      const name = el.name;
+
+      if (el.value) {
+        data[name] = el.value;
+      }
+    });
+    return data;
+  }
+
+}
+
+class CreateTaskRandomView extends CreateTaskView {
   constructor(element) {
     super(element); //Get inputs (.elements name must match their corresponding switch's name)
 
@@ -2248,19 +2266,6 @@ class CreateTaskRandomView extends FormView {
   } //Function to return form data on submit
 
 
-  getValues(selector) {
-    const nonToggleInputs = Array.from(this.root.querySelectorAll("".concat(selector)));
-    const data = {};
-    nonToggleInputs.forEach(el => {
-      const name = el.name;
-
-      if (el.value) {
-        data[name] = el.value;
-      }
-    });
-    return data;
-  }
-
   getUpperLower(checkOne, checkTwo, searchParam) {
     const lowerValue = this.elements[checkOne.name].value;
     const higherValue = this.elements[checkTwo.name].value;
@@ -2279,6 +2284,59 @@ class CreateTaskRandomView extends FormView {
 }
 
 exports.CreateTaskRandomView = CreateTaskRandomView;
+
+class CreateTaskChooseSentenceView extends CreateTaskView {
+  constructor(element) {
+    super(element);
+    this.elements.tableParent = this.root.querySelector('.sentence-table-holder');
+    this.elements.saveButton = this.root.querySelector('button.set-tasks-button-choose-sentences');
+    this.getFilterElements().forEach(el => {
+      el.addEventListener('change', this.updateFilters.bind(this));
+    });
+    this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.tableParent.addEventListener('change', evt => {
+      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
+        const sentenceId = evt.target.dataset.sentence_id;
+
+        if (sentenceId) {
+          const triggerType = evt.target.checked ? 'add_sentence' : 'remove_sentence';
+          this.trigger(triggerType, {
+            sentenceId
+          });
+        }
+      }
+    });
+  }
+
+  getFilterElements() {
+    return Array.from(this.root.querySelectorAll('.filter-selector'));
+  }
+
+  updateFilters() {
+    const filterState = {};
+    this.getFilterElements().forEach(el => filterState[el.name] = el.value);
+    this.trigger('filter_update', filterState);
+  }
+
+  updateDisplay(sentences, toSave) {
+    const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
+    const fieldClasses = {
+      grammar: 'narrow',
+      vivaRef: 'narrow',
+      tense: 'narrow',
+      level: 'narrow'
+    };
+    this.elements.tableParent.innerHTML = (0, _sentencetable.sentencetableTemplate)({
+      fields,
+      sentences,
+      fieldClasses
+    });
+  }
+
+} // TRAINING VIEW
+
+
+exports.CreateTaskChooseSentenceView = CreateTaskChooseSentenceView;
 
 class TrainingView extends FormView {
   constructor(element) {
@@ -2394,58 +2452,6 @@ class TrainingView extends FormView {
 }
 
 exports.TrainingView = TrainingView;
-
-class CreateTaskView extends View {
-  constructor(element) {
-    super(element);
-    this.elements.tableParent = this.root.querySelector('.sentence-table-holder');
-    this.elements.saveButton = this.root.querySelector('button.set-tasks-button');
-    this.getFilterElements().forEach(el => {
-      el.addEventListener('change', this.updateFilters.bind(this));
-    });
-    this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
-    this.elements.tableParent.addEventListener('change', evt => {
-      if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
-        const sentenceId = evt.target.dataset.sentence_id;
-
-        if (sentenceId) {
-          const triggerType = evt.target.checked ? 'add_sentence' : 'remove_sentence';
-          this.trigger(triggerType, {
-            sentenceId
-          });
-        }
-      }
-    });
-  }
-
-  getFilterElements() {
-    return Array.from(this.root.querySelectorAll('.filter-selector'));
-  }
-
-  updateFilters() {
-    const filterState = {};
-    this.getFilterElements().forEach(el => filterState[el.name] = el.value);
-    this.trigger('filter_update', filterState);
-  }
-
-  updateDisplay(sentences, toSave) {
-    const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
-    const fieldClasses = {
-      grammar: 'narrow',
-      vivaRef: 'narrow',
-      tense: 'narrow',
-      level: 'narrow'
-    };
-    this.elements.tableParent.innerHTML = (0, _sentencetable.sentencetableTemplate)({
-      fields,
-      sentences,
-      fieldClasses
-    });
-  }
-
-}
-
-exports.CreateTaskView = CreateTaskView;
 },{"diff":"../../node_modules/diff/dist/diff.js","./templates/sentencetable":"templates/sentencetable.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
@@ -3482,7 +3488,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3791,7 +3797,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -4277,11 +4283,11 @@ class AuthModel extends Model {
   }
 
   static async logout() {
-    return this.sendApiRequest('api/v1/users/logout', 'GET');
+    return this.sendApiRequest('/api/v1/users/logout', 'GET');
   }
 
   static async signup(name, email, password, passwordConfirm, classCode) {
-    return this.sendApiRequest('api/v1/users/signup', 'POST', {
+    return this.sendApiRequest('/api/v1/users/signup', 'POST', {
       name,
       email,
       password,
@@ -4390,11 +4396,17 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CreateTaskController = exports.TrainController = exports.CreateTaskRandomController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.CreateTaskChooseSentenceController = exports.TrainController = exports.CreateTaskRandomController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
 var _models = require("./models.js");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
@@ -4630,9 +4642,9 @@ class TrainController extends Controller {
 
 exports.TrainController = TrainController;
 
-class CreateTaskController extends Controller {
+class CreateTaskChooseSentenceController extends Controller {
   getViewClass() {
-    return _views.CreateTaskView;
+    return _views.CreateTaskChooseSentenceView;
   }
 
   constructor(viewBaseElement) {
@@ -4687,15 +4699,25 @@ class CreateTaskController extends Controller {
     this.view.updateDisplay(sentences, this.sentencesToSave);
   }
 
-  save() {
-    const sentences = this.sentencesToSave; // TODO put actualy save logic here
+  async save() {
+    try {
+      const sentences = this.sentencesToSave.map(e => e.data._id);
 
-    _views.AlertView.show('success', 'placeholder');
+      const taskDetails = _objectSpread(_objectSpread({}, this.view.getValues('.task-details')), sentences);
+
+      const createTask = await _models.CreateTaskModel.sendApiRequest('/api/v1/tasks', 'POST', taskDetails);
+
+      if (createTask) {
+        _views.AlertView.show('success', 'Task created!');
+      }
+    } catch (err) {
+      _views.AlertView.show('error', err.message);
+    }
   }
 
 }
 
-exports.CreateTaskController = CreateTaskController;
+exports.CreateTaskChooseSentenceController = CreateTaskChooseSentenceController;
 },{"./views.js":"views.js","./models.js":"models.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
