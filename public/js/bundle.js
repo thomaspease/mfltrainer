@@ -4664,10 +4664,7 @@ class CreateTaskController extends Controller {
       } = _ref6;
       this.sentencesToSave = this.sentencesToSave.filter(sent => sent.data._id != sentenceId);
     });
-    this.view.on('save', () => {
-      _views.AlertView.show('success', 'placeholder'); // TODO chuck an API call to task creation in here
-
-    });
+    this.view.on('save', this.save.bind(this));
     this.sentences = [];
 
     _models.SentenceModel.fetchAll().then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
@@ -4676,6 +4673,12 @@ class CreateTaskController extends Controller {
   updateSentences(sentences) {
     this.sentences = sentences;
     this.view.updateDisplay(sentences, this.sentencesToSave);
+  }
+
+  save() {
+    const sentences = this.sentencesToSave; // TODO put actualy save logic here
+
+    _views.AlertView.show('success', 'placeholder');
   }
 
 }

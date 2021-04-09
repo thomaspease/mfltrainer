@@ -292,10 +292,7 @@ export class CreateTaskController extends Controller {
       );
     });
 
-    this.view.on('save', () => {
-      AlertView.show('success', 'placeholder');
-      // TODO chuck an API call to task creation in here
-    });
+    this.view.on('save', this.save.bind(this));
 
     this.sentences = [];
     SentenceModel.fetchAll()
@@ -307,5 +304,12 @@ export class CreateTaskController extends Controller {
     this.sentences = sentences;
 
     this.view.updateDisplay(sentences, this.sentencesToSave);
+  }
+
+  save() {
+    const sentences = this.sentencesToSave;
+
+    // TODO put actualy save logic here
+    AlertView.show('success', 'placeholder');
   }
 }
