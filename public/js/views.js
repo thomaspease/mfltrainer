@@ -243,7 +243,11 @@ export class TrainingView extends FormView {
     this.elements.prompt = this.root.querySelector('.card-title');
     this.elements.input = this.root.querySelector('[name=student_answer]');
     this.elements.answer_feedback = this.root.querySelector('.answer-feedback');
+    this.elements.answer_feedback_inner = this.root.querySelector('.answer-feedback-inner');
     this.elements.correct_answer = this.root.querySelector('.correct-answer');
+    this.elements.correct_answer_inner = this.root.querySelector('.correct-answer-inner');
+    this.elements.right_count = this.root.querySelector('.right-count');
+    this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector(
       'button[type=submit]'
     );
@@ -271,9 +275,14 @@ export class TrainingView extends FormView {
     });
   }
 
+  updateCounts(right, total) {
+    this.elements.right_count.innerText = right;
+    this.elements.total_count.innerText = total;
+  }
+
   clearAnswerText() {
     this.elements.input.value = '';
-    this.elements.correct_answer.innerText = '';
+    this.elements.correct_answer_inner.innerText = '';
   }
 
   handleStudentAnswer({ student_answer }) {
@@ -294,14 +303,14 @@ export class TrainingView extends FormView {
       //   this method call looks a little over-fancy. feel free to refactor into something easier to read. hopefully I've added enough comments to make it understandable?
       this.setAsHighlightedSpan(
         // element name
-        'answer_feedback',
+        'answer_feedback_inner',
         // pass only the diff entries that we want to display
         diffs.filter((diff) => !diff.removed),
         // CSS class name callback
         (diff) => (diff.added ? 'highlight-wrong' : 'highlight-right')
       );
 
-      this.elements.correct_answer.innerText = this.answer;
+      this.elements.correct_answer_inner.innerText = this.answer;
     }
 
     // SET UP DOM STATE
@@ -356,7 +365,7 @@ export class CreateTaskView extends View {
   constructor(element) {
     super(element);
 
-    this.elements.table = this.root.querySelector('table.sentence-table')
+    this.elements.tableParent = this.root.querySelector('.sentence-table-holder')
     this.elements.saveButton = this.root.querySelector('button.set-tasks-button')
 
     this.getFilterElements().forEach(el => {
@@ -365,7 +374,7 @@ export class CreateTaskView extends View {
 
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
 
-    this.elements.table.addEventListener('change', evt => {
+    this.elements.tableParent.addEventListener('change', evt => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
         const sentenceId = evt.target.dataset.sentence_id
         if (sentenceId) {
@@ -389,7 +398,13 @@ export class CreateTaskView extends View {
 
   updateDisplay(sentences, toSave) {
     const fields = ['grammar', 'vivaRef', 'tense', 'level', 'sentence', 'translation'];
+    const fieldClasses = {
+      grammar: 'narrow',
+      vivaRef: 'narrow',
+      tense: 'narrow',
+      level: 'narrow',
+    }
 
-    this.elements.table.innerHTML = sentencetableTemplate({fields, sentences})
+    this.elements.tableParent.innerHTML = sentencetableTemplate({fields, sentences, fieldClasses})
   }
 }

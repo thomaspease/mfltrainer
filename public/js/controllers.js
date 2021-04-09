@@ -184,6 +184,8 @@ export class TrainController extends Controller {
     this.rightCount = 0;
     this.wrongCount = 0;
 
+    this.view.updateCounts(this.rightCount, this.initialCount);
+
     this.view.on('answer', this.doAnswer.bind(this));
     this.view.on('next', this.doNextSentence.bind(this));
 
@@ -201,8 +203,10 @@ export class TrainController extends Controller {
     });
 
     if (isCorrect) {
+      AlertView.show('success', 'Correct Answer');
       this.rightCount++;
     } else {
+      AlertView.show('error', 'Incorrect Answer');
       this.wrongCount++;
 
       const insertionIndex = Math.min(
@@ -212,8 +216,7 @@ export class TrainController extends Controller {
       this.sentences.splice(insertionIndex, 0, sentenceObject);
     }
 
-    console.log(this.sentences);
-    console.log(this.finishedSentences);
+    this.view.updateCounts(this.rightCount, this.initialCount);
   }
 
   doNextSentence() {
@@ -232,7 +235,7 @@ export class TrainController extends Controller {
 
   async sendResultsToServer() {
     try {
-      StudentResultsModel.send(
+      await StudentResultsModel.send(
         this.correctCount,
         this.wrongCount,
         this.finishedSentences
@@ -292,10 +295,7 @@ export class CreateTaskController extends Controller {
       );
     });
 
-    this.view.on('save', () => {
-      AlertView.show('success', 'placeholder');
-      // TODO chuck an API call to task creation in here
-    });
+    this.view.on('save', this.save.bind(this));
 
     this.sentences = [];
     SentenceModel.fetchAll()
@@ -307,5 +307,12 @@ export class CreateTaskController extends Controller {
     this.sentences = sentences;
 
     this.view.updateDisplay(sentences, this.sentencesToSave);
+  }
+
+  save() {
+    const sentences = this.sentencesToSave;
+
+    // TODO put actualy save logic here
+    AlertView.show('success', 'placeholder');
   }
 }
