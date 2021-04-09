@@ -368,11 +368,9 @@ export class TrainingView extends FormView {
     // CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
 
     function normalize(str) {
-      // compare, ignoring:
-      //   - case differences
-      //   - all punctuation
-      //   - whitespace (we're currently stripping *all*, maybe we should just strip adjacent?) 
-      return str.toLowerCase().trim().replace(/\s+/g, '').replace(/\W/g, '');
+      // normalize to ONLY letters and numbers (cross-language), lowercase
+      // this'll require fairly modern JS, incidentally 
+      return str.replace(/[^\p{Letter}\p{Number}]/ugi, '').toLowerCase()
     }
 
     // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
