@@ -4319,7 +4319,7 @@ class CreateSentenceModel extends Model {
 exports.CreateSentenceModel = CreateSentenceModel;
 
 class StudentResultsModel extends Model {
-  static async sendResults(correctCount, wrongCount, studentSentences) {
+  static async send(correctCount, wrongCount, studentSentences) {
     const payload = {
       correctCount: this.correctCount,
       wrongCount: this.wrongCount,
