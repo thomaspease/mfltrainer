@@ -462,4 +462,12 @@ export class TrainingView extends FormView {
   set prompt(value) {
     return (this.elements.prompt.innerText = value);
   }
+
+  get audioUrl() {
+    return this.elements.audio.src;
+  }
+
+  set audioUrl(value) {
+    return (this.elements.audio.src = value);
+  }
 }

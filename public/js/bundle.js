@@ -2370,7 +2370,7 @@ class TrainingView extends FormView {
       this.clearAnswerText();
       this.elements.input.focus();
       this.trigger('next');
-    }); // GLOBAL hotkeys! (should be fine, though?)
+    }); // global hotkeys (should be fine, though?)
 
     document.addEventListener('keydown', evt => {
       if (evt.key == '[') {
@@ -2462,6 +2462,14 @@ class TrainingView extends FormView {
 
   set prompt(value) {
     return this.elements.prompt.innerText = value;
+  }
+
+  get audioUrl() {
+    return this.elements.audio.src;
+  }
+
+  set audioUrl(value) {
+    return this.elements.audio.src = value;
   }
 
 }
@@ -4372,6 +4380,10 @@ class SentenceModel extends Model {
     return this.data.translation;
   }
 
+  get audioUrl() {
+    return this.data.audio;
+  }
+
   static async fetchAll() {
     const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
     const sentences = res.data.data.data;
@@ -4645,6 +4657,7 @@ class TrainController extends Controller {
     const sentence = this.sentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
+    this.view.audioUrl = sentence.audioUrl;
   }
 
   async sendResultsToServer() {
