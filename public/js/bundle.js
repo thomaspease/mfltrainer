@@ -2354,7 +2354,8 @@ class TrainingView extends FormView {
     this.elements.right_count = this.root.querySelector('.right-count');
     this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector('button[type=submit]');
-    this.elements.next_button = this.root.querySelector('button[type=button].btn-next'); // define some groups of elements
+    this.elements.next_button = this.root.querySelector('button[type=button].btn-next');
+    this.elements.audio = this.root.querySelector('audio.sentence-audio'); // define some groups of elements
 
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']); // prep DOM
@@ -2369,6 +2370,13 @@ class TrainingView extends FormView {
       this.clearAnswerText();
       this.elements.input.focus();
       this.trigger('next');
+    }); // global hotkeys (should be fine, though?)
+
+    document.addEventListener('keydown', evt => {
+      if (evt.key == '[') {
+        evt.preventDefault();
+        this.elements.audio.play();
+      }
     });
   }
 
@@ -2454,6 +2462,14 @@ class TrainingView extends FormView {
 
   set prompt(value) {
     return this.elements.prompt.innerText = value;
+  }
+
+  get audioUrl() {
+    return this.elements.audio.src;
+  }
+
+  set audioUrl(value) {
+    return this.elements.audio.src = value;
   }
 
 }
@@ -3495,7 +3511,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3804,7 +3820,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -4364,6 +4380,10 @@ class SentenceModel extends Model {
     return this.data.translation;
   }
 
+  get audioUrl() {
+    return this.data.audio;
+  }
+
   static async fetchAll() {
     const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
     const sentences = res.data.data.data;
@@ -4637,6 +4657,7 @@ class TrainController extends Controller {
     const sentence = this.sentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
+    this.view.audioUrl = sentence.audioUrl;
   }
 
   async sendResultsToServer() {

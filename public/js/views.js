@@ -338,6 +338,8 @@ export class TrainingView extends FormView {
       'button[type=button].btn-next'
     );
 
+    this.elements.audio = this.root.querySelector('audio.sentence-audio')
+
     // define some groups of elements
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']);
@@ -358,6 +360,14 @@ export class TrainingView extends FormView {
 
       this.trigger('next');
     });
+
+    // global hotkeys (should be fine, though?)
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key == '[') {
+        evt.preventDefault();
+        this.elements.audio.play();
+      }
+    })
   }
 
   updateCounts(right, total) {
@@ -451,5 +461,13 @@ export class TrainingView extends FormView {
 
   set prompt(value) {
     return (this.elements.prompt.innerText = value);
+  }
+
+  get audioUrl() {
+    return this.elements.audio.src;
+  }
+
+  set audioUrl(value) {
+    return (this.elements.audio.src = value);
   }
 }

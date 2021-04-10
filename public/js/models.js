@@ -115,6 +115,10 @@ export class SentenceModel extends Model {
     return this.data.translation;
   }
 
+  get audioUrl() {
+    return this.data.audio;
+  }
+
   static async fetchAll() {
     const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
     const sentences = res.data.data.data;

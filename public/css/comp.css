@@ -253,6 +253,11 @@ a:hover {
     grid-template-rows: repeat(3, min-content);
     grid-template-columns: 4fr 1fr;
     grid-auto-flow: column; }
+    .card__exercise .audio-area {
+      text-align: center; }
+    .card__exercise .help-text {
+      color: #b0b0b0;
+      font-size: 120%; }
   .card__exercise-list {
     display: grid;
     grid-template-columns: 3fr 1fr 1fr;
