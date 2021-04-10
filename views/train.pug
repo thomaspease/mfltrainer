@@ -9,15 +9,19 @@ block content
         form.card(data-controller="TrainController")
             .card__exercise
                 div.card-title.card-text.card-text--bold Question text
-                input.form__input(type='text', name='student_answer', placeholder='Answer', required)
-                span.answer-feedback.card-text.standin-for-input
-                    ="Your answer: " /* JS string so that the trailing space is easier to spot */
-                    span.answer-feedback-inner
-                button.btn.btn--green.btn--green__exercise(type="submit") Submit
-                button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
+                div.student-answer
+                    input.form__input(type='text', name='student_answer', placeholder='Answer', required, autocomplete="off")
+                    span.answer-feedback.card-text.standin-for-input
+                        ="Your answer: " /* JS string so that the trailing space is easier to spot */
+                        span.answer-feedback-inner
                 div.correct-answer.card-text
                     ="Correct answer: " /* JS string so that the trailing space is easier to spot */
                     span.correct-answer-inner
+                div
+                    audio.sentence-audio(src="/heather-test-audio.mp3" controls)
+                div.buttons
+                    button.btn.btn--green.btn--green__exercise(type="submit") Submit
+                    button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
                 div.answer-counts.card-text
                     span.right-count
                     =" / "
