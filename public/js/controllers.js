@@ -266,7 +266,8 @@ export class CreateTaskChooseSentenceController extends Controller {
   constructor(viewBaseElement) {
     super(viewBaseElement);
 
-    this.view.on('filter_update', (filterData) => {
+    this.view.on('filter_update', async (filterData) => {
+      /*
       const tmp = this.sentences.filter((sent) => {
         if (
           this.sentencesToSave.some((other) => other.data._id == sent.data._id)
@@ -290,8 +291,21 @@ export class CreateTaskChooseSentenceController extends Controller {
 
         return true;
       });
+      */
 
-      this.view.updateDisplay(tmp, this.sentencesToSave);
+      const searchParams = new URLSearchParams({
+        ...filterData,
+      })
+      const tmp = await SentenceModel.sendApiRequest(
+        `/api/v1/sentences?${searchParams.toString()}`,
+        'GET'
+      );
+
+      const sents = tmp.data.data.data.map((dbObj) => new SentenceModel(dbObj))
+
+      const saveIds = this.sentencesToSave.map((sent) => sent.data._id);
+
+      this.view.updateDisplay(sents.filter((sent) => !saveIds.includes(sent.data._id)), this.sentencesToSave);
     });
 
     this.sentencesToSave = [];
