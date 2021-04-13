@@ -10766,7 +10766,8 @@ class TrainingView extends FormView {
     this.elements.total_count = this.root.querySelector('.total-count');
     this.elements.submit_button = this.root.querySelector('button[type=submit]');
     this.elements.next_button = this.root.querySelector('button[type=button].btn-next');
-    this.elements.audio = this.root.querySelector('audio.sentence-audio'); // define some groups of elements
+    this.elements.audio = this.root.querySelector('audio.sentence-audio');
+    this.elements.playAudio = this.root.querySelector('.play-audio'); // define some groups of elements
 
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']); // prep DOM
@@ -10789,12 +10790,9 @@ class TrainingView extends FormView {
         this.elements.audio.play();
       }
     });
-    const playlist = (0, _waveformPlaylist.default)({
-      container: this.root.querySelector('.TEST-audio-editor')
+    this.elements.playAudio.addEventListener('click', () => {
+      this.elements.audio.play();
     });
-    playlist.load([{
-      src: "/heather-test-audio.mp3"
-    }]).then(_ => _);
   }
 
   updateCounts(right, total) {
@@ -13080,7 +13078,7 @@ class TrainController extends Controller {
     const sentence = this.sentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
-    this.view.audioUrl = sentence.audioUrl;
+    this.view.audioUrl = '/heather-test-audio.mp3'; //sentence.audioUrl;
   }
 
   async sendResultsToServer() {
@@ -13129,17 +13127,9 @@ class CreateTaskChooseSentenceController extends Controller {
       */
       const searchParams = new URLSearchParams(_objectSpread({}, filterData));
       const tmp = await _models.SentenceModel.sendApiRequest("/api/v1/sentences?".concat(searchParams.toString()), 'GET');
-      var sents;
-
-      try {
-        sents = tmp.data.data.data.map(dbObj => new _models.SentenceModel(dbObj));
-      } catch (err) {
-        _views.AlertView.show('error', err.message);
-      }
-
-      _views.AlertView.show('success', JSON.stringify(sents));
-
-      this.view.updateDisplay(sents, this.sentencesToSave);
+      const sents = tmp.data.data.data.map(dbObj => new _models.SentenceModel(dbObj));
+      const saveIds = this.sentencesToSave.map(sent => sent.data._id);
+      this.view.updateDisplay(sents.filter(sent => !saveIds.includes(sent.data._id)), this.sentencesToSave);
     });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref5) => {

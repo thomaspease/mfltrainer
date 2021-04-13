@@ -339,6 +339,7 @@ export class TrainingView extends FormView {
     );
 
     this.elements.audio = this.root.querySelector('audio.sentence-audio')
+    this.elements.playAudio = this.root.querySelector('.play-audio');
 
     // define some groups of elements
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
@@ -367,6 +368,10 @@ export class TrainingView extends FormView {
         evt.preventDefault();
         this.elements.audio.play();
       }
+    })
+
+    this.elements.playAudio.addEventListener('click', () => {
+      this.elements.audio.play();
     })
   }
 

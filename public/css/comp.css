@@ -692,6 +692,9 @@ input {
 .correct-answer-inner {
   font-weight: bold; }
 
+.audio-area img.play-audio {
+  height: 3.5rem; }
+
 .footer {
   background-color: #f7f7f7;
   padding: 3rem 4rem;

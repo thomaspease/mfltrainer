@@ -18,7 +18,8 @@ block content
                     ="Correct answer: " /* JS string so that the trailing space is easier to spot */
                     span.correct-answer-inner
                 div.audio-area
-                    audio.sentence-audio(controls)
+                    audio.sentence-audio
+                    img.play-audio(src="/img/play_audio.png")
                     div.help-text
                         |press "[" to replay
                 div.buttons
