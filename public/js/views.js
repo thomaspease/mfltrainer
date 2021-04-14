@@ -2,6 +2,8 @@ import { diffWords } from 'diff';
 
 import { sentencetableTemplate } from './templates/sentencetable';
 
+import WaveformPlaylist from 'waveform-playlist';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -136,6 +138,59 @@ export class SignupFormView extends FormView {}
 // CREATE SENTENCE VIEWS --------
 
 export class CreateSentenceFormView extends FormView {}
+
+export class AudioEditorView extends View {
+  constructor(element) {
+    super(element);
+
+    // gnarly, awkward workaround for the fact that WaveformPlaylist uses eval for something that could have been a member access on window
+    // but, we can technically replace `eval` with a function that invokes member access on window, so... that kind of works?
+    window.eval = (str) => window[str];
+
+    this.elements.save = this.root.querySelector('.save-button')
+    this.elements.record = this.root.querySelector('.record-button')
+
+    this.elements.save.addEventListener('click', () => {
+      this.ee.emit('startaudiorendering', 'buffer');
+    })
+
+    this.elements.record.addEventListener('click', () => {
+      this.ee.emit('record');
+    })
+
+    this.setupEditor();
+  }
+
+  setupEditor() {
+    this.playlist = WaveformPlaylist({
+      container: this.root.querySelector('.TEST-audio-editor'),
+      state: 'select',
+    })
+    this.ee = this.playlist.getEventEmitter();
+
+    this.playlist.load([
+      {src: "/heather-test-audio.mp3"},
+    ]).then(() => {
+      this.ee.emit('zoomin')
+      this.ee.emit('zoomin')
+    })
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key == '\\') {
+        evt.preventDefault();
+        this.ee.emit('play');
+      }
+      if (evt.key == '/') {
+        evt.preventDefault();
+        this.ee.emit('select', 0.5, 2.5);
+        //ee.emit('statechange', 'select');
+      }
+    })
+
+    this.ee.on('audiorenderingfinished', (type, data) => {
+      AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${data.length/data.sampleRate}]`)
+    })
+  }
+}
 
 // CREATE TASK VIEWS --------
 
@@ -283,7 +338,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
 
   updateFilters() {
     const filterState = {};
-    this.getFilterElements().forEach((el) => (filterState[el.name] = el.value));
+    this.getFilterElements().filter((el) => el.value != '').forEach((el) => (filterState[el.name] = el.value));
 
     this.trigger('filter_update', filterState);
   }

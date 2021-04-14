@@ -2,6 +2,7 @@ import {
   LoginFormView,
   TrainingView,
   CreateSentenceFormView,
+  AudioEditorView,
   DataParserView,
   AlertView,
   LogoutView,
@@ -130,6 +131,12 @@ export class CreateSentenceController extends Controller {
         }
       }
     );
+  }
+}
+
+export class AudioEditorController extends Controller {
+  getViewClass() {
+    return AudioEditorView;
   }
 }
 

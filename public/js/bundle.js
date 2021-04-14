@@ -10460,7 +10460,7 @@ function init() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TrainingView = exports.CreateTaskChooseSentenceView = exports.CreateTaskRandomView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
+exports.TrainingView = exports.CreateTaskChooseSentenceView = exports.CreateTaskRandomView = exports.AudioEditorView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
 
 var _diff = require("diff");
 
@@ -10612,10 +10612,60 @@ class SignupFormView extends FormView {} // CREATE SENTENCE VIEWS --------
 
 exports.SignupFormView = SignupFormView;
 
-class CreateSentenceFormView extends FormView {} // CREATE TASK VIEWS --------
-
+class CreateSentenceFormView extends FormView {}
 
 exports.CreateSentenceFormView = CreateSentenceFormView;
+
+class AudioEditorView extends View {
+  constructor(element) {
+    super(element); // gnarly, awkward workaround for the fact that WaveformPlaylist uses eval for something that could have been a member access on window
+    // but, we can technically replace `eval` with a function that invokes member access on window, so... that kind of works?
+
+    window.eval = str => window[str];
+
+    this.elements.save = this.root.querySelector('.save-button');
+    this.elements.record = this.root.querySelector('.record-button');
+    this.elements.save.addEventListener('click', () => {
+      this.ee.emit('startaudiorendering', 'buffer');
+    });
+    this.elements.record.addEventListener('click', () => {
+      this.ee.emit('record');
+    });
+    this.setupEditor();
+  }
+
+  setupEditor() {
+    this.playlist = (0, _waveformPlaylist.default)({
+      container: this.root.querySelector('.TEST-audio-editor'),
+      state: 'select'
+    });
+    this.ee = this.playlist.getEventEmitter();
+    this.playlist.load([{
+      src: "/heather-test-audio.mp3"
+    }]).then(() => {
+      this.ee.emit('zoomin');
+      this.ee.emit('zoomin');
+    });
+    document.addEventListener('keydown', evt => {
+      if (evt.key == '\\') {
+        evt.preventDefault();
+        this.ee.emit('play');
+      }
+
+      if (evt.key == '/') {
+        evt.preventDefault();
+        this.ee.emit('select', 0.5, 2.5); //ee.emit('statechange', 'select');
+      }
+    });
+    this.ee.on('audiorenderingfinished', (type, data) => {
+      AlertView.show('success', "".concat(type, ": ").concat(data.__proto__.constructor.name, "[").concat(data.length / data.sampleRate, "]"));
+    });
+  }
+
+} // CREATE TASK VIEWS --------
+
+
+exports.AudioEditorView = AudioEditorView;
 
 class CreateTaskView extends View {
   getValues(selector) {
@@ -10789,12 +10839,6 @@ class TrainingView extends FormView {
         this.elements.audio.play();
       }
     });
-    const playlist = (0, _waveformPlaylist.default)({
-      container: this.root.querySelector('.TEST-audio-editor')
-    });
-    playlist.load([{
-      src: "/heather-test-audio.mp3"
-    }]).then(_ => _);
   }
 
   updateCounts(right, total) {
@@ -12840,7 +12884,7 @@ class TranslationSentenceModel extends SentenceModel {}
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CreateTaskChooseSentenceController = exports.TrainController = exports.CreateTaskRandomController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.CreateTaskChooseSentenceController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -12986,6 +13030,15 @@ class CreateSentenceController extends Controller {
 
 exports.CreateSentenceController = CreateSentenceController;
 
+class AudioEditorController extends Controller {
+  getViewClass() {
+    return _views.AudioEditorView;
+  }
+
+}
+
+exports.AudioEditorController = AudioEditorController;
+
 class CreateTaskRandomController extends Controller {
   getViewClass() {
     return _views.CreateTaskRandomView;
@@ -13129,17 +13182,9 @@ class CreateTaskChooseSentenceController extends Controller {
       */
       const searchParams = new URLSearchParams(_objectSpread({}, filterData));
       const tmp = await _models.SentenceModel.sendApiRequest("/api/v1/sentences?".concat(searchParams.toString()), 'GET');
-      var sents;
-
-      try {
-        sents = tmp.data.data.data.map(dbObj => new _models.SentenceModel(dbObj));
-      } catch (err) {
-        _views.AlertView.show('error', err.message);
-      }
-
-      _views.AlertView.show('success', JSON.stringify(sents));
-
-      this.view.updateDisplay(sents, this.sentencesToSave);
+      const sents = tmp.data.data.data.map(dbObj => new _models.SentenceModel(dbObj));
+      const saveIds = this.sentencesToSave.map(sent => sent.data._id);
+      this.view.updateDisplay(sents.filter(sent => !saveIds.includes(sent.data._id)), this.sentencesToSave);
     });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref5) => {

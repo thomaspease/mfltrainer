@@ -44,6 +44,7 @@
 		"slugify": "^1.4.6",
 		"templates": "^1.2.9",
 		"validator": "^13.5.2",
+		"waveform-playlist": "^3.2.4",
 		"xss-clean": "^0.1.1"
 	}
 }
