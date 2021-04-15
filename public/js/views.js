@@ -307,6 +307,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
       sentences,
+      saved: toSave,
       fieldClasses,
     });
   }

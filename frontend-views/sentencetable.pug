@@ -1,3 +1,15 @@
+mixin row(sentence, isSaved)
+    tr
+        td
+            if isSaved
+                input(type="checkbox" checked data-sentence_id=sentence.data._id)
+            else
+                input(type="checkbox" data-sentence_id=sentence.data._id)
+        each field in fields
+            td
+                =sentence.data[field]
+  
+
 table.sentence-table
     colgroup
         col.selected-toggle.narrow
@@ -10,11 +22,7 @@ table.sentence-table
             each field in fields
                 th
                     =field
+        each sentence in saved
+            +row(sentence, true)
         each sentence in sentences
-            tr
-                td
-                    input(type="checkbox" checked="" data-sentence_id=sentence.data._id)
-                each field in fields
-                    td
-                        =sentence.data[field]
-                
+            +row(sentence, false)
