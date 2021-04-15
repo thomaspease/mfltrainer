@@ -283,7 +283,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
 
   updateFilters() {
     const filterState = {};
-    this.getFilterElements().forEach((el) => (filterState[el.name] = el.value));
+    this.getFilterElements().filter((el) => el.value != '').forEach((el) => (filterState[el.name] = el.value));
 
     this.trigger('filter_update', filterState);
   }
@@ -307,6 +307,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
       sentences,
+      saved: toSave,
       fieldClasses,
     });
   }

@@ -267,45 +267,15 @@ export class CreateTaskChooseSentenceController extends Controller {
     super(viewBaseElement);
 
     this.view.on('filter_update', async (filterData) => {
-      /*
-      const tmp = this.sentences.filter((sent) => {
-        if (
-          this.sentencesToSave.some((other) => other.data._id == sent.data._id)
-        ) {
-          return true;
-        }
-        for (let key in filterData) {
-          if (filterData[key] == '') {
-            continue;
-          }
-          if (sent.data[key] instanceof Array) {
-            if (!sent.data[key].includes(filterData[key])) {
-              return false;
-            }
-          } else {
-            if (sent.data[key] != filterData[key]) {
-              return false;
-            }
-          }
-        }
-
-        return true;
-      });
-      */
-
       const searchParams = new URLSearchParams({
         ...filterData,
       })
-      const tmp = await SentenceModel.sendApiRequest(
-        `/api/v1/sentences?${searchParams.toString()}`,
-        'GET'
-      );
 
-      const sents = tmp.data.data.data.map((dbObj) => new SentenceModel(dbObj))
+      const sents = await SentenceModel.loadFromServer(searchParams)
 
       const saveIds = this.sentencesToSave.map((sent) => sent.data._id);
 
-      this.view.updateDisplay(sents.filter((sent) => !saveIds.includes(sent.data._id)), this.sentencesToSave);
+      this.updateSentences(sents.filter((sent) => !saveIds.includes(sent.data._id)));
     });
 
     this.sentencesToSave = [];
