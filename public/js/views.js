@@ -155,7 +155,11 @@ export class AudioEditorView extends View {
     })
 
     this.elements.record.addEventListener('click', () => {
-      this.ee.emit('record');
+      try {
+        this.ee.emit('record');
+      } catch(err) {
+        AlertView.show('success', err.stack);
+      }
     })
 
     this.setupEditor();
@@ -167,6 +171,8 @@ export class AudioEditorView extends View {
       state: 'select',
     })
     this.ee = this.playlist.getEventEmitter();
+
+    //navigator.mediaDevices.getUserMedia({audio:true}).then(stream => this.playlist.initRecorder(stream))
 
     this.playlist.load([
       {src: "/heather-test-audio.mp3"},
@@ -185,9 +191,27 @@ export class AudioEditorView extends View {
         //ee.emit('statechange', 'select');
       }
     })
+    this.ee.on('select', (start, end, track) => {
+      this.start = start;
+      this.end = end;
+    })
 
     this.ee.on('audiorenderingfinished', (type, data) => {
-      AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${data.length/data.sampleRate}]`)
+      //AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${data.length/data.sampleRate}]`)
+      try {
+        const start = Math.floor(this.start * data.sampleRate) || 0;
+        const length = (this.end ? Math.floor(this.end * data.sampleRate) : data.length) - start;
+        const chan = data.getChannelData(0).slice(start);
+        const sampleRate = data.sampleRate;
+        const seconds = this.end - this.start;
+        const buf = new AudioBuffer({length, sampleRate});
+        //AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${buf.length/buf.sampleRate}]\n${data.length}\n${chan.length}\n${buf.length}`)
+
+        buf.copyToChannel(chan, 0);
+        return
+      } catch (err) {
+        AlertView.show('error', err);
+      }
     })
   }
 }
