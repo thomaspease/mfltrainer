@@ -4,6 +4,9 @@ import { sentencetableTemplate } from './templates/sentencetable';
 
 import WaveformPlaylist from 'waveform-playlist';
 
+import audioEncoder from 'audio-encoder';
+import fileSaver from 'file-saver';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -147,49 +150,56 @@ export class AudioEditorView extends View {
     // but, we can technically replace `eval` with a function that invokes member access on window, so... that kind of works?
     window.eval = (str) => window[str];
 
+    this.elements.play = this.root.querySelector('.play-button')
     this.elements.save = this.root.querySelector('.save-button')
     this.elements.record = this.root.querySelector('.record-button')
+
+    this.elements.play.addEventListener('click', () => {
+      this.ee.emit('play');
+    })
 
     this.elements.save.addEventListener('click', () => {
       this.ee.emit('startaudiorendering', 'buffer');
     })
 
+    this.isRecording = false;
+
     this.elements.record.addEventListener('click', () => {
-      try {
+      if (this.isRecording) {
+        this.isRecording = false;
+        this.ee.emit('stop');
+        this.elements.record.innerText = 'record';
+      } else {
+        this.ee.emit('clear');
         this.ee.emit('record');
-      } catch(err) {
-        AlertView.show('success', err.stack);
+        this.isRecording = true;
+        this.elements.record.innerText = 'stop';
       }
     })
 
-    this.setupEditor();
+    this.elements.main_block = this.root.querySelector('.editor-container');
+    this.hideElement('main_block');
+
+    // this juggling with 'init' might-or-might-not be needed, depending on browser security quirks?
+    this.elements.init = this.root.querySelector('.init');
+    this.elements.init.addEventListener('click', this.setupEditor.bind(this));
   }
 
   setupEditor() {
+    this.hideElement('init');
+    this.showElement('main_block');
     this.playlist = WaveformPlaylist({
-      container: this.root.querySelector('.TEST-audio-editor'),
+      container: this.root.querySelector('.audio-editor'),
       state: 'select',
     })
     this.ee = this.playlist.getEventEmitter();
 
-    //navigator.mediaDevices.getUserMedia({audio:true}).then(stream => this.playlist.initRecorder(stream))
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => this.playlist.initRecorder(stream))
 
     this.playlist.load([
-      {src: "/heather-test-audio.mp3"},
     ]).then(() => {
       this.ee.emit('zoomin')
       this.ee.emit('zoomin')
-    })
-    document.addEventListener('keydown', (evt) => {
-      if (evt.key == '\\') {
-        evt.preventDefault();
-        this.ee.emit('play');
-      }
-      if (evt.key == '/') {
-        evt.preventDefault();
-        this.ee.emit('select', 0.5, 2.5);
-        //ee.emit('statechange', 'select');
-      }
     })
     this.ee.on('select', (start, end, track) => {
       this.start = start;
@@ -205,9 +215,14 @@ export class AudioEditorView extends View {
         const sampleRate = data.sampleRate;
         const seconds = this.end - this.start;
         const buf = new AudioBuffer({length, sampleRate});
-        //AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${buf.length/buf.sampleRate}]\n${data.length}\n${chan.length}\n${buf.length}`)
 
         buf.copyToChannel(chan, 0);
+
+        const bitrate = 96;
+        audioEncoder(buf, bitrate, null, (blob) => {
+          // TODO audio-saving code here. probably send to the server, and let the server handle it from there?
+          fileSaver.saveAs(blob, 'test-clip.mp3');
+        });
         return
       } catch (err) {
         AlertView.show('error', err);
