@@ -26,7 +26,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 //---------GLOBAL MIDDLEWARE-----------------------------------
 //Set security HTTP headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
+app.use((req, res, next) => {
+  res.header('Content-Security-Policy', "default-src 'self';base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';worker-src 'self' blob:;style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests")
+  next();
+})
 
 //Development logging
 if (process.env.NODE_ENV === 'development') {
