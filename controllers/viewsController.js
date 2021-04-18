@@ -30,6 +30,7 @@ exports.doExercise = catchAsync(async (req, res, next) => {
     title: 'Train',
     sentences: task.sentences,
     exercise: task.exercise,
+    studentTask: req.params.id,
   });
 });
 

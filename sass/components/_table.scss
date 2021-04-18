@@ -56,7 +56,7 @@ tr:nth-child(even) {
 
 td {
   line-height: 1.42857;
-  vertical-align: top;
+  vertical-align: middle;
   border-left: 1px solid #ddd;
   border-top: 0;
   padding: 10px;
@@ -74,4 +74,8 @@ td {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.table--task:hover {
+  color: #004696;
 }

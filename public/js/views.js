@@ -113,7 +113,7 @@ export class AlertView extends View {
         this.hide();
         resolve();
       }, 3000);
-    })
+    });
   }
 }
 
@@ -196,7 +196,7 @@ export class CreateTaskRandomView extends CreateTaskView {
 
   //Function to return form data on submit
 
-  onCreateTaskRandomValues = (callback) => {
+  onCreateTaskRandomValues(callback) {
     this.root.addEventListener('submit', (e) => {
       e.preventDefault();
       const vivaRefRes = this.getUpperLower(
@@ -218,7 +218,7 @@ export class CreateTaskRandomView extends CreateTaskView {
 
       callback(searchParams, taskDetails);
     });
-  };
+  }
 
   getUpperLower(checkOne, checkTwo, searchParam) {
     const lowerValue = this.elements[checkOne.name].value;
@@ -236,13 +236,13 @@ export class CreateTaskRandomView extends CreateTaskView {
     }
   }
 
-  showHide = (el) => {
+  showHide(el) {
     if (el.checked) {
       this.showElement(el.name);
     } else {
       this.hideElement(el.name);
     }
-  };
+  }
 }
 
 export class CreateTaskChooseSentenceView extends CreateTaskView {
@@ -338,7 +338,7 @@ export class TrainingView extends FormView {
       'button[type=button].btn-next'
     );
 
-    this.elements.audio = this.root.querySelector('audio.sentence-audio')
+    this.elements.audio = this.root.querySelector('audio.sentence-audio');
 
     // define some groups of elements
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
@@ -367,7 +367,7 @@ export class TrainingView extends FormView {
         evt.preventDefault();
         this.elements.audio.play();
       }
-    })
+    });
   }
 
   updateCounts(right, total) {
@@ -385,8 +385,8 @@ export class TrainingView extends FormView {
 
     function normalize(str) {
       // normalize to ONLY letters and numbers (cross-language), lowercase
-      // this'll require fairly modern JS, incidentally 
-      return str.replace(/[^\p{Letter}\p{Number}]/ugi, '').toLowerCase()
+      // this'll require fairly modern JS, incidentally
+      return str.replace(/[^\p{Letter}\p{Number}]/giu, '').toLowerCase();
     }
 
     // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
@@ -469,5 +469,21 @@ export class TrainingView extends FormView {
 
   set audioUrl(value) {
     return (this.elements.audio.src = value);
+  }
+}
+
+//DELETE
+
+export class DeleteView extends View {
+  constructor(element) {
+    super(element);
+
+    var deleteBox =
+      '<span class="deleteBox"><p>Are you sure you want to delete?</p><span class="cancel">Cancel</span><span class="confirm">Yes</span></span>';
+
+    this.root.addEventListener('click', () => {
+      this.root.insertAdjacentHTML('beforeend', deleteBox);
+      this.root.classList.add('selected');
+    });
   }
 }
