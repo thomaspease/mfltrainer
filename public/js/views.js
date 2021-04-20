@@ -579,11 +579,48 @@ export class DeleteView extends View {
     super(element);
 
     var deleteBox =
-      '<span class="deleteBox"><p>Are you sure you want to delete?</p><span class="cancel">Cancel</span><span class="confirm">Yes</span></span>';
+      '<span class="deleteBox"><p>Are you sure you want to delete?</p><span class="button cancel">Cancel</span><span class="button confirm">Yes</span></span>';
 
-    this.root.addEventListener('click', () => {
-      this.root.insertAdjacentHTML('beforeend', deleteBox);
+    this.root.insertAdjacentHTML('beforeend', deleteBox);
+
+    this.root.addEventListener('click', (evt) => {
+      // use a different set of event-handling for anything marked as a button
+      if (evt.target.classList.contains('button')) {
+        if (evt.target.classList.contains('cancel')) {
+          this.root.classList.remove('selected');
+        } else if (evt.target.classList.contains('confirm')) {
+          // deletion logic goes in this branch.
+
+          var row = evt.target;
+          while (row.tagName != 'TR') {
+            row = row.parentNode;
+          }
+
+          deleteRow(row);
+        }
+        return false;
+      }
+
+      // not a button, so show the deleteBox (if not already shown)
       this.root.classList.add('selected');
+      return false;
     });
+
+  }
+
+  deleteRow(row) {
+    row.classList.add('loading');
+
+    // TODO replace fakeAjax with an actual API call
+    const fakeAjax = new Promise((resolve, reject) => {
+      setTimeout(resolve, 500);
+    })
+
+    fakeAjax.then(() => {
+      row.classList.add('deleted');
+      setTimeout(() => {
+        row.remove();
+      }, 500);
+    })
   }
 }
