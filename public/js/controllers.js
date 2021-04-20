@@ -9,6 +9,7 @@ import {
   SignupFormView,
   CreateTaskRandomView,
   CreateTaskChooseSentenceView,
+  DeleteView,
 } from './views.js';
 import {
   AuthModel,
@@ -156,7 +157,7 @@ export class CreateTaskRandomController extends Controller {
           'GET'
         );
         // Add sentence ID array and teacher to req.body for task creation
-        taskDetails.sentences = sentencesRes.data.data.data.map((e) => e._id);
+        taskDetails.sentences = sentencesRes.data.data.map((e) => e._id);
         taskDetails.teacher = DataParserView.get('user');
 
         //Create task
@@ -256,7 +257,7 @@ export class TrainController extends Controller {
       await StudentResultsModel.send(
         this.correctCount,
         this.wrongCount,
-        this.finishedSentences
+        DataParserView.get('studentTask')
       );
       // do we need to show feedback or anything?
     } catch (err) {
@@ -331,5 +332,11 @@ export class CreateTaskChooseSentenceController extends Controller {
     } catch (err) {
       AlertView.show('error', err.message);
     }
+  }
+}
+
+export class DeleteController extends Controller {
+  getViewClass() {
+    return DeleteView;
   }
 }

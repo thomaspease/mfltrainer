@@ -3,7 +3,8 @@ extends base
 mixin row(name, completed, due, id)
     tr  
         td.td-left
-            a.truncate-text(href=`/manage-tasks/${id}`) #{name}
+            a.truncate-text.table--task(href=`/manage-tasks/${id}`) #{name}
+            a.delete(data-controller="DeleteController")
         td #{completed}
         td #{due}
 

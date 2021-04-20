@@ -38,7 +38,7 @@ class Model {
       'GET',
     );
 
-    const objects = response.data.data.data.map((row) => new this(row));
+    const objects = response.data.data.map((row) => new this(row));
     return objects;
   }
 
@@ -109,14 +109,23 @@ export class CreateSentenceModel extends Model {
 
 // TODO maybe move some of the data from the controller into this?
 export class StudentResultsModel extends Model {
-  static async send(correctCount, wrongCount, studentSentences) {
+  static async send(correctCount, wrongCount, taskURL) {
     const payload = {
       correctCount: this.correctCount,
       wrongCount: this.wrongCount,
-      studentSentences: this.finishedSentences,
+      percentCorrect:
+        (this.correctCount / (this.correctCount + this.wrongCount)) * 100,
+      completed: true,
     };
 
-    return this.sendApiRequest('TODO-PLACEHOLDER', 'POST', payload);
+    console.log(correctCount);
+    console.log(this.correctCount);
+
+    // return this.sendApiRequest(
+    //   `/api/v1/studenttasks/${taskURL}`,
+    //   'PATCH',
+    //   payload
+    // );
   }
 }
 

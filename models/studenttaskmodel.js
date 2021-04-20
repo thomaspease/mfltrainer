@@ -18,8 +18,8 @@ const studentTaskSchema = mongoose.Schema({
     default: false,
   },
   percentCorrect: Number,
-  rightAnswers: Number,
-  wrongAnswers: Number,
+  correctCount: Number,
+  wrongCount: Number,
 });
 
 const StudentTask = mongoose.model(

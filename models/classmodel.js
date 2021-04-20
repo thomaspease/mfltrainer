@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const randomWords = require('random-words');
 
 const classSchema = mongoose.Schema(
   {
@@ -37,7 +38,10 @@ const classSchema = mongoose.Schema(
         ref: 'Task',
       },
     ],
-    classCode: String,
+    classCode: {
+      type: String,
+      default: randomWords({ exactly: 2, join: '-' }),
+    },
   },
   {
     toJSON: { virtuals: true },
