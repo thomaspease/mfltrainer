@@ -1,10 +1,14 @@
 const express = require('express');
 const sentenceController = require('../controllers/sentenceController');
-//const authController = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
 router.route('/get-custom-sentences').get(sentenceController.sentenceSorter);
+
+router
+  .route('/audio-upload-url')
+  .get(authController.protect, sentenceController.getS3UploadUrl);
 
 router
   .route('/')

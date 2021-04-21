@@ -209,7 +209,6 @@ export class AudioEditorView extends View {
     })
 
     this.ee.on('audiorenderingfinished', (type, data) => {
-      //AlertView.show('success', `${type}: ${data.__proto__.constructor.name}[${data.length/data.sampleRate}]`)
       try {
         const start = Math.floor(this.start * data.sampleRate) || 0;
         const length = (this.end ? Math.floor(this.end * data.sampleRate) : data.length) - start;
@@ -221,29 +220,25 @@ export class AudioEditorView extends View {
         buf.copyToChannel(chan, 0);
 
         const bitrate = 96;
-        audioEncoder(buf, bitrate, null, (blob) => {
-          axios({
+        audioEncoder(buf, bitrate, null, async (blob) => {
+          const authedResponse = await axios({
             method: 'GET',
-            url: '/get-s3-signed-url',
-          }).then((response) => {
-            const {signedUrl} = response.data;
-            console.log(signedUrl);
+            url: '/api/v1/sentences/audio-upload-url',
+          });
 
-            return axios({
-              method: 'PUT',
-              url: signedUrl,
-              data: blob,
-              headers: {
-                'Content-Type': 'audio/mpeg'
-              },
-            })
-          }).then((response) => {
-            console.log(response);
-          })
-          // TODO audio-saving code here. probably send to the server, and let the server handle it from there?
-          //fileSaver.saveAs(blob, 'test-clip.mp3');
+          const {signedUrl} = authedResponse.data;
+
+          const uploadResponse = await axios({
+            method: 'PUT',
+            url: signedUrl,
+            data: blob,
+            headers: {
+              'Content-Type': 'audio/mpeg'
+            },
+          });
+
+          // TODO provide feedback to the user when the upload has finished
         });
-        return
       } catch (err) {
         AlertView.show('error', err);
       }

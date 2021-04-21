@@ -1,6 +1,11 @@
 const Sentence = require('../models/sentencemodel');
 const factory = require('./handlerFactory');
 
+const aws = require('aws-sdk');
+aws.config.region = 'eu-west-2';
+const S3_BUCKET = 'mfltrainer-assets';
+
+
 //Unfinished
 
 exports.getAllSentences = factory.getAll(Sentence);
@@ -57,4 +62,39 @@ exports.sentenceSorter = async (req, res, next) => {
       message: err,
     });
   }
+};
+
+/***********************************************
+ * gets a signed URL for upload to S3
+ * does NOT follow our typical API response pattern
+ */
+exports.getS3UploadUrl = async (req, res) => {
+  const s3 = new aws.S3();
+
+  // TODO use a per-file filename
+  const filename = 'upload-test';
+  const filetype = 'audio/mpeg';
+
+  const s3Params = {
+    Bucket: S3_BUCKET,
+    Key: filename,
+    Expires: 60,
+    ContentType: filetype,
+    ACL: 'public-read',
+  };
+
+  s3.getSignedUrl('putObject', s3Params, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(400).end();
+    }
+
+    const returnData = {
+      signedUrl: data,
+      // the final URL is also available with the AWS region in the domain name (seems to be aliased)
+      url: `https://${S3_BUCKET}.s3.amazonaws.com/${filename}`
+    };
+
+    res.json(returnData);
+  })
 };
