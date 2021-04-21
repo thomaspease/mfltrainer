@@ -139,6 +139,16 @@ export class AudioEditorController extends Controller {
   getViewClass() {
     return AudioEditorView;
   }
+  
+  constructor(...args) {
+    super(...args);
+
+    this.view.on('save_file', async (blob) => {
+      await SentenceModel.uploadAudioFile(blob);
+
+      // TODO provide feedback to the user when the upload has finished
+    })
+  }
 }
 
 export class CreateTaskRandomController extends Controller {

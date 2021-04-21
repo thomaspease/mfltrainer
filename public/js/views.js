@@ -221,23 +221,7 @@ export class AudioEditorView extends View {
 
         const bitrate = 96;
         audioEncoder(buf, bitrate, null, async (blob) => {
-          const authedResponse = await axios({
-            method: 'GET',
-            url: '/api/v1/sentences/audio-upload-url',
-          });
-
-          const {signedUrl} = authedResponse.data;
-
-          const uploadResponse = await axios({
-            method: 'PUT',
-            url: signedUrl,
-            data: blob,
-            headers: {
-              'Content-Type': 'audio/mpeg'
-            },
-          });
-
-          // TODO provide feedback to the user when the upload has finished
+          this.trigger('save_file', blob)
         });
       } catch (err) {
         AlertView.show('error', err);

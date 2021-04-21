@@ -150,6 +150,26 @@ export class SentenceModel extends Model {
   get audioUrl() {
     return this.data.audio;
   }
+
+  static async uploadAudioFile(blob) {
+    // this could maybe use sendApiRequest instead? although the response IS in a different format than normal...
+    const authedResponse = await axios({
+      method: 'GET',
+      url: '/api/v1/sentences/audio-upload-url',
+    });
+
+    const {signedUrl} = authedResponse.data;
+
+    // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
+    const uploadResponse = await axios({
+      method: 'PUT',
+      url: signedUrl,
+      data: blob,
+      headers: {
+        'Content-Type': 'audio/mpeg'
+      },
+    });
+  }
 }
 
 class GappedSentenceModel extends SentenceModel {

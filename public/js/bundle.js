@@ -28881,21 +28881,7 @@ class AudioEditorView extends View {
         buf.copyToChannel(chan, 0);
         const bitrate = 96;
         (0, _audioEncoder.default)(buf, bitrate, null, async blob => {
-          const authedResponse = await (0, _axios.default)({
-            method: 'GET',
-            url: '/api/v1/sentences/audio-upload-url'
-          });
-          const {
-            signedUrl
-          } = authedResponse.data;
-          const uploadResponse = await (0, _axios.default)({
-            method: 'PUT',
-            url: signedUrl,
-            data: blob,
-            headers: {
-              'Content-Type': 'audio/mpeg'
-            }
-          }); // TODO provide feedback to the user when the upload has finished
+          this.trigger('save_file', blob);
         });
       } catch (err) {
         AlertView.show('error', err);
@@ -29403,6 +29389,26 @@ class SentenceModel extends Model {
     return this.data.audio;
   }
 
+  static async uploadAudioFile(blob) {
+    // this could maybe use sendApiRequest instead? although the response IS in a different format than normal...
+    const authedResponse = await (0, _axios.default)({
+      method: 'GET',
+      url: '/api/v1/sentences/audio-upload-url'
+    });
+    const {
+      signedUrl
+    } = authedResponse.data; // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
+
+    const uploadResponse = await (0, _axios.default)({
+      method: 'PUT',
+      url: signedUrl,
+      data: blob,
+      headers: {
+        'Content-Type': 'audio/mpeg'
+      }
+    });
+  }
+
 }
 
 exports.SentenceModel = SentenceModel;
@@ -29585,6 +29591,13 @@ exports.CreateSentenceController = CreateSentenceController;
 class AudioEditorController extends Controller {
   getViewClass() {
     return _views.AudioEditorView;
+  }
+
+  constructor() {
+    super(...arguments);
+    this.view.on('save_file', async blob => {
+      await _models.SentenceModel.uploadAudioFile(blob); // TODO provide feedback to the user when the upload has finished
+    });
   }
 
 }
