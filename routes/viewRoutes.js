@@ -13,6 +13,43 @@ router.get(
   authController.protect,
   viewsController.getCreateSentenceForm
 );
+// temp
+router.get("/get-s3-signed-url", authController.protect, (req, res) => {
+  const aws = require('aws-sdk');
+  aws.config.region = 'eu-west-2';
+
+  const S3_BUCKET = 'mfltrainer-assets';
+
+  {
+    const s3 = new aws.S3();
+
+    const filename = 'upload-test';
+    const filetype = 'application/json';
+
+    const s3Params = {
+      Bucket: S3_BUCKET,
+      Key: filename,
+      Expires: 60,
+      ContentType: filetype,
+      ACL: 'public-read',
+    };
+
+    s3.getSignedUrl('putObject', s3Params, (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.end();
+      }
+
+      const returnData = {
+        signedUrl: data,
+        url: `https://${S3_BUCKET}.s3.amazonaws.com/${filename}`
+      };
+
+      res.json(returnData);
+    })
+  }
+})
+// above: temp
 router.get(
   '/create-task',
   authController.protect,

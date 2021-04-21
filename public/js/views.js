@@ -7,6 +7,8 @@ import WaveformPlaylist from 'waveform-playlist';
 import audioEncoder from 'audio-encoder';
 import fileSaver from 'file-saver';
 
+import axios from 'axios';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -220,8 +222,26 @@ export class AudioEditorView extends View {
 
         const bitrate = 96;
         audioEncoder(buf, bitrate, null, (blob) => {
+          axios({
+            method: 'GET',
+            url: '/get-s3-signed-url',
+          }).then((response) => {
+            const {signedUrl} = response.data;
+            console.log(signedUrl);
+
+            return axios({
+              method: 'PUT',
+              url: signedUrl,
+              data: blob,
+              headers: {
+                'Content-Type': 'audio/mpeg'
+              },
+            })
+          }).then((response) => {
+            console.log(response);
+          })
           // TODO audio-saving code here. probably send to the server, and let the server handle it from there?
-          fileSaver.saveAs(blob, 'test-clip.mp3');
+          //fileSaver.saveAs(blob, 'test-clip.mp3');
         });
         return
       } catch (err) {
