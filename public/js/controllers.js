@@ -146,7 +146,7 @@ export class AudioEditorController extends Controller {
     this.view.on('save_file', async (blob) => {
       await SentenceModel.uploadAudioFile(blob);
 
-      // TODO provide feedback to the user when the upload has finished
+      AlertView.show('success', 'File uploaded successfully.');
     })
   }
 }
