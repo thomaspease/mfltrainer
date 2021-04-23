@@ -137,6 +137,8 @@ export class SentenceModel extends Model {
         return new GappedSentenceModel(this.data);
       case 'translation':
         return new TranslationSentenceModel(this.data);
+      case 'transcription':
+        return new TranscriptionSentenceModel(this.data);
     }
   }
   get prompt() {
@@ -197,3 +199,13 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class TranscriptionSentenceModel extends SentenceModel {
+  get prompt() {
+    return null;
+  }
+
+  get answer() {
+    return this.data.sentence;
+  }
+}

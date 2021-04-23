@@ -29374,6 +29374,9 @@ class SentenceModel extends Model {
 
       case 'translation':
         return new TranslationSentenceModel(this.data);
+
+      case 'transcription':
+        return new TranscriptionSentenceModel(this.data);
     }
   }
 
@@ -29436,6 +29439,17 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class TranscriptionSentenceModel extends SentenceModel {
+  get prompt() {
+    return null;
+  }
+
+  get answer() {
+    return this.data.sentence;
+  }
+
+}
 },{"./views.js":"views.js","axios":"../../node_modules/axios/index.js"}],"controllers.js":[function(require,module,exports) {
 "use strict";
 
@@ -29596,7 +29610,9 @@ class AudioEditorController extends Controller {
   constructor() {
     super(...arguments);
     this.view.on('save_file', async blob => {
-      await _models.SentenceModel.uploadAudioFile(blob); // TODO provide feedback to the user when the upload has finished
+      await _models.SentenceModel.uploadAudioFile(blob);
+
+      _views.AlertView.show('success', 'File uploaded successfully.');
     });
   }
 
