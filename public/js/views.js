@@ -2,6 +2,13 @@ import { diffWords } from 'diff';
 
 import { sentencetableTemplate } from './templates/sentencetable';
 
+import WaveformPlaylist from 'waveform-playlist';
+
+import audioEncoder from 'audio-encoder';
+import fileSaver from 'file-saver';
+
+import axios from 'axios';
+
 class View {
   constructor(baseElement) {
     this.root = baseElement;
@@ -136,6 +143,92 @@ export class SignupFormView extends FormView {}
 // CREATE SENTENCE VIEWS --------
 
 export class CreateSentenceFormView extends FormView {}
+
+export class AudioEditorView extends View {
+  constructor(element) {
+    super(element);
+
+    // gnarly, awkward workaround for the fact that WaveformPlaylist uses eval for something that could have been a member access on window
+    // but, we can technically replace `eval` with a function that invokes member access on window, so... that kind of works?
+    window.eval = (str) => window[str];
+
+    this.elements.play = this.root.querySelector('.play-button')
+    this.elements.save = this.root.querySelector('.save-button')
+    this.elements.record = this.root.querySelector('.record-button')
+
+    this.elements.play.addEventListener('click', () => {
+      this.ee.emit('play');
+    })
+
+    this.elements.save.addEventListener('click', () => {
+      this.ee.emit('startaudiorendering', 'buffer');
+    })
+
+    this.isRecording = false;
+
+    this.elements.record.addEventListener('click', () => {
+      if (this.isRecording) {
+        this.isRecording = false;
+        this.ee.emit('stop');
+        this.elements.record.innerText = 'record';
+      } else {
+        this.ee.emit('clear');
+        this.ee.emit('record');
+        this.isRecording = true;
+        this.elements.record.innerText = 'stop';
+      }
+    })
+
+    this.elements.main_block = this.root.querySelector('.editor-container');
+    this.hideElement('main_block');
+
+    // this juggling with 'init' might-or-might-not be needed, depending on browser security quirks?
+    this.elements.init = this.root.querySelector('.init');
+    this.elements.init.addEventListener('click', this.setupEditor.bind(this));
+  }
+
+  setupEditor() {
+    this.hideElement('init');
+    this.showElement('main_block');
+    this.playlist = WaveformPlaylist({
+      container: this.root.querySelector('.audio-editor'),
+      state: 'select',
+    })
+    this.ee = this.playlist.getEventEmitter();
+
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => this.playlist.initRecorder(stream))
+
+    this.playlist.load([
+    ]).then(() => {
+      this.ee.emit('zoomin')
+      this.ee.emit('zoomin')
+    })
+    this.ee.on('select', (start, end, track) => {
+      this.start = start;
+      this.end = end;
+    })
+
+    this.ee.on('audiorenderingfinished', (type, data) => {
+      try {
+        const start = Math.floor(this.start * data.sampleRate) || 0;
+        const length = (this.end ? Math.floor(this.end * data.sampleRate) : data.length) - start;
+        const chan = data.getChannelData(0).slice(start);
+        const sampleRate = data.sampleRate;
+        const seconds = this.end - this.start;
+        const buf = new AudioBuffer({length, sampleRate});
+
+        buf.copyToChannel(chan, 0);
+
+        const bitrate = 96;
+        audioEncoder(buf, bitrate, null, async (blob) => {
+          this.trigger('save_file', blob)
+        });
+      } catch (err) {
+        AlertView.show('error', err);
+      }
+    })
+  }
+}
 
 // CREATE TASK VIEWS --------
 
@@ -283,7 +376,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
 
   updateFilters() {
     const filterState = {};
-    this.getFilterElements().forEach((el) => (filterState[el.name] = el.value));
+    this.getFilterElements().filter((el) => el.value != '').forEach((el) => (filterState[el.name] = el.value));
 
     this.trigger('filter_update', filterState);
   }
@@ -307,6 +400,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
       sentences,
+      saved: toSave,
       fieldClasses,
     });
   }
@@ -339,6 +433,7 @@ export class TrainingView extends FormView {
     );
 
     this.elements.audio = this.root.querySelector('audio.sentence-audio');
+    this.elements.playAudio = this.root.querySelector('.play-audio');
 
     // define some groups of elements
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
@@ -367,6 +462,10 @@ export class TrainingView extends FormView {
         evt.preventDefault();
         this.elements.audio.play();
       }
+    });
+
+    this.elements.playAudio.addEventListener('click', () => {
+      this.elements.audio.play();
     });
   }
 
@@ -479,11 +578,48 @@ export class DeleteView extends View {
     super(element);
 
     var deleteBox =
-      '<span class="deleteBox"><p>Are you sure you want to delete?</p><span class="cancel">Cancel</span><span class="confirm">Yes</span></span>';
+      '<span class="deleteBox"><p>Are you sure you want to delete?</p><span class="button cancel">Cancel</span><span class="button confirm">Yes</span></span>';
 
-    this.root.addEventListener('click', () => {
-      this.root.insertAdjacentHTML('beforeend', deleteBox);
+    this.root.insertAdjacentHTML('beforeend', deleteBox);
+
+    this.root.addEventListener('click', (evt) => {
+      // use a different set of event-handling for anything marked as a button
+      if (evt.target.classList.contains('button')) {
+        if (evt.target.classList.contains('cancel')) {
+          this.root.classList.remove('selected');
+        } else if (evt.target.classList.contains('confirm')) {
+          // deletion logic goes in this branch.
+
+          var row = evt.target;
+          while (row.tagName != 'TR') {
+            row = row.parentNode;
+          }
+
+          deleteRow(row);
+        }
+        return false;
+      }
+
+      // not a button, so show the deleteBox (if not already shown)
       this.root.classList.add('selected');
+      return false;
     });
+
+  }
+
+  deleteRow(row) {
+    row.classList.add('loading');
+
+    // TODO replace fakeAjax with an actual API call
+    const fakeAjax = new Promise((resolve, reject) => {
+      setTimeout(resolve, 500);
+    })
+
+    fakeAjax.then(() => {
+      row.classList.add('deleted');
+      setTimeout(() => {
+        row.remove();
+      }, 500);
+    })
   }
 }

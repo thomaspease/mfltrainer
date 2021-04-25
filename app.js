@@ -26,7 +26,16 @@ app.set('views', path.join(__dirname, 'views'));
 
 //---------GLOBAL MIDDLEWARE-----------------------------------
 //Set security HTTP headers
-app.use(helmet());
+app.use(helmet({
+  // tweak Content-Security-Policy as needed
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'worker-src': ["'self'", "blob:"],
+      'connect-src': ["'self'", "https://mfltrainer-assets.s3.eu-west-2.amazonaws.com/"],
+    }
+  },
+}));
 
 //Development logging
 if (process.env.NODE_ENV === 'development') {

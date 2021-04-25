@@ -31,6 +31,29 @@ class Model {
     }
   }
 
+  // expects searchParams to be of type URLSearchParams
+  static async loadFromServer(searchParams) {
+    const response = await this.sendApiRequest(
+      this.apiUrl() + '?' + searchParams.toString(),
+      'GET',
+    );
+
+    const objects = response.data.data.map((row) => new this(row));
+    return objects;
+  }
+
+  static async fetchAll() {
+    return await this.loadFromServer(new URLSearchParams({}));
+  }
+
+  // default API URL and database name (i.e., table), which will work for *most* classes
+  static apiUrl() {
+    return `/api/v1/${this.dbName()}`;
+  }
+  static dbName() {
+    return this.name.toLowerCase().replace(/model$/, 's');
+  }
+
   // returns an array of instantiated objects, based on JSON embedded in a specific DOM element
   static getLocal(name) {
     // this is *maybe* not as theoretically clean to have a Model call into a View, but since we're storing global data in certain DOM elements, it works well in practice
@@ -128,10 +151,24 @@ export class SentenceModel extends Model {
     return this.data.audio;
   }
 
-  static async fetchAll() {
-    const res = await this.sendApiRequest('api/v1/sentences', 'GET', {});
-    const sentences = res.data.data;
-    return sentences.map((sentenceData) => new this(sentenceData));
+  static async uploadAudioFile(blob) {
+    // this could maybe use sendApiRequest instead? although the response IS in a different format than normal...
+    const authedResponse = await axios({
+      method: 'GET',
+      url: '/api/v1/sentences/audio-upload-url',
+    });
+
+    const {signedUrl} = authedResponse.data;
+
+    // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
+    const uploadResponse = await axios({
+      method: 'PUT',
+      url: signedUrl,
+      data: blob,
+      headers: {
+        'Content-Type': 'audio/mpeg'
+      },
+    });
   }
 }
 

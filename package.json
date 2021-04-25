@@ -22,6 +22,8 @@
 		"prettier": "^2.2.1"
 	},
 	"dependencies": {
+		"audio-encoder": "^1.0.2",
+		"aws-sdk": "^2.889.0",
 		"axios": "^0.19.2",
 		"bcryptjs": "^2.4.3",
 		"cookie-parser": "^1.4.5",
@@ -31,6 +33,7 @@
 		"express": "^4.17.1",
 		"express-mongo-sanitize": "^2.0.1",
 		"express-rate-limit": "^5.2.3",
+		"file-saver": "^2.0.5",
 		"helmet": "^4.2.0",
 		"hpp": "^0.2.3",
 		"jsonwebtoken": "^8.5.1",
@@ -45,6 +48,7 @@
 		"slugify": "^1.4.6",
 		"templates": "^1.2.9",
 		"validator": "^13.5.2",
+		"waveform-playlist": "^3.2.4",
 		"xss-clean": "^0.1.1"
 	}
 }

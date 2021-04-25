@@ -2,6 +2,7 @@ import {
   LoginFormView,
   TrainingView,
   CreateSentenceFormView,
+  AudioEditorView,
   DataParserView,
   AlertView,
   LogoutView,
@@ -131,6 +132,22 @@ export class CreateSentenceController extends Controller {
         }
       }
     );
+  }
+}
+
+export class AudioEditorController extends Controller {
+  getViewClass() {
+    return AudioEditorView;
+  }
+  
+  constructor(...args) {
+    super(...args);
+
+    this.view.on('save_file', async (blob) => {
+      await SentenceModel.uploadAudioFile(blob);
+
+      AlertView.show('success', 'File uploaded successfully.');
+    })
   }
 }
 
@@ -267,32 +284,16 @@ export class CreateTaskChooseSentenceController extends Controller {
   constructor(viewBaseElement) {
     super(viewBaseElement);
 
-    this.view.on('filter_update', (filterData) => {
-      const tmp = this.sentences.filter((sent) => {
-        if (
-          this.sentencesToSave.some((other) => other.data._id == sent.data._id)
-        ) {
-          return true;
-        }
-        for (let key in filterData) {
-          if (filterData[key] == '') {
-            continue;
-          }
-          if (sent.data[key] instanceof Array) {
-            if (!sent.data[key].includes(filterData[key])) {
-              return false;
-            }
-          } else {
-            if (sent.data[key] != filterData[key]) {
-              return false;
-            }
-          }
-        }
+    this.view.on('filter_update', async (filterData) => {
+      const searchParams = new URLSearchParams({
+        ...filterData,
+      })
 
-        return true;
-      });
+      const sents = await SentenceModel.loadFromServer(searchParams)
 
-      this.view.updateDisplay(tmp, this.sentencesToSave);
+      const saveIds = this.sentencesToSave.map((sent) => sent.data._id);
+
+      this.updateSentences(sents.filter((sent) => !saveIds.includes(sent.data._id)));
     });
 
     this.sentencesToSave = [];
