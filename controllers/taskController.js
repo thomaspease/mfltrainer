@@ -10,9 +10,9 @@ const studentTaskController = require('../controllers/studentTaskController');
 exports.getAllTasks = factory.getAll(Task);
 
 exports.createTaskAndStudentTasks = catchAsync(async (req, res, next) => {
-  // if (req.user.role === 'teacher') {
-  //   req.body.teacher = req.user.id;
-  // }
+  if (req.user.role === 'teacher') {
+    req.body.teacher = req.user.id;
+  }
 
   const doc = await Task.create(req.body);
 
