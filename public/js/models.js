@@ -35,7 +35,7 @@ class Model {
   static async loadFromServer(searchParams) {
     const response = await this.sendApiRequest(
       this.apiUrl() + '?' + searchParams.toString(),
-      'GET',
+      'GET'
     );
 
     const objects = response.data.data.map((row) => new this(row));
@@ -158,7 +158,7 @@ export class SentenceModel extends Model {
       url: '/api/v1/sentences/audio-upload-url',
     });
 
-    const {signedUrl} = authedResponse.data;
+    const { signedUrl } = authedResponse.data;
 
     // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
     const uploadResponse = await axios({
@@ -166,7 +166,7 @@ export class SentenceModel extends Model {
       url: signedUrl,
       data: blob,
       headers: {
-        'Content-Type': 'audio/mpeg'
+        'Content-Type': 'audio/mpeg',
       },
     });
   }
@@ -197,3 +197,5 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+export class DeleteModel extends Model {}

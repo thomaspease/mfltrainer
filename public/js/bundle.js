@@ -2696,7 +2696,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -2718,7 +2718,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -27917,7 +27917,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28226,7 +28226,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -29188,7 +29188,7 @@ class DeleteView extends View {
             row = row.parentNode;
           }
 
-          deleteRow(row);
+          this.trigger('delete', row.getAttribute('name'));
         }
 
         return false;
@@ -29223,7 +29223,7 @@ exports.DeleteView = DeleteView;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.CreateTaskModel = exports.AuthModel = void 0;
+exports.DeleteModel = exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.CreateTaskModel = exports.AuthModel = void 0;
 
 var _views = require("./views.js");
 
@@ -29436,6 +29436,10 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class DeleteModel extends Model {}
+
+exports.DeleteModel = DeleteModel;
 },{"./views.js":"views.js","axios":"../../node_modules/axios/index.js"}],"controllers.js":[function(require,module,exports) {
 "use strict";
 
@@ -29596,7 +29600,9 @@ class AudioEditorController extends Controller {
   constructor() {
     super(...arguments);
     this.view.on('save_file', async blob => {
-      await _models.SentenceModel.uploadAudioFile(blob); // TODO provide feedback to the user when the upload has finished
+      await _models.SentenceModel.uploadAudioFile(blob);
+
+      _views.AlertView.show('success', 'File uploaded successfully.');
     });
   }
 
@@ -29773,6 +29779,26 @@ exports.CreateTaskChooseSentenceController = CreateTaskChooseSentenceController;
 class DeleteController extends Controller {
   getViewClass() {
     return _views.DeleteView;
+  }
+
+  constructor() {
+    super(...arguments);
+    this.view.on('delete', async id => {
+      try {
+        console.log(id);
+        const deleteTask = await _models.DeleteModel.sendApiRequest("/api/v1/tasks/".concat(id), 'DELETE');
+        deleteTask.then(() => {
+          this.view.row.classList.add('deleted');
+          setTimeout(() => {
+            row.remove();
+          }, 500);
+        });
+      } catch (err) {
+        this.view.root.classList.remove('selected');
+
+        _views.AlertView.show('error', err.message);
+      }
+    });
   }
 
 }

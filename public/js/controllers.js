@@ -17,6 +17,7 @@ import {
   CreateSentenceModel,
   StudentResultsModel,
   CreateTaskModel,
+  DeleteModel,
 } from './models.js';
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
@@ -139,7 +140,7 @@ export class AudioEditorController extends Controller {
   getViewClass() {
     return AudioEditorView;
   }
-  
+
   constructor(...args) {
     super(...args);
 
@@ -147,7 +148,7 @@ export class AudioEditorController extends Controller {
       await SentenceModel.uploadAudioFile(blob);
 
       AlertView.show('success', 'File uploaded successfully.');
-    })
+    });
   }
 }
 
@@ -287,13 +288,15 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.view.on('filter_update', async (filterData) => {
       const searchParams = new URLSearchParams({
         ...filterData,
-      })
+      });
 
-      const sents = await SentenceModel.loadFromServer(searchParams)
+      const sents = await SentenceModel.loadFromServer(searchParams);
 
       const saveIds = this.sentencesToSave.map((sent) => sent.data._id);
 
-      this.updateSentences(sents.filter((sent) => !saveIds.includes(sent.data._id)));
+      this.updateSentences(
+        sents.filter((sent) => !saveIds.includes(sent.data._id))
+      );
     });
 
     this.sentencesToSave = [];
@@ -348,5 +351,28 @@ export class CreateTaskChooseSentenceController extends Controller {
 export class DeleteController extends Controller {
   getViewClass() {
     return DeleteView;
+  }
+  constructor(...args) {
+    super(...args);
+
+    this.view.on('delete', async (id) => {
+      try {
+        console.log(id);
+        const deleteTask = await DeleteModel.sendApiRequest(
+          `/api/v1/tasks/${id}`,
+          'DELETE'
+        );
+
+        deleteTask.then(() => {
+          this.view.row.classList.add('deleted');
+          setTimeout(() => {
+            row.remove();
+          }, 500);
+        });
+      } catch (err) {
+        this.view.root.classList.remove('selected');
+        AlertView.show('error', err.message);
+      }
+    });
   }
 }

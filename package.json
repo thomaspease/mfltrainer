@@ -8,6 +8,7 @@
 		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
 		"build:frontend-pug": "./build-frontend-pug.sh",
 		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
+		"start" : "node server.js",
 		"serve": "nodemon server.js"
 	},
 	"author": "tom",
@@ -50,5 +51,8 @@
 		"validator": "^13.5.2",
 		"waveform-playlist": "^3.2.4",
 		"xss-clean": "^0.1.1"
+	},
+	"engines": {
+		"node": ">=10.0.0"
 	}
 }

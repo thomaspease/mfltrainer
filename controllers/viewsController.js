@@ -9,7 +9,7 @@ const catchAsync = require('../utils/catchAsync');
 exports.displayTasks = catchAsync(async (req, res, next) => {
   //At the moment tasks coming from isLoggedin and being stored in locals.studentTasks\
 
-  res.status(200).render('tasks', {
+  res.status(200).render('student/studenttasks', {
     title: 'Tasks',
   });
 });
@@ -26,7 +26,7 @@ exports.doExercise = catchAsync(async (req, res, next) => {
   );
 
   //Render template and pass in sentences
-  res.status(200).render('train', {
+  res.status(200).render('student/train', {
     title: 'Train',
     sentences: task.sentences,
     exercise: task.exercise,
@@ -47,7 +47,7 @@ exports.getSignupForm = (req, res) => {
 };
 
 exports.getCreateSentenceForm = (req, res) => {
-  res.status(200).render('createsentences', {
+  res.status(200).render('teacher/create/createsentences', {
     title: 'Create sentences',
   });
 };
@@ -66,21 +66,21 @@ exports.getSetTasksForm = catchAsync(async (req, res, next) => {
     Sentence.distinct('tense').then((values) => (fieldValues.tense = values)),
   ]);
 
-  res.status(200).render('settasks', {
+  res.status(200).render('teacher/create/settasks', {
     title: 'Create tasks',
     fieldValues,
   });
 });
 
 exports.getSetTasksRandomForm = catchAsync(async (req, res, next) => {
-  res.status(200).render('settasksrandom', {
+  res.status(200).render('teacher/create/settasksrandom', {
     title: 'Create tasks',
   });
 });
 
 //TEACHER CLASS MANAGEMENT
 exports.manageMyClasses = catchAsync(async (req, res, next) => {
-  res.status(200).render('myclasses', {
+  res.status(200).render('teacher/overviews/classesoverview', {
     title: 'My classes',
   });
 });
@@ -89,7 +89,7 @@ exports.getClass = catchAsync(async (req, res, next) => {
   //Find class
   const classData = await Class.findById(req.params.class).populate('tasks');
 
-  res.status(200).render('classoverview', {
+  res.status(200).render('teacher/manage-individual/manageclass', {
     title: classData.name,
     classData,
   });
@@ -99,7 +99,7 @@ exports.getClass = catchAsync(async (req, res, next) => {
 exports.manageMyTasks = catchAsync(async (req, res, next) => {
   const tasks = await Task.find({ teacher: res.locals.user._id });
 
-  res.status(200).render('mytasks', {
+  res.status(200).render('teacher/overviews/tasksoverview', {
     title: 'My tasks',
     tasks,
   });
@@ -114,7 +114,7 @@ exports.getTask = catchAsync(async (req, res, next) => {
     task: req.params.task,
   }).populate('user');
 
-  res.status(200).render('taskoverview', {
+  res.status(200).render('teacher/manage-individual/managetask', {
     title: task.name,
     task,
     studentTasks,
