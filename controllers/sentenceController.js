@@ -5,7 +5,6 @@ const aws = require('aws-sdk');
 aws.config.region = 'eu-west-2';
 const S3_BUCKET = 'mfltrainer-assets';
 
-
 //Unfinished
 
 exports.getAllSentences = factory.getAll(Sentence);
@@ -72,7 +71,7 @@ exports.getS3UploadUrl = async (req, res) => {
   const s3 = new aws.S3();
 
   // TODO use a per-file filename
-  const filename = 'upload-test';
+  const filename = generateGUID();
   const filetype = 'audio/mpeg';
 
   const s3Params = {
@@ -92,9 +91,16 @@ exports.getS3UploadUrl = async (req, res) => {
     const returnData = {
       signedUrl: data,
       // the final URL is also available with the AWS region in the domain name (seems to be aliased)
-      url: `https://${S3_BUCKET}.s3.amazonaws.com/${filename}`
+      url: `https://${S3_BUCKET}.s3.amazonaws.com/${filename}`,
     };
 
     res.json(returnData);
-  })
+  });
 };
+
+//GENERATE GUID
+function S4() {
+  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+}
+
+generateGUID = () => (S4() + S4() + S4()).toLowerCase();
