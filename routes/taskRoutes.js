@@ -8,7 +8,7 @@ const router = express.Router({ mergeParams: true });
 router
   .route('/')
   .get(taskController.getAllTasks)
-  .post(taskController.createTaskAndStudentTasks);
+  .post(authController.protect, taskController.createTaskAndStudentTasks);
 
 router
   .route('/:id')

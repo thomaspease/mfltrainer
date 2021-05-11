@@ -152,17 +152,17 @@ export class AudioEditorView extends View {
     // but, we can technically replace `eval` with a function that invokes member access on window, so... that kind of works?
     window.eval = (str) => window[str];
 
-    this.elements.play = this.root.querySelector('.play-button')
-    this.elements.save = this.root.querySelector('.save-button')
-    this.elements.record = this.root.querySelector('.record-button')
+    this.elements.play = this.root.querySelector('.play-button');
+    this.elements.save = this.root.querySelector('.save-button');
+    this.elements.record = this.root.querySelector('.record-button');
 
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
-    })
+    });
 
     this.elements.save.addEventListener('click', () => {
       this.ee.emit('startaudiorendering', 'buffer');
-    })
+    });
 
     this.isRecording = false;
 
@@ -177,7 +177,7 @@ export class AudioEditorView extends View {
         this.isRecording = true;
         this.elements.record.innerText = 'stop';
       }
-    })
+    });
 
     this.elements.main_block = this.root.querySelector('.editor-container');
     this.hideElement('main_block');
@@ -193,40 +193,43 @@ export class AudioEditorView extends View {
     this.playlist = WaveformPlaylist({
       container: this.root.querySelector('.audio-editor'),
       state: 'select',
-    })
+    });
     this.ee = this.playlist.getEventEmitter();
 
-    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => this.playlist.initRecorder(stream))
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => this.playlist.initRecorder(stream));
 
-    this.playlist.load([
-    ]).then(() => {
-      this.ee.emit('zoomin')
-      this.ee.emit('zoomin')
-    })
+    this.playlist.load([]).then(() => {
+      this.ee.emit('zoomin');
+      this.ee.emit('zoomin');
+    });
     this.ee.on('select', (start, end, track) => {
       this.start = start;
       this.end = end;
-    })
+    });
 
     this.ee.on('audiorenderingfinished', (type, data) => {
       try {
         const start = Math.floor(this.start * data.sampleRate) || 0;
-        const length = (this.end ? Math.floor(this.end * data.sampleRate) : data.length) - start;
+        const length =
+          (this.end ? Math.floor(this.end * data.sampleRate) : data.length) -
+          start;
         const chan = data.getChannelData(0).slice(start);
         const sampleRate = data.sampleRate;
         const seconds = this.end - this.start;
-        const buf = new AudioBuffer({length, sampleRate});
+        const buf = new AudioBuffer({ length, sampleRate });
 
         buf.copyToChannel(chan, 0);
 
         const bitrate = 96;
         audioEncoder(buf, bitrate, null, async (blob) => {
-          this.trigger('save_file', blob)
+          this.trigger('save_file', blob);
         });
       } catch (err) {
         AlertView.show('error', err);
       }
-    })
+    });
   }
 }
 
@@ -376,7 +379,9 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
 
   updateFilters() {
     const filterState = {};
-    this.getFilterElements().filter((el) => el.value != '').forEach((el) => (filterState[el.name] = el.value));
+    this.getFilterElements()
+      .filter((el) => el.value != '')
+      .forEach((el) => (filterState[el.name] = el.value));
 
     this.trigger('filter_update', filterState);
   }
@@ -595,7 +600,7 @@ export class DeleteView extends View {
             row = row.parentNode;
           }
 
-          deleteRow(row);
+          this.trigger('delete', row.getAttribute('name'));
         }
         return false;
       }
@@ -604,7 +609,6 @@ export class DeleteView extends View {
       this.root.classList.add('selected');
       return false;
     });
-
   }
 
   deleteRow(row) {
@@ -613,13 +617,13 @@ export class DeleteView extends View {
     // TODO replace fakeAjax with an actual API call
     const fakeAjax = new Promise((resolve, reject) => {
       setTimeout(resolve, 500);
-    })
+    });
 
     fakeAjax.then(() => {
       row.classList.add('deleted');
       setTimeout(() => {
         row.remove();
       }, 500);
-    })
+    });
   }
 }

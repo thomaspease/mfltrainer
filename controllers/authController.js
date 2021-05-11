@@ -42,7 +42,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     classCode: req.body.classCode,
   });
 
-  console.log(classData, req.body.classCode);
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -50,6 +49,17 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     class: classData[0]._id,
   });
+
+  Class.findByIdAndUpdate(
+    { _id: classData[0]._id },
+    { $push: { students: newUser.id } },
+    (err, user) => {
+      if (err) {
+        new AppError('Could not add student to class');
+      }
+    }
+  );
+
   createSendToken(newUser, 201, res);
 });
 
