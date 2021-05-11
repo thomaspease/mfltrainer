@@ -18,7 +18,7 @@ const studentTaskSchema = mongoose.Schema({
     default: false,
   },
   percentCorrect: Number,
-  correctCount: Number,
+  rightCount: Number,
   wrongCount: Number,
 });
 

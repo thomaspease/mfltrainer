@@ -265,7 +265,7 @@ export class TrainController extends Controller {
   async sendResultsToServer() {
     try {
       await StudentResultsModel.send(
-        this.correctCount,
+        this.rightCount,
         this.wrongCount,
         DataParserView.get('studentTask')
       );
