@@ -25,7 +25,7 @@ const sentenceSchema = mongoose.Schema({
     type: String,
   },
   grammar: Array,
-  audio: String,
+  audioUrl: String,
   createdAt: {
     type: Date,
     default: Date.now(),
