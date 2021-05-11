@@ -109,23 +109,20 @@ export class CreateSentenceModel extends Model {
 
 // TODO maybe move some of the data from the controller into this?
 export class StudentResultsModel extends Model {
-  static async send(correctCount, wrongCount, taskURL) {
+  static async send(rightCount, wrongCount, taskURL) {
     const payload = {
-      correctCount: this.correctCount,
-      wrongCount: this.wrongCount,
+      rightCount: rightCount,
+      wrongCount: wrongCount,
       percentCorrect:
-        (this.correctCount / (this.correctCount + this.wrongCount)) * 100,
+        (rightCount / (rightCount + wrongCount)) * 100,
       completed: true,
     };
 
-    console.log(correctCount);
-    console.log(this.correctCount);
-
-    // return this.sendApiRequest(
-    //   `/api/v1/studenttasks/${taskURL}`,
-    //   'PATCH',
-    //   payload
-    // );
+    return this.sendApiRequest(
+      `/api/v1/studenttasks/${taskURL}`,
+      'PATCH',
+      payload
+    );
   }
 }
 
@@ -137,6 +134,8 @@ export class SentenceModel extends Model {
         return new GappedSentenceModel(this.data);
       case 'translation':
         return new TranslationSentenceModel(this.data);
+      case 'transcription':
+        return new TranscriptionSentenceModel(this.data);
     }
   }
   get prompt() {
@@ -197,5 +196,15 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class TranscriptionSentenceModel extends SentenceModel {
+  get prompt() {
+    return null;
+  }
+
+  get answer() {
+    return this.data.sentence;
+  }
+}
 
 export class DeleteModel extends Model {}

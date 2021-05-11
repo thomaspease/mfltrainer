@@ -116,7 +116,6 @@ export class CreateSentenceController extends Controller {
     this.view.onFormData(
       async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
         try {
-          const 
           const res = await CreateSentenceModel.create(
             sentence,
             translation,
@@ -266,7 +265,7 @@ export class TrainController extends Controller {
   async sendResultsToServer() {
     try {
       await StudentResultsModel.send(
-        this.correctCount,
+        this.rightCount,
         this.wrongCount,
         DataParserView.get('studentTask')
       );

@@ -2696,7 +2696,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -2718,7 +2718,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -27917,7 +27917,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28226,7 +28226,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -29346,19 +29346,14 @@ class CreateSentenceModel extends Model {
 exports.CreateSentenceModel = CreateSentenceModel;
 
 class StudentResultsModel extends Model {
-  static async send(correctCount, wrongCount, taskURL) {
+  static async send(rightCount, wrongCount, taskURL) {
     const payload = {
-      correctCount: this.correctCount,
-      wrongCount: this.wrongCount,
-      percentCorrect: this.correctCount / (this.correctCount + this.wrongCount) * 100,
+      rightCount: rightCount,
+      wrongCount: wrongCount,
+      percentCorrect: rightCount / (rightCount + wrongCount) * 100,
       completed: true
     };
-    console.log(correctCount);
-    console.log(this.correctCount); // return this.sendApiRequest(
-    //   `/api/v1/studenttasks/${taskURL}`,
-    //   'PATCH',
-    //   payload
-    // );
+    return this.sendApiRequest("/api/v1/studenttasks/".concat(taskURL), 'PATCH', payload);
   }
 
 }
@@ -29374,6 +29369,9 @@ class SentenceModel extends Model {
 
       case 'translation':
         return new TranslationSentenceModel(this.data);
+
+      case 'transcription':
+        return new TranscriptionSentenceModel(this.data);
     }
   }
 
@@ -29436,6 +29434,17 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class TranscriptionSentenceModel extends SentenceModel {
+  get prompt() {
+    return null;
+  }
+
+  get answer() {
+    return this.data.sentence;
+  }
+
+}
 
 class DeleteModel extends Model {}
 
@@ -29709,7 +29718,7 @@ class TrainController extends Controller {
 
   async sendResultsToServer() {
     try {
-      await _models.StudentResultsModel.send(this.correctCount, this.wrongCount, _views.DataParserView.get('studentTask')); // do we need to show feedback or anything?
+      await _models.StudentResultsModel.send(this.rightCount, this.wrongCount, _views.DataParserView.get('studentTask')); // do we need to show feedback or anything?
     } catch (err) {
       _views.AlertView.show('error', err.message);
     }
