@@ -70,12 +70,16 @@ td {
   border-right: 0;
 }
 
-.truncate-text {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+.table--task {
+  color: #0e79c9;
 }
 
 .table--task:hover {
   color: #004696;
+}
+
+.truncate-text {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

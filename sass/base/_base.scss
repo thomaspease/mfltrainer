@@ -17,7 +17,6 @@ body {
   font-weight: 300;
   font-family: 'Lato', sans-serif;
   color: #777;
-  padding: 3rem;
   min-height: 100vh;
   height: 100%;
   //   display: -webkit-box;
@@ -54,4 +53,16 @@ body {
   .main {
     padding: 4rem 0rem;
   }
+}
+
+.ma-bt-md {
+  margin-bottom: 3rem !important;
+}
+
+.ma-bt-lg {
+  margin-bottom: 3.5rem !important;
+}
+
+.ma-tp-sm {
+  margin-top: 0.5rem !important;
 }

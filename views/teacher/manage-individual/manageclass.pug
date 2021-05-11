@@ -3,23 +3,24 @@ extends ../../base
 mixin row(name, completed, due, id)
     tr  
         td.td-left
-            a.truncate-text(href=`/manage-tasks/${id}`) #{name}
+            a.truncate-text.table--task(href=`/manage-tasks/${id}`) #{name}
         td #{completed}
         td #{due}
 
 block content
     main.main
-        div.card-container
-            h2.heading-secondary.ma-bt-md Tasks set
-            div.card
-                table
-                    thead
-                        tr
-                            th Task 
-                            th Completed 
-                            th.td-right Due
-                            
-                    tbody
-                        each task in classData.tasks
-                            +row(task.name, task.completed, task.dueDate.toDateString(), task.id)
+        div.card
+            h2.class-name-heading #{classData.name}
+            h2.heading-secondary.ma-bt-md Classcode: #{classData.classCode}
+            h2.heading-secondary Tasks set
+            table
+                thead
+                    tr
+                        th Task 
+                        th Completed 
+                        th.td-right Due
+                        
+                tbody
+                    each task in classData.tasks
+                        +row(task.name, task.completed, task.dueDate.toDateString(), task.id)
 

@@ -15,7 +15,6 @@ body {
   font-weight: 300;
   font-family: 'Lato', sans-serif;
   color: #777;
-  padding: 3rem;
   min-height: 100vh;
   height: 100%; }
 
@@ -37,6 +36,15 @@ body {
   .main {
     padding: 4rem 0rem; } }
 
+.ma-bt-md {
+  margin-bottom: 3rem !important; }
+
+.ma-bt-lg {
+  margin-bottom: 3.5rem !important; }
+
+.ma-tp-sm {
+  margin-top: 0.5rem !important; }
+
 .card-text {
   margin-bottom: 0.1rem;
   padding: 3rem 0;
@@ -48,7 +56,7 @@ body {
     font-size: 1.2rem;
     font-style: italic; }
 
-.classlist-card__heading {
+.class-name-heading {
   font-size: 2rem;
   text-transform: uppercase;
   font-weight: 700;
@@ -56,14 +64,12 @@ body {
   background-image: linear-gradient(to right, #7ed56f, #28b485);
   color: transparent;
   letter-spacing: 0.2rem;
-  -webkit-background-clip: text;
-  padding: 3rem 0rem; }
+  -webkit-background-clip: text; }
 
 a,
 a:link,
 a:visited {
   text-decoration: none;
-  color: #0e79c9;
   font-weight: bold; }
 
 a:hover {
@@ -643,13 +649,16 @@ td {
 .td-right {
   border-right: 0; }
 
+.table--task {
+  color: #0e79c9; }
+
+.table--task:hover {
+  color: #004696; }
+
 .truncate-text {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden; }
-
-.table--task:hover {
-  color: #004696; }
 
 .alert {
   position: fixed;

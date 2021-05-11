@@ -12,7 +12,7 @@
   }
 }
 
-.classlist-card__heading {
+.class-name-heading {
   font-size: 2rem;
   text-transform: uppercase;
   font-weight: 700;
@@ -21,14 +21,12 @@
   color: transparent;
   letter-spacing: 0.2rem;
   -webkit-background-clip: text;
-  padding: 3rem 0rem;
 }
 
 a,
 a:link,
 a:visited {
   text-decoration: none;
-  color: #0e79c9;
   font-weight: bold;
 }
 
