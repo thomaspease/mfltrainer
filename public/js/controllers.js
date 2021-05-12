@@ -261,7 +261,7 @@ export class TrainController extends Controller {
 
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
-    this.view.audioUrl = sentence.audioUrl;
+    this.view.audioUrl = sentence.data.audioUrl;
   }
 
   async sendResultsToServer() {
