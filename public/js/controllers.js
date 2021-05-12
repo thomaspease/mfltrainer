@@ -114,7 +114,7 @@ export class CreateSentenceController extends Controller {
     super(...args);
 
     this.view.onFormData(
-      async ({ sentence, translation, level, vivaRef, tense, grammar, audioUrl}) => {
+      async ({ sentence, translation, level, vivaRef, tense, grammar, audioUrl }) => {
         try {
           const res = await CreateSentenceModel.create(
             sentence,

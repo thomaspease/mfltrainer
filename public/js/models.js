@@ -93,7 +93,7 @@ export class CreateTaskModel extends Model {}
 
 export class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
-  static async create(sentence, translation, level, vivaRef, tense, grammar) {
+  static async create(sentence, translation, level, vivaRef, tense, grammar, audioUrl) {
     const data = {
       sentence,
       translation,
@@ -101,6 +101,7 @@ export class CreateSentenceModel extends Model {
       vivaRef,
       grammar,
       tense,
+      audioUrl,
     };
 
     return this.sendApiRequest('/api/v1/sentences', 'POST', data);

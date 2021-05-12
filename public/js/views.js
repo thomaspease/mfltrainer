@@ -156,7 +156,7 @@ export class AudioEditorView extends View {
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
 
-    this.elements.filename_input = this.root.querySelector('input[name=filename]')
+    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]')
 
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
@@ -235,11 +235,11 @@ export class AudioEditorView extends View {
   }
 
   get audioUrl() {
-    return this.elements.filename_input.value;
+    return this.elements.audio_url_input.value;
   }
 
   set audioUrl(val) {
-    return this.elements.filename_input.value = val;
+    return this.elements.audio_url_input.value = val;
   }
 }
 

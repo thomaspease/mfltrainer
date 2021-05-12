@@ -28822,7 +28822,7 @@ class AudioEditorView extends View {
     this.elements.play = this.root.querySelector('.play-button');
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
-    this.elements.filename_input = this.root.querySelector('input[name=filename]');
+    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]');
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
     });
@@ -28891,11 +28891,11 @@ class AudioEditorView extends View {
   }
 
   get audioUrl() {
-    return this.elements.filename_input.value;
+    return this.elements.audio_url_input.value;
   }
 
   set audioUrl(val) {
-    return this.elements.filename_input.value = val;
+    return this.elements.audio_url_input.value = val;
   }
 
 } // CREATE TASK VIEWS --------
@@ -29337,14 +29337,15 @@ exports.CreateTaskModel = CreateTaskModel;
 
 class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
-  static async create(sentence, translation, level, vivaRef, tense, grammar) {
+  static async create(sentence, translation, level, vivaRef, tense, grammar, audioUrl) {
     const data = {
       sentence,
       translation,
       level,
       vivaRef,
       grammar,
-      tense
+      tense,
+      audioUrl
     };
     return this.sendApiRequest('/api/v1/sentences', 'POST', data);
   }
