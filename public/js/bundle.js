@@ -28837,9 +28837,12 @@ class AudioEditorView extends View {
         this.elements.record.innerText = 'record';
       } else {
         this.ee.emit('clear');
-        this.ee.emit('record');
         this.isRecording = true;
-        this.elements.record.innerText = 'stop';
+        this.elements.record.innerText = 'stop'; // this MIGHT help with a reported issue with the audio re-playing? (TODO: test)
+
+        setTimeout(() => {
+          this.ee.emit('record');
+        }, 10);
       }
     });
     this.elements.main_block = this.root.querySelector('.editor-container');
