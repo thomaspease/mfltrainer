@@ -4,15 +4,16 @@ block content
     main.main
         .card-container
             h2.heading-secondary Create a new sentence
-            div(data-controller="AudioEditorController")
-                button.init(type="button") initialize audio editor
-                div.editor-container
-                    button.play-button(type="button") play
-                    button.save-button(type="button") save audio
-                    button.record-button(type="button") record
-                    div.audio-editor
             form.card.create-sentence-form(data-controller="CreateSentenceController")
                 .card__details
+                    .form__group(data-controller="AudioEditorController")
+                        button.init(type="button") initialize audio editor
+                        div.editor-container
+                            button.play-button(type="button") play
+                            button.save-button(type="button") save audio
+                            button.record-button(type="button") record
+                            div.audio-editor
+                        input(type="hidden" name="audioUrl", required)
                     .form__group
                         label.form__label(for='email') Spanish
                         input#spanish.form__input(name='sentence', type='text', placeholder='Spanish sentence', required)

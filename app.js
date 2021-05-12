@@ -33,6 +33,7 @@ app.use(helmet({
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       'worker-src': ["'self'", "blob:"],
       'connect-src': ["'self'", "https://mfltrainer-assets.s3.eu-west-2.amazonaws.com/"],
+      'media-src': ["'self'", "https://mfltrainer-assets.s3.eu-west-2.amazonaws.com/"],
     }
   },
 }));

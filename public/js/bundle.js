@@ -2696,7 +2696,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -2718,7 +2718,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -27917,7 +27917,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28226,7 +28226,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -28822,6 +28822,7 @@ class AudioEditorView extends View {
     this.elements.play = this.root.querySelector('.play-button');
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
+    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]');
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
     });
@@ -28836,9 +28837,12 @@ class AudioEditorView extends View {
         this.elements.record.innerText = 'record';
       } else {
         this.ee.emit('clear');
-        this.ee.emit('record');
         this.isRecording = true;
-        this.elements.record.innerText = 'stop';
+        this.elements.record.innerText = 'stop'; // this MIGHT help with a reported issue with the audio re-playing? (TODO: test)
+
+        setTimeout(() => {
+          this.ee.emit('record');
+        }, 10);
       }
     });
     this.elements.main_block = this.root.querySelector('.editor-container');
@@ -28887,6 +28891,14 @@ class AudioEditorView extends View {
         AlertView.show('error', err);
       }
     });
+  }
+
+  get audioUrl() {
+    return this.elements.audio_url_input.value;
+  }
+
+  set audioUrl(val) {
+    return this.elements.audio_url_input.value = val;
   }
 
 } // CREATE TASK VIEWS --------
@@ -29328,14 +29340,15 @@ exports.CreateTaskModel = CreateTaskModel;
 
 class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
-  static async create(sentence, translation, level, vivaRef, tense, grammar) {
+  static async create(sentence, translation, level, vivaRef, tense, grammar, audioUrl) {
     const data = {
       sentence,
       translation,
       level,
       vivaRef,
       grammar,
-      tense
+      tense,
+      audioUrl
     };
     return this.sendApiRequest('/api/v1/sentences', 'POST', data);
   }
@@ -29394,7 +29407,9 @@ class SentenceModel extends Model {
       url: '/api/v1/sentences/audio-upload-url'
     });
     const {
-      signedUrl
+      signedUrl,
+      url,
+      filename
     } = authedResponse.data; // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
 
     const uploadResponse = await (0, _axios.default)({
@@ -29405,6 +29420,10 @@ class SentenceModel extends Model {
         'Content-Type': 'audio/mpeg'
       }
     });
+    return {
+      url,
+      filename
+    };
   }
 
 }
@@ -29581,11 +29600,12 @@ class CreateSentenceController extends Controller {
         level,
         vivaRef,
         tense,
-        grammar
+        grammar,
+        audioUrl
       } = _ref3;
 
       try {
-        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar);
+        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
         this.view.clearFormData();
 
         if (res) {
@@ -29609,7 +29629,10 @@ class AudioEditorController extends Controller {
   constructor() {
     super(...arguments);
     this.view.on('save_file', async blob => {
-      await _models.SentenceModel.uploadAudioFile(blob);
+      const {
+        url
+      } = await _models.SentenceModel.uploadAudioFile(blob);
+      this.view.audioUrl = url;
 
       _views.AlertView.show('success', 'File uploaded successfully.');
     });

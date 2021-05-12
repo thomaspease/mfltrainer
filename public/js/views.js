@@ -156,6 +156,8 @@ export class AudioEditorView extends View {
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
 
+    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]')
+
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
     });
@@ -173,9 +175,12 @@ export class AudioEditorView extends View {
         this.elements.record.innerText = 'record';
       } else {
         this.ee.emit('clear');
-        this.ee.emit('record');
         this.isRecording = true;
         this.elements.record.innerText = 'stop';
+        // this MIGHT help with a reported issue with the audio re-playing? (TODO: test)
+        setTimeout(() => {
+          this.ee.emit('record');
+        }, 10)
       }
     });
 
@@ -230,6 +235,14 @@ export class AudioEditorView extends View {
         AlertView.show('error', err);
       }
     });
+  }
+
+  get audioUrl() {
+    return this.elements.audio_url_input.value;
+  }
+
+  set audioUrl(val) {
+    return this.elements.audio_url_input.value = val;
   }
 }
 

@@ -114,7 +114,7 @@ export class CreateSentenceController extends Controller {
     super(...args);
 
     this.view.onFormData(
-      async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
+      async ({ sentence, translation, level, vivaRef, tense, grammar, audioUrl }) => {
         try {
           const res = await CreateSentenceModel.create(
             sentence,
@@ -122,7 +122,8 @@ export class CreateSentenceController extends Controller {
             level,
             vivaRef,
             tense,
-            grammar
+            grammar,
+            audioUrl,
           );
           this.view.clearFormData();
           if (res) {
@@ -145,7 +146,8 @@ export class AudioEditorController extends Controller {
     super(...args);
 
     this.view.on('save_file', async (blob) => {
-      await SentenceModel.uploadAudioFile(blob);
+      const {url} = await SentenceModel.uploadAudioFile(blob);
+      this.view.audioUrl = url;
       AlertView.show('success', 'File uploaded successfully.');
     });
   }
