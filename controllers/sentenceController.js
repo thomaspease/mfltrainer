@@ -92,6 +92,7 @@ exports.getS3UploadUrl = async (req, res) => {
       signedUrl: data,
       // the final URL is also available with the AWS region in the domain name (seems to be aliased)
       url: `https://${S3_BUCKET}.s3.amazonaws.com/${filename}`,
+      filename,
     };
 
     res.json(returnData);

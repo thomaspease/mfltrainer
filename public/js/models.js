@@ -157,7 +157,7 @@ export class SentenceModel extends Model {
       url: '/api/v1/sentences/audio-upload-url',
     });
 
-    const { signedUrl } = authedResponse.data;
+    const { signedUrl, url, filename } = authedResponse.data;
 
     // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
     const uploadResponse = await axios({
@@ -168,6 +168,8 @@ export class SentenceModel extends Model {
         'Content-Type': 'audio/mpeg',
       },
     });
+
+    return {url, filename};
   }
 }
 
