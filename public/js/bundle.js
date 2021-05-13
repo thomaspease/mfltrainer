@@ -28733,6 +28733,14 @@ class FormView extends View {
   onFormData(callback) {
     this.root.addEventListener('submit', e => {
       e.preventDefault();
+      this.root.querySelectorAll('input[type=hidden][required]');
+      const missingHiddenFields = Array.from(this.root.querySelectorAll('input[type=hidden][required]')).filter(el => !el.value);
+
+      if (missingHiddenFields.length > 0) {
+        AlertView.show('error', "The following additional fields are missing: ".concat(missingHiddenFields.map(el => el.dataset.humanName || el.name).join(', ')));
+        return;
+      }
+
       callback(this.getFormData());
     });
   }
