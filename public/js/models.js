@@ -93,7 +93,15 @@ export class CreateTaskModel extends Model {}
 
 export class CreateSentenceModel extends Model {
   // can throw, catch in the Controller layer
-  static async create(sentence, translation, level, vivaRef, tense, grammar, audioUrl) {
+  static async create(
+    sentence,
+    translation,
+    level,
+    vivaRef,
+    tense,
+    grammar,
+    audioUrl
+  ) {
     const data = {
       sentence,
       translation,
@@ -114,8 +122,7 @@ export class StudentResultsModel extends Model {
     const payload = {
       rightCount: rightCount,
       wrongCount: wrongCount,
-      percentCorrect:
-        (rightCount / (rightCount + wrongCount)) * 100,
+      percentCorrect: (rightCount / (rightCount + wrongCount)) * 100,
       completed: true,
     };
 
@@ -160,6 +167,8 @@ export class SentenceModel extends Model {
 
     const { signedUrl, url, filename } = authedResponse.data;
 
+    console.log(authedResponse);
+
     // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
     const uploadResponse = await axios({
       method: 'PUT',
@@ -170,7 +179,7 @@ export class SentenceModel extends Model {
       },
     });
 
-    return {url, filename};
+    return { url, filename };
   }
 }
 

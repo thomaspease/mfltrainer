@@ -29410,7 +29410,8 @@ class SentenceModel extends Model {
       signedUrl,
       url,
       filename
-    } = authedResponse.data; // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
+    } = authedResponse.data;
+    console.log(authedResponse); // this shouldn't go thorugh sendApiRequest, because it's rather different than a typical request (and not even on the same domain)
 
     const uploadResponse = await (0, _axios.default)({
       method: 'PUT',
