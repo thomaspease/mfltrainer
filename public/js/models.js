@@ -20,12 +20,13 @@ class Model {
         url,
         data,
       });
+      //IS this okay?
+      if (res.status == 204) {
+        return res;
+      }
       if (res.data.status == 'success') {
         return res;
       }
-
-      // TODO question for Tom: what should we pass as the error message here?
-      throw new ModelApiError('API failure');
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }

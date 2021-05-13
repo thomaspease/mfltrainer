@@ -366,7 +366,6 @@ export class DeleteController extends Controller {
 
     this.view.on('delete', async (id) => {
       try {
-        console.log(id);
         const deleteTask = await DeleteModel.sendApiRequest(
           `/api/v1/tasks/${id}`,
           'DELETE'

@@ -29261,14 +29261,15 @@ class Model {
         method,
         url,
         data
-      });
+      }); //IS this okay?
+
+      if (res.status == 204) {
+        return res;
+      }
 
       if (res.data.status == 'success') {
         return res;
-      } // TODO question for Tom: what should we pass as the error message here?
-
-
-      throw new ModelApiError('API failure');
+      }
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }
@@ -29818,7 +29819,6 @@ class DeleteController extends Controller {
     super(...arguments);
     this.view.on('delete', async id => {
       try {
-        console.log(id);
         const deleteTask = await _models.DeleteModel.sendApiRequest("/api/v1/tasks/".concat(id), 'DELETE');
         deleteTask.then(() => {
           this.view.row.classList.add('deleted');
