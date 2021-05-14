@@ -164,16 +164,8 @@ export class AudioEditorView extends View {
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
 
-    this.elements.audio_url_input = this.root.querySelector(
-      'input[name=audioUrl]'
-    );
-
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
-    });
-
-    this.elements.save.addEventListener('click', () => {
-      this.ee.emit('startaudiorendering', 'buffer');
     });
 
     this.isRecording = false;
@@ -200,6 +192,14 @@ export class AudioEditorView extends View {
     // this juggling with 'init' might-or-might-not be needed, depending on browser security quirks?
     this.elements.init = this.root.querySelector('.init');
     this.elements.init.addEventListener('click', this.setupEditor.bind(this));
+  }
+
+  save() {
+    this.ee.emit('startaudiorendering', 'buffer');
+  }
+
+  clear() {
+    this.ee.emit('clear');
   }
 
   setupEditor() {
@@ -245,14 +245,6 @@ export class AudioEditorView extends View {
         AlertView.show('error', err);
       }
     });
-  }
-
-  get audioUrl() {
-    return this.elements.audio_url_input.value;
-  }
-
-  set audioUrl(val) {
-    return (this.elements.audio_url_input.value = val);
   }
 }
 

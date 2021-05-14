@@ -25,6 +25,7 @@ class Controller {
   constructor(viewBaseElement) {
     const viewClass = this.getViewClass();
     this.view = new viewClass(viewBaseElement);
+    this.children = {};
   }
 }
 
@@ -121,9 +122,9 @@ export class CreateSentenceController extends Controller {
         vivaRef,
         tense,
         grammar,
-        audioUrl,
       }) => {
         try {
+          const {audioUrl} = await this.children.audioEditor.save();
           const res = await CreateSentenceModel.create(
             sentence,
             translation,
@@ -134,6 +135,7 @@ export class CreateSentenceController extends Controller {
             audioUrl
           );
           this.view.clearFormData();
+          this.children.audioEditor.clear();
           if (res) {
             AlertView.show('success', 'Sentence created');
           }
@@ -153,11 +155,28 @@ export class AudioEditorController extends Controller {
   constructor(...args) {
     super(...args);
 
+    // using this to knit together some event-based and promise-based lines of code
+    this._saveRequests = [];
+
     this.view.on('save_file', async (blob) => {
       const { url } = await SentenceModel.uploadAudioFile(blob);
-      this.view.audioUrl = url;
+      // knitting together event-based and promise-based code
+      this._saveRequests.forEach((saveRequest) => saveRequest({audioUrl: url}));
+      this._saveRequests = [];
       AlertView.show('success', 'File uploaded successfully.');
     });
+  }
+
+  async save() {
+    this.view.save();
+    const prom = new Promise((resolve, reject) => {
+      this._saveRequests.push(resolve);
+    })
+    return prom;
+  }
+
+  clear() {
+    this.view.clear();
   }
 }
 

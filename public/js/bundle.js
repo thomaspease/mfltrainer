@@ -28830,12 +28830,8 @@ class AudioEditorView extends View {
     this.elements.play = this.root.querySelector('.play-button');
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
-    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]');
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
-    });
-    this.elements.save.addEventListener('click', () => {
-      this.ee.emit('startaudiorendering', 'buffer');
     });
     this.isRecording = false;
     this.elements.record.addEventListener('click', () => {
@@ -28858,6 +28854,14 @@ class AudioEditorView extends View {
 
     this.elements.init = this.root.querySelector('.init');
     this.elements.init.addEventListener('click', this.setupEditor.bind(this));
+  }
+
+  save() {
+    this.ee.emit('startaudiorendering', 'buffer');
+  }
+
+  clear() {
+    this.ee.emit('clear');
   }
 
   setupEditor() {
@@ -28899,14 +28903,6 @@ class AudioEditorView extends View {
         AlertView.show('error', err);
       }
     });
-  }
-
-  get audioUrl() {
-    return this.elements.audio_url_input.value;
-  }
-
-  set audioUrl(val) {
-    return this.elements.audio_url_input.value = val;
   }
 
 } // CREATE TASK VIEWS --------
@@ -29500,6 +29496,7 @@ class Controller {
   constructor(viewBaseElement) {
     const viewClass = this.getViewClass();
     this.view = new viewClass(viewBaseElement);
+    this.children = {};
   }
 
 }
@@ -29609,13 +29606,16 @@ class CreateSentenceController extends Controller {
         level,
         vivaRef,
         tense,
-        grammar,
-        audioUrl
+        grammar
       } = _ref3;
 
       try {
+        const {
+          audioUrl
+        } = await this.children.audioEditor.save();
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
         this.view.clearFormData();
+        this.children.audioEditor.clear();
 
         if (res) {
           _views.AlertView.show('success', 'Sentence created');
@@ -29636,15 +29636,34 @@ class AudioEditorController extends Controller {
   }
 
   constructor() {
-    super(...arguments);
+    super(...arguments); // using this to knit together some event-based and promise-based lines of code
+
+    this._saveRequests = [];
     this.view.on('save_file', async blob => {
       const {
         url
-      } = await _models.SentenceModel.uploadAudioFile(blob);
-      this.view.audioUrl = url;
+      } = await _models.SentenceModel.uploadAudioFile(blob); // knitting together event-based and promise-based code
+
+      this._saveRequests.forEach(saveRequest => saveRequest({
+        audioUrl: url
+      }));
+
+      this._saveRequests = [];
 
       _views.AlertView.show('success', 'File uploaded successfully.');
     });
+  }
+
+  async save() {
+    this.view.save();
+    const prom = new Promise((resolve, reject) => {
+      this._saveRequests.push(resolve);
+    });
+    return prom;
+  }
+
+  clear() {
+    this.view.clear();
   }
 
 }
@@ -29858,7 +29877,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
   // load controllers dynamically based on what the server-generated HTML requests
   Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
     const controllerClass = controllers[domElement.dataset['controller']];
-    new controllerClass(domElement);
+    const controller = new controllerClass(domElement);
+    domElement.controller = controller;
+
+    if (domElement.dataset.exposeControllerAs) {
+      const name = domElement.dataset.exposeControllerAs;
+      const containing = domElement.parentNode.closest("[data-controller][data-accept-child=\"".concat(name, "\"]"));
+
+      if (containing) {
+        containing.controller.children[name] = controller;
+      }
+    }
   });
 })();
 },{"./controllers.js":"controllers.js"}]},{},["app.js"], null)
