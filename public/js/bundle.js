@@ -2696,7 +2696,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -2718,7 +2718,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -27917,7 +27917,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28226,7 +28226,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -28733,6 +28733,14 @@ class FormView extends View {
   onFormData(callback) {
     this.root.addEventListener('submit', e => {
       e.preventDefault();
+      this.root.querySelectorAll('input[type=hidden][required]');
+      const missingHiddenFields = Array.from(this.root.querySelectorAll('input[type=hidden][required]')).filter(el => !el.value);
+
+      if (missingHiddenFields.length > 0) {
+        AlertView.show('error', "The following additional fields are missing: ".concat(missingHiddenFields.map(el => el.dataset.humanName || el.name).join(', ')));
+        return;
+      }
+
       callback(this.getFormData());
     });
   }
@@ -28822,12 +28830,8 @@ class AudioEditorView extends View {
     this.elements.play = this.root.querySelector('.play-button');
     this.elements.save = this.root.querySelector('.save-button');
     this.elements.record = this.root.querySelector('.record-button');
-    this.elements.audio_url_input = this.root.querySelector('input[name=audioUrl]');
     this.elements.play.addEventListener('click', () => {
       this.ee.emit('play');
-    });
-    this.elements.save.addEventListener('click', () => {
-      this.ee.emit('startaudiorendering', 'buffer');
     });
     this.isRecording = false;
     this.elements.record.addEventListener('click', () => {
@@ -28850,6 +28854,14 @@ class AudioEditorView extends View {
 
     this.elements.init = this.root.querySelector('.init');
     this.elements.init.addEventListener('click', this.setupEditor.bind(this));
+  }
+
+  save() {
+    this.ee.emit('startaudiorendering', 'buffer');
+  }
+
+  clear() {
+    this.ee.emit('clear');
   }
 
   setupEditor() {
@@ -28891,14 +28903,6 @@ class AudioEditorView extends View {
         AlertView.show('error', err);
       }
     });
-  }
-
-  get audioUrl() {
-    return this.elements.audio_url_input.value;
-  }
-
-  set audioUrl(val) {
-    return this.elements.audio_url_input.value = val;
   }
 
 } // CREATE TASK VIEWS --------
@@ -29493,6 +29497,7 @@ class Controller {
   constructor(viewBaseElement) {
     const viewClass = this.getViewClass();
     this.view = new viewClass(viewBaseElement);
+    this.children = {};
   }
 
 }
@@ -29602,13 +29607,16 @@ class CreateSentenceController extends Controller {
         level,
         vivaRef,
         tense,
-        grammar,
-        audioUrl
+        grammar
       } = _ref3;
 
       try {
+        const {
+          audioUrl
+        } = await this.children.audioEditor.save();
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
         this.view.clearFormData();
+        this.children.audioEditor.clear();
 
         if (res) {
           _views.AlertView.show('success', 'Sentence created');
@@ -29629,15 +29637,34 @@ class AudioEditorController extends Controller {
   }
 
   constructor() {
-    super(...arguments);
+    super(...arguments); // using this to knit together some event-based and promise-based lines of code
+
+    this._saveRequests = [];
     this.view.on('save_file', async blob => {
       const {
         url
-      } = await _models.SentenceModel.uploadAudioFile(blob);
-      this.view.audioUrl = url;
+      } = await _models.SentenceModel.uploadAudioFile(blob); // knitting together event-based and promise-based code
+
+      this._saveRequests.forEach(saveRequest => saveRequest({
+        audioUrl: url
+      }));
+
+      this._saveRequests = [];
 
       _views.AlertView.show('success', 'File uploaded successfully.');
     });
+  }
+
+  async save() {
+    this.view.save();
+    const prom = new Promise((resolve, reject) => {
+      this._saveRequests.push(resolve);
+    });
+    return prom;
+  }
+
+  clear() {
+    this.view.clear();
   }
 
 }
@@ -29850,7 +29877,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
   // load controllers dynamically based on what the server-generated HTML requests
   Array.from(document.querySelectorAll('[data-controller]')).forEach(domElement => {
     const controllerClass = controllers[domElement.dataset['controller']];
-    new controllerClass(domElement);
+    const controller = new controllerClass(domElement);
+    domElement.controller = controller;
+
+    if (domElement.dataset.exposeControllerAs) {
+      const name = domElement.dataset.exposeControllerAs;
+      const containing = domElement.parentNode.closest("[data-controller][data-accept-child=\"".concat(name, "\"]"));
+
+      if (containing) {
+        containing.controller.children[name] = controller;
+      }
+    }
   });
 })();
 },{"./controllers.js":"controllers.js"}]},{},["app.js"], null)
