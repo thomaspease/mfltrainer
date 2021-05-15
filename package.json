@@ -8,7 +8,7 @@
 		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
 		"build:frontend-pug": "./build-frontend-pug.sh",
 		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
-		"start" : "node server.js",
+		"start": "node server.js",
 		"serve": "nodemon server.js"
 	},
 	"author": "tom",
