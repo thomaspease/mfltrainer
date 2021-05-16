@@ -32,6 +32,15 @@ const sentenceSchema = mongoose.Schema({
   },
 });
 
+// sentenceSchema.pre('save', async function (next) {
+//   // Only run function if pw has actually been modified
+//   if (!this.isNew) return next();
+
+//   const hello = this.grammar.map((e) => e.split(',').map((e) => e.trim()));
+//   console.log(hello);
+//   this.grammar = hello;
+// });
+
 const Sentence = mongoose.model('Sentence', sentenceSchema, 'sentences');
 
 module.exports = Sentence;

@@ -16,6 +16,7 @@ body {
   line-height: 1.6;
   font-weight: 300;
   font-family: 'Lato', sans-serif;
+  background-color: #f7f7f7;
   color: #777;
   min-height: 100vh;
   height: 100%;
@@ -41,9 +42,7 @@ body {
 }
 
 .main {
-  background-color: #f7f7f7;
   padding: 4rem 6rem;
-  min-height: 100%;
   position: relative;
   grid-column: 2 / -1;
   grid-row: 1 / 2;
@@ -53,6 +52,10 @@ body {
   .main {
     padding: 4rem 0rem;
   }
+}
+
+ul {
+  padding-left: 1.5rem;
 }
 
 .ma-bt-md {

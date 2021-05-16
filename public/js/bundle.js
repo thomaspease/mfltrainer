@@ -29614,7 +29614,8 @@ class CreateSentenceController extends Controller {
         const {
           audioUrl
         } = await this.children.audioEditor.save();
-        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
+        const grammarArray = grammar.split(',').map(e => e.trim());
+        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar = grammarArray, audioUrl);
         this.view.clearFormData();
         this.children.audioEditor.clear();
 

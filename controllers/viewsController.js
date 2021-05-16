@@ -126,3 +126,9 @@ exports.getAccount = catchAsync(async (req, res, next) => {
     title: 'Your account',
   });
 });
+
+exports.privacy = catchAsync(async (req, res, next) => {
+  res.status(200).render('privacy', {
+    title: 'Privacy policy',
+  });
+});
