@@ -38,8 +38,7 @@ exports.doExercise = catchAsync(async (req, res, next) => {
 exports.doRevise = catchAsync(async (req, res, next) => {
   const student = res.locals.user;
 
-  const studentSentences = await StudentSentence.find({student: student.id}).populate('sentence').limit(10).exec();
-  //const sentences = await Sentence.find({_id: {$in: studentSentences.map((doc) => doc.sentence)}}).exec();
+  const studentSentences = await StudentSentence.find({student: student.id, retestOn:{$lte:Date.now()}}).populate('sentence').limit(10).exec();
 
   res.status(200).render('student/revise', {
     title: 'Revise',
