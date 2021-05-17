@@ -115,20 +115,26 @@ export class CreateSentenceController extends Controller {
     super(...args);
 
     this.view.onFormData(
-      async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
+      async ({
+        sentence,
+        translation,
+        level,
+        vivaRef,
+        tense,
+        grammar,
+      }) => {
         try {
-          const { audioUrl } = await this.children.audioEditor.save();
-          const grammarArray = grammar.split(',').map((e) => e.trim());
+          const {audioUrl} = await this.children.audioEditor.save();
           const res = await CreateSentenceModel.create(
             sentence,
             translation,
             level,
             vivaRef,
             tense,
-            (grammar = grammarArray),
+            grammar,
             audioUrl
           );
-          this.view.clearFormData();
+          this.view.clearFormData({keep:["vivaRef", "tense", "grammar"]});
           this.children.audioEditor.clear();
           if (res) {
             AlertView.show('success', 'Sentence created');
@@ -155,9 +161,7 @@ export class AudioEditorController extends Controller {
     this.view.on('save_file', async (blob) => {
       const { url } = await SentenceModel.uploadAudioFile(blob);
       // knitting together event-based and promise-based code
-      this._saveRequests.forEach((saveRequest) =>
-        saveRequest({ audioUrl: url })
-      );
+      this._saveRequests.forEach((saveRequest) => saveRequest({audioUrl: url}));
       this._saveRequests = [];
       AlertView.show('success', 'File uploaded successfully.');
     });
@@ -167,7 +171,7 @@ export class AudioEditorController extends Controller {
     this.view.save();
     const prom = new Promise((resolve, reject) => {
       this._saveRequests.push(resolve);
-    });
+    })
     return prom;
   }
 
@@ -381,12 +385,18 @@ export class DeleteController extends Controller {
 
     this.view.on('delete', async (id) => {
       try {
-        //I tried to separate concerns, but now struggling to make it work properly...
-
+        console.log(id);
         const deleteTask = await DeleteModel.sendApiRequest(
           `/api/v1/tasks/${id}`,
           'DELETE'
         );
+
+        deleteTask.then(() => {
+          this.view.row.classList.add('deleted');
+          setTimeout(() => {
+            row.remove();
+          }, 500);
+        });
       } catch (err) {
         this.view.root.classList.remove('selected');
         AlertView.show('error', err.message);

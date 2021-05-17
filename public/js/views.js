@@ -99,10 +99,13 @@ class FormView extends View {
     return data;
   }
 
-  clearFormData() {
+  clearFormData(options = {}) {
     const inputs = Array.from(this.root.querySelectorAll('input'));
+    const keep = options.keep || [];
     inputs.forEach((el) => {
-      el.value = '';
+      if (!keep.includes(el.name)) {
+        el.value = '';
+      }
     });
   }
 }
