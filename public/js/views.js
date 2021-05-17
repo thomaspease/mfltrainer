@@ -429,7 +429,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 }
 
-// TRAINING VIEW
+// TRAINING + REVISION VIEW
 
 export class TrainingView extends FormView {
   constructor(element) {

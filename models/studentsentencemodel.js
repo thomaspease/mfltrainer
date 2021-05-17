@@ -5,6 +5,7 @@ const studentSentenceSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     unique: false,
     required: true,
+    ref: "Sentence",
   },
   student: {
     type: mongoose.Schema.ObjectId,

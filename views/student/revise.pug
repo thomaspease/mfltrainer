@@ -4,4 +4,31 @@ include ./exercise_shared_code
 
 block content
     main.main
-      +js-value('sentences', sentences)
+        form.card(data-controller="ReviseController")
+            -// TODO: update the below for Revise (it's heavily based on Train...)
+            .card__exercise
+                if exercise == 'transcription'
+                    +audio_area()
+                else
+                    +card_title()
+                div.student-answer
+                    input.form__input(type='text', name='student_answer', placeholder='Answer', required, autocomplete="off")
+                    span.answer-feedback.card-text.standin-for-input
+                        ="Your answer: " /* JS string so that the trailing space is easier to spot */
+                        span.answer-feedback-inner
+                div.correct-answer.card-text
+                    ="Correct answer: " /* JS string so that the trailing space is easier to spot */
+                    span.correct-answer-inner
+                if exercise == 'transcription'
+                    +card_title()
+                else
+                    +audio_area()
+                div.buttons
+                    button.btn.btn--green.btn--green__exercise(type="submit") Submit
+                    button.btn.btn--green.btn--green__exercise.btn-next(type="button") Next
+                div.answer-counts.card-text
+                    span.right-count
+                    =" / "
+                    span.total-count
+                    =" sentences answered"
+        +js-value('studentSentences', studentSentences)

@@ -29045,7 +29045,7 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     });
   }
 
-} // TRAINING VIEW
+} // TRAINING + REVISION VIEW
 
 
 exports.CreateTaskChooseSentenceView = CreateTaskChooseSentenceView;
@@ -29375,7 +29375,7 @@ class StudentResultsModel extends Model {
       percentCorrect: rightCount / (rightCount + wrongCount) * 100,
       completed: true
     };
-    return this.sendApiRequest("/api/v1/studenttasks/".concat(taskURL), 'PATCH', payload);
+    return this.sendApiRequest("/api/v1/studenttasks/save-results/".concat(taskURL), 'PATCH', payload);
   }
 
 }
@@ -29484,7 +29484,7 @@ exports.DeleteModel = DeleteModel;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -29782,9 +29782,72 @@ class TrainController extends Controller {
     }
   }
 
-}
+} // TODO do a full once-over to see what needs to change relative to TrainController
+
 
 exports.TrainController = TrainController;
+
+class ReviseController extends Controller {
+  getViewClass() {
+    return _views.TrainingView;
+  }
+
+  constructor() {
+    super(...arguments);
+
+    const sentenceData = _views.DataParserView.get('studentSentences');
+
+    this.sentences = sentenceData.map(doc => {
+      const sentence = new _models.SentenceModel(doc.sentence);
+      return sentence.subclassAs(doc.exercise);
+    });
+    this.initialCount = this.sentences.length;
+    this.rightCount = 0;
+    this.wrongCount = 0;
+    this.view.updateCounts(this.rightCount, this.initialCount);
+    this.view.on('answer', this.doAnswer.bind(this));
+    this.view.on('next', this.doNextSentence.bind(this));
+    this.doNextSentence();
+  }
+
+  doAnswer(_ref5) {
+    let {
+      student_answer,
+      isCorrect
+    } = _ref5;
+    const desiredReaskLength = 3;
+    const sentenceObject = this.sentences.shift();
+
+    if (isCorrect) {
+      _views.AlertView.show('success', 'Correct Answer');
+
+      this.rightCount++;
+    } else {
+      _views.AlertView.show('error', 'Incorrect Answer');
+
+      this.wrongCount++;
+    } // TODO update next revision time, on the server
+
+
+    this.view.updateCounts(this.rightCount, this.initialCount);
+  }
+
+  doNextSentence() {
+    if (!this.sentences[0]) {
+      this.view.finish(); // TODO what next? (probably different from TrainController)
+
+      return;
+    }
+
+    const sentence = this.sentences[0];
+    this.view.prompt = sentence.prompt;
+    this.view.answer = sentence.answer;
+    this.view.audioUrl = sentence.data.audioUrl;
+  }
+
+}
+
+exports.ReviseController = ReviseController;
 
 class CreateTaskChooseSentenceController extends Controller {
   getViewClass() {
@@ -29800,16 +29863,16 @@ class CreateTaskChooseSentenceController extends Controller {
       this.updateSentences(sents.filter(sent => !saveIds.includes(sent.data._id)));
     });
     this.sentencesToSave = [];
-    this.view.on('add_sentence', (_ref5) => {
-      let {
-        sentenceId
-      } = _ref5;
-      this.sentencesToSave.push(this.sentences.find(sent => sent.data._id == sentenceId));
-    });
-    this.view.on('remove_sentence', (_ref6) => {
+    this.view.on('add_sentence', (_ref6) => {
       let {
         sentenceId
       } = _ref6;
+      this.sentencesToSave.push(this.sentences.find(sent => sent.data._id == sentenceId));
+    });
+    this.view.on('remove_sentence', (_ref7) => {
+      let {
+        sentenceId
+      } = _ref7;
       this.sentencesToSave = this.sentencesToSave.filter(sent => sent.data._id != sentenceId);
     });
     this.view.on('save', this.save.bind(this));

@@ -305,6 +305,69 @@ export class TrainController extends Controller {
   }
 }
 
+// TODO do a full once-over to see what needs to change relative to TrainController
+export class ReviseController extends Controller {
+  getViewClass() {
+    return TrainingView;
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    const sentenceData = DataParserView.get('studentSentences');
+
+    this.sentences = sentenceData.map((doc) => {
+      const sentence = new SentenceModel(doc.sentence);
+      return sentence.subclassAs(doc.exercise);
+    })
+
+    this.initialCount = this.sentences.length;
+
+    this.rightCount = 0;
+    this.wrongCount = 0;
+
+    this.view.updateCounts(this.rightCount, this.initialCount);
+
+    this.view.on('answer', this.doAnswer.bind(this));
+    this.view.on('next', this.doNextSentence.bind(this));
+
+    this.doNextSentence();
+  }
+
+  doAnswer({ student_answer, isCorrect }) {
+    const desiredReaskLength = 3;
+
+    const sentenceObject = this.sentences.shift();
+
+    if (isCorrect) {
+      AlertView.show('success', 'Correct Answer');
+      this.rightCount++;
+    } else {
+      AlertView.show('error', 'Incorrect Answer');
+      this.wrongCount++;
+    }
+
+    // TODO update next revision time, on the server
+
+    this.view.updateCounts(this.rightCount, this.initialCount);
+  }
+
+  doNextSentence() {
+    if (!this.sentences[0]) {
+      this.view.finish();
+
+      // TODO what next? (probably different from TrainController)
+      return;
+    }
+
+    const sentence = this.sentences[0];
+
+    this.view.prompt = sentence.prompt;
+    this.view.answer = sentence.answer;
+    this.view.audioUrl = sentence.data.audioUrl;
+  }
+}
+
 export class CreateTaskChooseSentenceController extends Controller {
   getViewClass() {
     return CreateTaskChooseSentenceView;
