@@ -128,7 +128,7 @@ export class StudentResultsModel extends Model {
     };
 
     return this.sendApiRequest(
-      `/api/v1/studenttasks/${taskURL}`,
+      `/api/v1/studenttasks/save-results/${taskURL}`,
       'PATCH',
       payload
     );
