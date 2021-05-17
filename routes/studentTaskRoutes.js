@@ -1,5 +1,6 @@
 const express = require('express');
 const studentTaskController = require('../controllers/studentTaskController');
+const studentSentenceController = require('../controllers/studentSentenceController');
 const authController = require('../controllers/authController');
 
 ////// ROUTER
@@ -18,6 +19,13 @@ router
 router
   .route('/:id')
   .delete(studentTaskController.deleteStudentTaskAndObjectIdRef);
+
+router
+  .route('/save-results/:id')
+  .patch(
+    studentSentenceController.createStudentSentencesDuringTraining,
+    studentTaskController.updateStudentTask
+  );
 
 router
   .route('/delete-reference-in-user-doc/:id')

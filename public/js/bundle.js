@@ -2696,7 +2696,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -2718,7 +2718,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -27917,7 +27917,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28226,7 +28226,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -28758,9 +28758,13 @@ class FormView extends View {
   }
 
   clearFormData() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     const inputs = Array.from(this.root.querySelectorAll('input'));
+    const keep = options.keep || [];
     inputs.forEach(el => {
-      el.value = '';
+      if (!keep.includes(el.name)) {
+        el.value = '';
+      }
     });
   }
 
@@ -29041,7 +29045,7 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     });
   }
 
-} // TRAINING VIEW
+} // TRAINING + REVISION VIEW
 
 
 exports.CreateTaskChooseSentenceView = CreateTaskChooseSentenceView;
@@ -29371,7 +29375,7 @@ class StudentResultsModel extends Model {
       percentCorrect: rightCount / (rightCount + wrongCount) * 100,
       completed: true
     };
-    return this.sendApiRequest("/api/v1/studenttasks/".concat(taskURL), 'PATCH', payload);
+    return this.sendApiRequest("/api/v1/studenttasks/save-results/".concat(taskURL), 'PATCH', payload);
   }
 
 }
@@ -29480,7 +29484,7 @@ exports.DeleteModel = DeleteModel;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -29614,9 +29618,10 @@ class CreateSentenceController extends Controller {
         const {
           audioUrl
         } = await this.children.audioEditor.save();
-        const grammarArray = grammar.split(',').map(e => e.trim());
-        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar = grammarArray, audioUrl);
-        this.view.clearFormData();
+        const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
+        this.view.clearFormData({
+          keep: ["vivaRef", "tense", "grammar"]
+        });
         this.children.audioEditor.clear();
 
         if (res) {
@@ -29777,9 +29782,72 @@ class TrainController extends Controller {
     }
   }
 
-}
+} // TODO do a full once-over to see what needs to change relative to TrainController
+
 
 exports.TrainController = TrainController;
+
+class ReviseController extends Controller {
+  getViewClass() {
+    return _views.TrainingView;
+  }
+
+  constructor() {
+    super(...arguments);
+
+    const sentenceData = _views.DataParserView.get('studentSentences');
+
+    this.sentences = sentenceData.map(doc => {
+      const sentence = new _models.SentenceModel(doc.sentence);
+      return sentence.subclassAs(doc.exercise);
+    });
+    this.initialCount = this.sentences.length;
+    this.rightCount = 0;
+    this.wrongCount = 0;
+    this.view.updateCounts(this.rightCount, this.initialCount);
+    this.view.on('answer', this.doAnswer.bind(this));
+    this.view.on('next', this.doNextSentence.bind(this));
+    this.doNextSentence();
+  }
+
+  doAnswer(_ref5) {
+    let {
+      student_answer,
+      isCorrect
+    } = _ref5;
+    const desiredReaskLength = 3;
+    const sentenceObject = this.sentences.shift();
+
+    if (isCorrect) {
+      _views.AlertView.show('success', 'Correct Answer');
+
+      this.rightCount++;
+    } else {
+      _views.AlertView.show('error', 'Incorrect Answer');
+
+      this.wrongCount++;
+    } // TODO update next revision time, on the server
+
+
+    this.view.updateCounts(this.rightCount, this.initialCount);
+  }
+
+  doNextSentence() {
+    if (!this.sentences[0]) {
+      this.view.finish(); // TODO what next? (probably different from TrainController)
+
+      return;
+    }
+
+    const sentence = this.sentences[0];
+    this.view.prompt = sentence.prompt;
+    this.view.answer = sentence.answer;
+    this.view.audioUrl = sentence.data.audioUrl;
+  }
+
+}
+
+exports.ReviseController = ReviseController;
 
 class CreateTaskChooseSentenceController extends Controller {
   getViewClass() {
@@ -29795,16 +29863,16 @@ class CreateTaskChooseSentenceController extends Controller {
       this.updateSentences(sents.filter(sent => !saveIds.includes(sent.data._id)));
     });
     this.sentencesToSave = [];
-    this.view.on('add_sentence', (_ref5) => {
-      let {
-        sentenceId
-      } = _ref5;
-      this.sentencesToSave.push(this.sentences.find(sent => sent.data._id == sentenceId));
-    });
-    this.view.on('remove_sentence', (_ref6) => {
+    this.view.on('add_sentence', (_ref6) => {
       let {
         sentenceId
       } = _ref6;
+      this.sentencesToSave.push(this.sentences.find(sent => sent.data._id == sentenceId));
+    });
+    this.view.on('remove_sentence', (_ref7) => {
+      let {
+        sentenceId
+      } = _ref7;
       this.sentencesToSave = this.sentencesToSave.filter(sent => sent.data._id != sentenceId);
     });
     this.view.on('save', this.save.bind(this));
@@ -29847,8 +29915,14 @@ class DeleteController extends Controller {
     super(...arguments);
     this.view.on('delete', async id => {
       try {
-        //I tried to separate concerns, but now struggling to make it work properly...
+        console.log(id);
         const deleteTask = await _models.DeleteModel.sendApiRequest("/api/v1/tasks/".concat(id), 'DELETE');
+        deleteTask.then(() => {
+          this.view.row.classList.add('deleted');
+          setTimeout(() => {
+            row.remove();
+          }, 500);
+        });
       } catch (err) {
         this.view.root.classList.remove('selected');
 

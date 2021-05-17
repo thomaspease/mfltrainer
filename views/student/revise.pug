@@ -4,7 +4,8 @@ include ./exercise_shared_code
 
 block content
     main.main
-        form.card(data-controller="TrainController")
+        form.card(data-controller="ReviseController")
+            -// TODO: update the below for Revise (it's heavily based on Train...)
             .card__exercise
                 if exercise == 'transcription'
                     +audio_area()
@@ -30,6 +31,4 @@ block content
                     =" / "
                     span.total-count
                     =" sentences answered"
-        +js-value('sentences', sentences)
-        +js-value('exercise', exercise)
-        +js-value('studentTask', studentTask)
+        +js-value('studentSentences', studentSentences)

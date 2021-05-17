@@ -1,5 +1,6 @@
 const User = require('../models/usermodel');
 const StudentTask = require('../models/studenttaskmodel');
+const StudentSentence = require('../models/studentsentencemodel');
 const Task = require('../models/taskmodel');
 const Class = require('../models/classmodel');
 const Sentence = require('../models/sentencemodel');
@@ -33,6 +34,17 @@ exports.doExercise = catchAsync(async (req, res, next) => {
     studentTask: req.params.id,
   });
 });
+
+exports.doRevise = catchAsync(async (req, res, next) => {
+  const student = res.locals.user;
+
+  const studentSentences = await StudentSentence.find({student: student.id, retestOn:{$lte:Date.now()}}).populate('sentence').limit(10).exec();
+
+  res.status(200).render('student/revise', {
+    title: 'Revise',
+    studentSentences,
+  });
+})
 
 exports.getLoginForm = (req, res) => {
   res.status(200).render('login', {

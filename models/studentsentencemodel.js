@@ -1,12 +1,20 @@
 const mongoose = require('mongoose');
 
 const studentSentenceSchema = mongoose.Schema({
-  sentenceId: {
-    type: ObjectId,
+  sentence: {
+    type: mongoose.Schema.ObjectId,
+    unique: false,
+    required: true,
+    ref: "Sentence",
+  },
+  student: {
+    type: mongoose.Schema.ObjectId,
+    unique: false,
     required: true,
   },
-  studentId: {
-    type: ObjectId,
+  exercise: {
+    type: String,
+    enum: ['gapped', 'translation', 'transcription'],
     required: true,
   },
   correctAttempts: Number,
@@ -15,32 +23,21 @@ const studentSentenceSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  sentence: {
-    type: String,
+  lastTestedOn: {
+    type: Date,
+    default: Date.now(),
+  },
+  retestOn: {
+    type: Date,
     required: true,
-    unique: true,
-    trim: true,
   },
-  translation: {
-    type: String,
-    required: [true, 'A sentence must have a translation'],
-    unique: true,
-    trim: true,
-  },
-  level: {
+  retestDays: {
     type: Number,
-    required: [true, 'A sentence must have a GCSE level'],
-  },
-  vivaRef: {
-    type: Number,
-    required: [true, 'A sentence must have a Viva reference'],
-  },
-  tense: {
-    type: String,
-  },
-  grammar: Array,
-  audio: String,
+    required: true,
+  }
 });
+
+studentSentenceSchema.index({sentence:1, student:1, exercise: 1}, {unique:true})
 
 const StudentSentence = mongoose.model(
   'StudentSentence',
