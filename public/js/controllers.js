@@ -306,7 +306,6 @@ export class TrainController extends Controller {
   }
 }
 
-// TODO do a full once-over to see what needs to change relative to TrainController
 export class ReviseController extends Controller {
   getViewClass() {
     return TrainingView;
@@ -347,8 +346,6 @@ export class ReviseController extends Controller {
       this.wrongCount++;
     }
 
-    // TODO update next revision time, on the server
-    
     this.view.updateCounts(this.rightCount, this.initialCount);
 
     const toUpdate = {
