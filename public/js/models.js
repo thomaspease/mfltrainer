@@ -12,6 +12,14 @@ class Model {
     this.data = data;
   }
 
+  async update(newData) {
+    for (let key in newData) {
+      this.data[key] = newData[key];
+    }
+
+    this.constructor.sendApiRequest(`${this.constructor.apiUrl()}/${this.data._id}`, 'PATCH', newData);
+  }
+
   // can throw, catch in the Controller layer
   static async sendApiRequest(url, method, data) {
     try {
@@ -132,6 +140,20 @@ export class StudentResultsModel extends Model {
       'PATCH',
       payload
     );
+  }
+}
+
+export class StudentSentenceModel extends Model {
+  constructor(data) {
+    super(data);
+
+    if (this.data.sentence) {
+      this.data.sentence = new SentenceModel(this.data.sentence).subclassAs(this.data.exercise);
+    }
+  }
+
+  get sentence() {
+    return this.data.sentence;
   }
 }
 

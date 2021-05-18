@@ -7,6 +7,7 @@ const Task = require('../models/taskmodel');
 
 exports.getAllStudentSentences = factory.getAll(StudentSentence);
 exports.getStudentSentence = factory.getOne(StudentSentence);
+exports.updateStudentSentence = factory.updateOne(StudentSentence);
 
 // designed to be called by the StudentTasks routes! before (some, not all) 'PATCH' routes
 exports.createStudentSentencesDuringTraining = catchAsync(async (req, res, next) => {

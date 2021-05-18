@@ -16,6 +16,7 @@ import {
   SentenceModel,
   CreateSentenceModel,
   StudentResultsModel,
+  StudentSentenceModel,
   CreateTaskModel,
   DeleteModel,
 } from './models.js';
@@ -316,12 +317,11 @@ export class ReviseController extends Controller {
 
     const sentenceData = DataParserView.get('studentSentences');
 
-    this.sentences = sentenceData.map((doc) => {
-      const sentence = new SentenceModel(doc.sentence);
-      return sentence.subclassAs(doc.exercise);
+    this.studentSentences = sentenceData.map((doc) => {
+      return new StudentSentenceModel(doc);
     })
 
-    this.initialCount = this.sentences.length;
+    this.initialCount = this.studentSentences.length;
 
     this.rightCount = 0;
     this.wrongCount = 0;
@@ -337,7 +337,7 @@ export class ReviseController extends Controller {
   doAnswer({ student_answer, isCorrect }) {
     const desiredReaskLength = 3;
 
-    const sentenceObject = this.sentences.shift();
+    const studentSentenceObject = this.studentSentences.shift();
 
     if (isCorrect) {
       AlertView.show('success', 'Correct Answer');
@@ -348,19 +348,34 @@ export class ReviseController extends Controller {
     }
 
     // TODO update next revision time, on the server
-
+    
     this.view.updateCounts(this.rightCount, this.initialCount);
+
+    const toUpdate = {
+      lastTestedOn: Date.now(),
+    };
+
+    if (isCorrect) {
+      toUpdate.correctAttempts = studentSentenceObject.data.correctAttempts + 1 || 1;
+      toUpdate.retestDays = studentSentenceObject.data.retestDays * 3;
+    } else {
+      toUpdate.incorrectAttempts = studentSentenceObject.data.incorrectAttempts + 1 || 1;
+      toUpdate.retestDays = 1;
+    }
+    toUpdate.retestOn = toUpdate.lastTestedOn + (toUpdate.retestDays * 24 * 60 * 60 * 1000);
+
+    studentSentenceObject.update(toUpdate);
   }
 
   doNextSentence() {
-    if (!this.sentences[0]) {
+    if (!this.studentSentences[0]) {
       this.view.finish();
 
       // TODO what next? (probably different from TrainController)
       return;
     }
 
-    const sentence = this.sentences[0];
+    const sentence = this.studentSentences[0].sentence;
 
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
