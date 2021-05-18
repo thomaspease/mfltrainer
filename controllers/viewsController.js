@@ -29,9 +29,12 @@ exports.doExercise = catchAsync(async (req, res, next) => {
   //Render template and pass in sentences
   res.status(200).render('student/train', {
     title: 'Train',
-    sentences: task.sentences,
-    exercise: task.exercise,
-    studentTask: req.params.id,
+    frontendVariables: {
+      sentences: task.sentences,
+      exercise: task.exercise,
+      studentTask: req.params.id,
+    },
+    controller: "TrainController",
   });
 });
 
@@ -40,9 +43,12 @@ exports.doRevise = catchAsync(async (req, res, next) => {
 
   const studentSentences = await StudentSentence.find({student: student.id, retestOn:{$lte:Date.now()}}).populate('sentence').limit(10).exec();
 
-  res.status(200).render('student/revise', {
+  res.status(200).render('student/train', {
     title: 'Revise',
-    studentSentences,
+    frontendVariables: {
+      studentSentences,
+    },
+    controller: "ReviseController",
   });
 })
 

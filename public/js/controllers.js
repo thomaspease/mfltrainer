@@ -375,11 +375,13 @@ export class ReviseController extends Controller {
       return;
     }
 
-    const sentence = this.studentSentences[0].sentence;
+    const {sentence, exercise} = this.studentSentences[0];
 
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
     this.view.audioUrl = sentence.data.audioUrl;
+
+    this.view.updateLayoutForExercise(exercise);
   }
 }
 

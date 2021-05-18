@@ -155,6 +155,10 @@ export class StudentSentenceModel extends Model {
   get sentence() {
     return this.data.sentence;
   }
+
+  get exercise() {
+    return this.data.exercise;
+  }
 }
 
 export class SentenceModel extends Model {

@@ -29093,6 +29093,16 @@ class TrainingView extends FormView {
     });
   }
 
+  updateLayoutForExercise(exercise) {
+    if (exercise == 'transcription') {
+      this.elements.prompt.style.gridArea = 'audio';
+      this.elements.audio.style.gridArea = 'prompt';
+    } else {
+      this.elements.prompt.style.gridArea = 'prompt';
+      this.elements.audio.style.gridArea = 'audio';
+    }
+  }
+
   updateCounts(right, total) {
     this.elements.right_count.innerText = right;
     this.elements.total_count.innerText = total;
@@ -29401,6 +29411,10 @@ class StudentSentenceModel extends Model {
 
   get sentence() {
     return this.data.sentence;
+  }
+
+  get exercise() {
+    return this.data.exercise;
   }
 
 }
@@ -29877,10 +29891,14 @@ class ReviseController extends Controller {
       return;
     }
 
-    const sentence = this.studentSentences[0].sentence;
+    const {
+      sentence,
+      exercise
+    } = this.studentSentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
     this.view.audioUrl = sentence.data.audioUrl;
+    this.view.updateLayoutForExercise(exercise);
   }
 
 }

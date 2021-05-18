@@ -492,6 +492,16 @@ export class TrainingView extends FormView {
     });
   }
 
+  updateLayoutForExercise(exercise) {
+    if (exercise == 'transcription') {
+      this.elements.prompt.style.gridArea = 'audio';
+      this.elements.audio.style.gridArea = 'prompt';
+    } else {
+      this.elements.prompt.style.gridArea = 'prompt';
+      this.elements.audio.style.gridArea = 'audio';
+    }
+  }
+
   updateCounts(right, total) {
     this.elements.right_count.innerText = right;
     this.elements.total_count.innerText = total;
