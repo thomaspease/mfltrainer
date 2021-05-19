@@ -50,5 +50,9 @@ block content
                             option=""
                             each value in fieldValues.tense
                               option= value
-                div.sentence-table-holder
+                div
+                    div.paging(style="font-size:300%;")
+                        a.previous-page <
+                        a.next-page >
+                    div.sentence-table-holder
             +js-value('user', user._id)

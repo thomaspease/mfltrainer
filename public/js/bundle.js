@@ -29005,10 +29005,18 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     super(element);
     this.elements.tableParent = this.root.querySelector('.sentence-table-holder');
     this.elements.saveButton = this.root.querySelector('button.set-tasks-button-choose-sentences');
+    this.elements.previousPage = this.root.querySelector('.previous-page');
+    this.elements.nextPage = this.root.querySelector('.next-page');
     this.getFilterElements().forEach(el => {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.previousPage.addEventListener('click', () => {
+      this.trigger('change_page', -1);
+    });
+    this.elements.nextPage.addEventListener('click', () => {
+      this.trigger('change_page', 1);
+    });
     this.elements.tableParent.addEventListener('change', evt => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
         const sentenceId = evt.target.dataset.sentence_id;
@@ -29028,9 +29036,13 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   updateFilters() {
+    this.trigger('filter_update', this.getFilterState());
+  }
+
+  getFilterState() {
     const filterState = {};
     this.getFilterElements().filter(el => el.value != '').forEach(el => filterState[el.name] = el.value);
-    this.trigger('filter_update', filterState);
+    return filterState;
   }
 
   updateDisplay(sentences, toSave) {
@@ -29296,11 +29308,11 @@ class Model {
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }
-  } // expects searchParams to be of type URLSearchParams
+  } // expects searchParams to be a plain object (i.e., not a URLSearchParams)
 
 
   static async loadFromServer(searchParams) {
-    const response = await this.sendApiRequest(this.apiUrl() + '?' + searchParams.toString(), 'GET');
+    const response = await this.sendApiRequest(this.apiUrl() + '?' + new URLSearchParams(searchParams).toString(), 'GET');
     const objects = response.data.data.map(row => new this(row));
     return objects;
   }
@@ -29907,11 +29919,41 @@ class CreateTaskChooseSentenceController extends Controller {
 
   constructor(viewBaseElement) {
     super(viewBaseElement);
+    this.page = 1;
+    this.limit = 10;
     this.view.on('filter_update', async filterData => {
-      const searchParams = new URLSearchParams(_objectSpread({}, filterData));
+      // always reset to the first page when updating the filter
+      this.page = 1;
+      const limit = Math.max(1, this.limit - this.sentencesToSave.length);
+      const idExcludeObj = {};
+      this.sentencesToSave.forEach((sent, index) => {
+        idExcludeObj["_id[nin][".concat(index, "]")] = sent.data._id;
+      });
+
+      const searchParams = _objectSpread(_objectSpread(_objectSpread({}, filterData), idExcludeObj), {}, {
+        page: this.page,
+        limit
+      });
+
       const sents = await _models.SentenceModel.loadFromServer(searchParams);
-      const saveIds = this.sentencesToSave.map(sent => sent.data._id);
-      this.updateSentences(sents.filter(sent => !saveIds.includes(sent.data._id)));
+      this.updateSentences(sents);
+    });
+    this.view.on('change_page', async offset => {
+      console.log(offset);
+      this.page += offset;
+      const limit = Math.max(1, this.limit - this.sentencesToSave.length);
+      const idExcludeObj = {};
+      this.sentencesToSave.forEach((sent, index) => {
+        idExcludeObj["_id[nin][".concat(index, "]")] = sent.data._id;
+      });
+
+      const searchParams = _objectSpread(_objectSpread(_objectSpread({}, this.view.getFilterState()), idExcludeObj), {}, {
+        page: this.page,
+        limit
+      });
+
+      const sents = await _models.SentenceModel.loadFromServer(searchParams);
+      this.updateSentences(sents);
     });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref6) => {
@@ -29929,7 +29971,10 @@ class CreateTaskChooseSentenceController extends Controller {
     this.view.on('save', this.save.bind(this));
     this.sentences = [];
 
-    _models.SentenceModel.fetchAll().then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+    _models.SentenceModel.loadFromServer({
+      page: this.page,
+      limit: this.limit
+    }).then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
   }
 
   updateSentences(sentences) {

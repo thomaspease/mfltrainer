@@ -40,10 +40,10 @@ class Model {
     }
   }
 
-  // expects searchParams to be of type URLSearchParams
+  // expects searchParams to be a plain object (i.e., not a URLSearchParams)
   static async loadFromServer(searchParams) {
     const response = await this.sendApiRequest(
-      this.apiUrl() + '?' + searchParams.toString(),
+      this.apiUrl() + '?' + new URLSearchParams(searchParams).toString(),
       'GET'
     );
 

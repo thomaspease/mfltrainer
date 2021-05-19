@@ -390,19 +390,56 @@ export class CreateTaskChooseSentenceController extends Controller {
   constructor(viewBaseElement) {
     super(viewBaseElement);
 
+    this.page = 1;
+    this.limit = 10;
+
     this.view.on('filter_update', async (filterData) => {
-      const searchParams = new URLSearchParams({
+      // always reset to the first page when updating the filter
+      this.page = 1;
+      const limit = Math.max(1, (this.limit - this.sentencesToSave.length));
+
+      const idExcludeObj = {};
+      this.sentencesToSave.forEach((sent,index) => {
+        idExcludeObj[`_id[nin][${index}]`] = sent.data._id;
+      })
+
+      const searchParams = {
         ...filterData,
-      });
+        ...idExcludeObj,
+        page: this.page,
+        limit,
+      };
 
       const sents = await SentenceModel.loadFromServer(searchParams);
 
-      const saveIds = this.sentencesToSave.map((sent) => sent.data._id);
-
       this.updateSentences(
-        sents.filter((sent) => !saveIds.includes(sent.data._id))
+        sents
       );
     });
+
+    this.view.on('change_page', async (offset) => {
+      console.log(offset);
+      this.page += offset;
+      const limit = Math.max(1, (this.limit - this.sentencesToSave.length));
+
+      const idExcludeObj = {};
+      this.sentencesToSave.forEach((sent,index) => {
+        idExcludeObj[`_id[nin][${index}]`] = sent.data._id;
+      })
+
+      const searchParams = {
+        ...this.view.getFilterState(),
+        ...idExcludeObj,
+        page: this.page,
+        limit,
+      };
+
+      const sents = await SentenceModel.loadFromServer(searchParams);
+
+      this.updateSentences(
+        sents
+      );
+    })
 
     this.sentencesToSave = [];
     this.view.on('add_sentence', ({ sentenceId }) => {
@@ -419,7 +456,7 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.view.on('save', this.save.bind(this));
 
     this.sentences = [];
-    SentenceModel.fetchAll()
+    SentenceModel.loadFromServer({page: this.page, limit: this.limit})
       .then((sent) => this.updateSentences(sent))
       .catch((err) => AlertView.show('error', err));
   }
