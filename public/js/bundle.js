@@ -28712,11 +28712,15 @@ class View {
     this.listeners[event].push(callback);
   }
 
-  trigger(event, data) {
+  trigger(event) {
+    for (var _len = arguments.length, data = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      data[_key - 1] = arguments[_key];
+    }
+
     const listeners = this.listeners[event];
 
     if (listeners) {
-      listeners.forEach(callback => callback(data));
+      listeners.forEach(callback => callback(...data));
     }
   }
 
@@ -29218,7 +29222,7 @@ class DeleteView extends View {
             row = row.parentNode;
           }
 
-          this.trigger('delete', row.getAttribute('name'));
+          this.trigger('delete', row.getAttribute('name'), row);
         }
 
         return false;
@@ -29231,17 +29235,10 @@ class DeleteView extends View {
   }
 
   deleteRow(row) {
-    row.classList.add('loading'); // TODO replace fakeAjax with an actual API call
-
-    const fakeAjax = new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
-    });
-    fakeAjax.then(() => {
-      row.classList.add('deleted');
-      setTimeout(() => {
-        row.remove();
-      }, 500);
-    });
+    row.classList.add('deleted');
+    setTimeout(() => {
+      row.remove();
+    }, 500);
   }
 
 }
@@ -29821,8 +29818,7 @@ class TrainController extends Controller {
     }
   }
 
-} // TODO do a full once-over to see what needs to change relative to TrainController
-
+}
 
 exports.TrainController = TrainController;
 
@@ -29864,8 +29860,7 @@ class ReviseController extends Controller {
       _views.AlertView.show('error', 'Incorrect Answer');
 
       this.wrongCount++;
-    } // TODO update next revision time, on the server
-
+    }
 
     this.view.updateCounts(this.rightCount, this.initialCount);
     const toUpdate = {
@@ -29969,16 +29964,11 @@ class DeleteController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.on('delete', async id => {
+    this.view.on('delete', async (id, row) => {
       try {
         console.log(id);
         const deleteTask = await _models.DeleteModel.sendApiRequest("/api/v1/tasks/".concat(id), 'DELETE');
-        deleteTask.then(() => {
-          this.view.row.classList.add('deleted');
-          setTimeout(() => {
-            row.remove();
-          }, 500);
-        });
+        this.view.deleteRow(row);
       } catch (err) {
         this.view.root.classList.remove('selected');
 

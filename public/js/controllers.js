@@ -460,7 +460,7 @@ export class DeleteController extends Controller {
   constructor(...args) {
     super(...args);
 
-    this.view.on('delete', async (id) => {
+    this.view.on('delete', async (id, row) => {
       try {
         console.log(id);
         const deleteTask = await DeleteModel.sendApiRequest(
@@ -468,12 +468,7 @@ export class DeleteController extends Controller {
           'DELETE'
         );
 
-        deleteTask.then(() => {
-          this.view.row.classList.add('deleted');
-          setTimeout(() => {
-            row.remove();
-          }, 500);
-        });
+        this.view.deleteRow(row);
       } catch (err) {
         this.view.root.classList.remove('selected');
         AlertView.show('error', err.message);

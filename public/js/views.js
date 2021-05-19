@@ -51,10 +51,10 @@ class View {
     this.listeners[event].push(callback);
   }
 
-  trigger(event, data) {
+  trigger(event, ...data) {
     const listeners = this.listeners[event];
     if (listeners) {
-      listeners.forEach((callback) => callback(data));
+      listeners.forEach((callback) => callback(...data));
     }
   }
 
@@ -628,7 +628,7 @@ export class DeleteView extends View {
             row = row.parentNode;
           }
 
-          this.trigger('delete', row.getAttribute('name'));
+          this.trigger('delete', row.getAttribute('name'), row);
         }
         return false;
       }
@@ -640,18 +640,9 @@ export class DeleteView extends View {
   }
 
   deleteRow(row) {
-    row.classList.add('loading');
-
-    // TODO replace fakeAjax with an actual API call
-    const fakeAjax = new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
-    });
-
-    fakeAjax.then(() => {
-      row.classList.add('deleted');
-      setTimeout(() => {
-        row.remove();
-      }, 500);
-    });
+    row.classList.add('deleted');
+    setTimeout(() => {
+      row.remove();
+    }, 500);
   }
 }
