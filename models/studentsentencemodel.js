@@ -17,8 +17,14 @@ const studentSentenceSchema = mongoose.Schema({
     enum: ['gapped', 'translation', 'transcription'],
     required: true,
   },
-  correctAttempts: Number,
-  incorrectAttempts: Number,
+  correctAttempts: {
+    type: Number,
+    default: 0,
+  },
+  incorrectAttempts: {
+    type: Number,
+    default: 0,
+  },
   firstLearnedOn: {
     type: Date,
     default: Date.now(),

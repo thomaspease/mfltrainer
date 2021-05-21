@@ -28712,11 +28712,15 @@ class View {
     this.listeners[event].push(callback);
   }
 
-  trigger(event, data) {
+  trigger(event) {
+    for (var _len = arguments.length, data = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      data[_key - 1] = arguments[_key];
+    }
+
     const listeners = this.listeners[event];
 
     if (listeners) {
-      listeners.forEach(callback => callback(data));
+      listeners.forEach(callback => callback(...data));
     }
   }
 
@@ -29093,6 +29097,16 @@ class TrainingView extends FormView {
     });
   }
 
+  updateLayoutForExercise(exercise) {
+    if (exercise == 'transcription') {
+      this.elements.prompt.style.gridArea = 'audio';
+      this.elements.audio.style.gridArea = 'prompt';
+    } else {
+      this.elements.prompt.style.gridArea = 'prompt';
+      this.elements.audio.style.gridArea = 'audio';
+    }
+  }
+
   updateCounts(right, total) {
     this.elements.right_count.innerText = right;
     this.elements.total_count.innerText = total;
@@ -29208,7 +29222,7 @@ class DeleteView extends View {
             row = row.parentNode;
           }
 
-          this.trigger('delete', row.getAttribute('name'));
+          this.trigger('delete', row.getAttribute('name'), row);
         }
 
         return false;
@@ -29221,17 +29235,10 @@ class DeleteView extends View {
   }
 
   deleteRow(row) {
-    row.classList.add('loading'); // TODO replace fakeAjax with an actual API call
-
-    const fakeAjax = new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
-    });
-    fakeAjax.then(() => {
-      row.classList.add('deleted');
-      setTimeout(() => {
-        row.remove();
-      }, 500);
-    });
+    row.classList.add('deleted');
+    setTimeout(() => {
+      row.remove();
+    }, 500);
   }
 
 }
@@ -29243,7 +29250,7 @@ exports.DeleteView = DeleteView;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteModel = exports.SentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.CreateTaskModel = exports.AuthModel = void 0;
+exports.DeleteModel = exports.SentenceModel = exports.StudentSentenceModel = exports.StudentResultsModel = exports.CreateSentenceModel = exports.CreateTaskModel = exports.AuthModel = void 0;
 
 var _views = require("./views.js");
 
@@ -29260,6 +29267,14 @@ class ModelApiError extends Error {} // parent class for models. includes some u
 class Model {
   constructor(data) {
     this.data = data;
+  }
+
+  async update(newData) {
+    for (let key in newData) {
+      this.data[key] = newData[key];
+    }
+
+    this.constructor.sendApiRequest("".concat(this.constructor.apiUrl(), "/").concat(this.data._id), 'PATCH', newData);
   } // can throw, catch in the Controller layer
 
 
@@ -29381,6 +29396,27 @@ class StudentResultsModel extends Model {
 }
 
 exports.StudentResultsModel = StudentResultsModel;
+
+class StudentSentenceModel extends Model {
+  constructor(data) {
+    super(data);
+
+    if (this.data.sentence) {
+      this.data.sentence = new SentenceModel(this.data.sentence).subclassAs(this.data.exercise);
+    }
+  }
+
+  get sentence() {
+    return this.data.sentence;
+  }
+
+  get exercise() {
+    return this.data.exercise;
+  }
+
+}
+
+exports.StudentSentenceModel = StudentSentenceModel;
 
 class SentenceModel extends Model {
   // type is 'gapped' or 'translation'
@@ -29782,8 +29818,7 @@ class TrainController extends Controller {
     }
   }
 
-} // TODO do a full once-over to see what needs to change relative to TrainController
-
+}
 
 exports.TrainController = TrainController;
 
@@ -29797,11 +29832,10 @@ class ReviseController extends Controller {
 
     const sentenceData = _views.DataParserView.get('studentSentences');
 
-    this.sentences = sentenceData.map(doc => {
-      const sentence = new _models.SentenceModel(doc.sentence);
-      return sentence.subclassAs(doc.exercise);
+    this.studentSentences = sentenceData.map(doc => {
+      return new _models.StudentSentenceModel(doc);
     });
-    this.initialCount = this.sentences.length;
+    this.initialCount = this.studentSentences.length;
     this.rightCount = 0;
     this.wrongCount = 0;
     this.view.updateCounts(this.rightCount, this.initialCount);
@@ -29816,7 +29850,7 @@ class ReviseController extends Controller {
       isCorrect
     } = _ref5;
     const desiredReaskLength = 3;
-    const sentenceObject = this.sentences.shift();
+    const studentSentenceObject = this.studentSentences.shift();
 
     if (isCorrect) {
       _views.AlertView.show('success', 'Correct Answer');
@@ -29826,23 +29860,40 @@ class ReviseController extends Controller {
       _views.AlertView.show('error', 'Incorrect Answer');
 
       this.wrongCount++;
-    } // TODO update next revision time, on the server
-
+    }
 
     this.view.updateCounts(this.rightCount, this.initialCount);
+    const toUpdate = {
+      lastTestedOn: Date.now()
+    };
+
+    if (isCorrect) {
+      toUpdate.correctAttempts = studentSentenceObject.data.correctAttempts + 1 || 1;
+      toUpdate.retestDays = studentSentenceObject.data.retestDays * 3;
+    } else {
+      toUpdate.incorrectAttempts = studentSentenceObject.data.incorrectAttempts + 1 || 1;
+      toUpdate.retestDays = 1;
+    }
+
+    toUpdate.retestOn = toUpdate.lastTestedOn + toUpdate.retestDays * 24 * 60 * 60 * 1000;
+    studentSentenceObject.update(toUpdate);
   }
 
   doNextSentence() {
-    if (!this.sentences[0]) {
+    if (!this.studentSentences[0]) {
       this.view.finish(); // TODO what next? (probably different from TrainController)
 
       return;
     }
 
-    const sentence = this.sentences[0];
+    const {
+      sentence,
+      exercise
+    } = this.studentSentences[0];
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
     this.view.audioUrl = sentence.data.audioUrl;
+    this.view.updateLayoutForExercise(exercise);
   }
 
 }
@@ -29913,16 +29964,11 @@ class DeleteController extends Controller {
 
   constructor() {
     super(...arguments);
-    this.view.on('delete', async id => {
+    this.view.on('delete', async (id, row) => {
       try {
         console.log(id);
         const deleteTask = await _models.DeleteModel.sendApiRequest("/api/v1/tasks/".concat(id), 'DELETE');
-        deleteTask.then(() => {
-          this.view.row.classList.add('deleted');
-          setTimeout(() => {
-            row.remove();
-          }, 500);
-        });
+        this.view.deleteRow(row);
       } catch (err) {
         this.view.root.classList.remove('selected');
 

@@ -51,10 +51,10 @@ class View {
     this.listeners[event].push(callback);
   }
 
-  trigger(event, data) {
+  trigger(event, ...data) {
     const listeners = this.listeners[event];
     if (listeners) {
-      listeners.forEach((callback) => callback(data));
+      listeners.forEach((callback) => callback(...data));
     }
   }
 
@@ -492,6 +492,16 @@ export class TrainingView extends FormView {
     });
   }
 
+  updateLayoutForExercise(exercise) {
+    if (exercise == 'transcription') {
+      this.elements.prompt.style.gridArea = 'audio';
+      this.elements.audio.style.gridArea = 'prompt';
+    } else {
+      this.elements.prompt.style.gridArea = 'prompt';
+      this.elements.audio.style.gridArea = 'audio';
+    }
+  }
+
   updateCounts(right, total) {
     this.elements.right_count.innerText = right;
     this.elements.total_count.innerText = total;
@@ -618,7 +628,7 @@ export class DeleteView extends View {
             row = row.parentNode;
           }
 
-          this.trigger('delete', row.getAttribute('name'));
+          this.trigger('delete', row.getAttribute('name'), row);
         }
         return false;
       }
@@ -630,18 +640,9 @@ export class DeleteView extends View {
   }
 
   deleteRow(row) {
-    row.classList.add('loading');
-
-    // TODO replace fakeAjax with an actual API call
-    const fakeAjax = new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
-    });
-
-    fakeAjax.then(() => {
-      row.classList.add('deleted');
-      setTimeout(() => {
-        row.remove();
-      }, 500);
-    });
+    row.classList.add('deleted');
+    setTimeout(() => {
+      row.remove();
+    }, 500);
   }
 }

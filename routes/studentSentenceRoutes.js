@@ -8,10 +8,10 @@ const router = express.Router({ mergeParams: true });
 router
   .route('/')
   .get(studentSentenceController.getAllStudentSentences)
-  //.post(studentSentenceController.createStudentSentence);
 
 router
   .route('/:id')
   .get(studentSentenceController.getStudentSentence)
+  .patch(studentSentenceController.updateStudentSentence)
 
 module.exports = router;
