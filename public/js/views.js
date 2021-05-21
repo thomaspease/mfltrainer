@@ -433,10 +433,15 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
       level: 'narrow',
     };
 
+    const savedIds = toSave.map((sent) => {
+      return sent.data._id;
+    })
+
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
       sentences,
       saved: toSave,
+      savedIds,
       fieldClasses,
     });
   }

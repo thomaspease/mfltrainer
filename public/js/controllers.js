@@ -396,18 +396,11 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.view.on('filter_update', async (filterData) => {
       // always reset to the first page when updating the filter
       this.page = 1;
-      const limit = Math.max(1, (this.limit - this.sentencesToSave.length));
-
-      const idExcludeObj = {};
-      this.sentencesToSave.forEach((sent,index) => {
-        idExcludeObj[`_id[nin][${index}]`] = sent.data._id;
-      })
 
       const searchParams = {
         ...filterData,
-        ...idExcludeObj,
         page: this.page,
-        limit,
+        limit: this.limit,
       };
 
       const sents = await SentenceModel.loadFromServer(searchParams);
@@ -420,18 +413,11 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.view.on('change_page', async (offset) => {
       console.log(offset);
       this.page += offset;
-      const limit = Math.max(1, (this.limit - this.sentencesToSave.length));
-
-      const idExcludeObj = {};
-      this.sentencesToSave.forEach((sent,index) => {
-        idExcludeObj[`_id[nin][${index}]`] = sent.data._id;
-      })
 
       const searchParams = {
         ...this.view.getFilterState(),
-        ...idExcludeObj,
         page: this.page,
-        limit,
+        limit: this.limit,
       };
 
       const sents = await SentenceModel.loadFromServer(searchParams);
