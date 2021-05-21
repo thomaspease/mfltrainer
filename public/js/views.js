@@ -371,6 +371,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     );
     this.elements.previousPage = this.root.querySelector('.previous-page');
     this.elements.nextPage = this.root.querySelector('.next-page');
+    this.elements.pageNum = this.root.querySelector('.page-num');
 
     this.getFilterElements().forEach((el) => {
       el.addEventListener('change', this.updateFilters.bind(this));
@@ -380,10 +381,12 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
       this.trigger('save', {})
     );
 
-    this.elements.previousPage.addEventListener('click', () => {
+    this.elements.previousPage.addEventListener('click', (evt) => {
+      evt.preventDefault();
       this.trigger('change_page', -1);
     })
-    this.elements.nextPage.addEventListener('click', () => {
+    this.elements.nextPage.addEventListener('click', (evt) => {
+      evt.preventDefault();
       this.trigger('change_page', 1);
     })
 
@@ -444,6 +447,15 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
       savedIds,
       fieldClasses,
     });
+  }
+
+  get page() {
+    return this._page;
+  }
+  set page(value) {
+    this._page = value;
+    this.elements.pageNum.innerText = this._page;
+    return this._page;
   }
 }
 

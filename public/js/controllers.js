@@ -392,39 +392,30 @@ export class CreateTaskChooseSentenceController extends Controller {
 
     this.page = 1;
     this.limit = 10;
+    this.waitingForData = false;
 
     this.view.on('filter_update', async (filterData) => {
       // always reset to the first page when updating the filter
       this.page = 1;
-
-      const searchParams = {
-        ...filterData,
-        page: this.page,
-        limit: this.limit,
-      };
-
-      const sents = await SentenceModel.loadFromServer(searchParams);
-
-      this.updateSentences(
-        sents
-      );
+      this.refetchData(filterData);
     });
 
     this.view.on('change_page', async (offset) => {
-      console.log(offset);
+      // don't let the user go below 1 or above the max page
+      if (this.page <= 1 && offset < 0) {
+        return;
+      }
+      if (offset > 0 && this.sentences.length == 0) {
+        return;
+      }
+
+      // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+      if (this.waitingForData) {
+        return;
+      }
+
       this.page += offset;
-
-      const searchParams = {
-        ...this.view.getFilterState(),
-        page: this.page,
-        limit: this.limit,
-      };
-
-      const sents = await SentenceModel.loadFromServer(searchParams);
-
-      this.updateSentences(
-        sents
-      );
+      this.refetchData(this.view.getFilterState());
     })
 
     this.sentencesToSave = [];
@@ -445,6 +436,23 @@ export class CreateTaskChooseSentenceController extends Controller {
     SentenceModel.loadFromServer({page: this.page, limit: this.limit})
       .then((sent) => this.updateSentences(sent))
       .catch((err) => AlertView.show('error', err));
+  }
+
+  async refetchData(filterData) {
+    const searchParams = {
+      ...filterData,
+      page: this.page,
+      limit: this.limit,
+    };
+
+    this.waitingForData = true;
+    const sents = await SentenceModel.loadFromServer(searchParams);
+    this.waitingForData = false;
+
+    this.view.page = this.page;
+    this.updateSentences(
+      sents
+    );
   }
 
   updateSentences(sentences) {

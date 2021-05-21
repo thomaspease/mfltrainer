@@ -29026,14 +29026,17 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.saveButton = this.root.querySelector('button.set-tasks-button-choose-sentences');
     this.elements.previousPage = this.root.querySelector('.previous-page');
     this.elements.nextPage = this.root.querySelector('.next-page');
+    this.elements.pageNum = this.root.querySelector('.page-num');
     this.getFilterElements().forEach(el => {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
-    this.elements.previousPage.addEventListener('click', () => {
+    this.elements.previousPage.addEventListener('click', evt => {
+      evt.preventDefault();
       this.trigger('change_page', -1);
     });
-    this.elements.nextPage.addEventListener('click', () => {
+    this.elements.nextPage.addEventListener('click', evt => {
+      evt.preventDefault();
       this.trigger('change_page', 1);
     });
     this.elements.tableParent.addEventListener('change', evt => {
@@ -29082,6 +29085,16 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
       savedIds,
       fieldClasses
     });
+  }
+
+  get page() {
+    return this._page;
+  }
+
+  set page(value) {
+    this._page = value;
+    this.elements.pageNum.innerText = this._page;
+    return this._page;
   }
 
 } // TRAINING + REVISION VIEW
@@ -29944,37 +29957,29 @@ class CreateTaskChooseSentenceController extends Controller {
     super(viewBaseElement);
     this.page = 1;
     this.limit = 10;
+    this.waitingForData = false;
     this.view.on('filter_update', async filterData => {
       // always reset to the first page when updating the filter
       this.page = 1;
-      const idExcludeObj = {};
-      this.sentencesToSave.forEach((sent, index) => {
-        idExcludeObj["_id[nin][".concat(index, "]")] = sent.data._id;
-      });
-
-      const searchParams = _objectSpread(_objectSpread({}, filterData), {}, {
-        page: this.page,
-        limit: this.limit
-      });
-
-      const sents = await _models.SentenceModel.loadFromServer(searchParams);
-      this.updateSentences(sents);
+      this.refetchData(filterData);
     });
     this.view.on('change_page', async offset => {
-      console.log(offset);
+      // don't let the user go below 1 or above the max page
+      if (this.page <= 1 && offset < 0) {
+        return;
+      }
+
+      if (offset > 0 && this.sentences.length == 0) {
+        return;
+      } // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+
+
+      if (this.waitingForData) {
+        return;
+      }
+
       this.page += offset;
-      const idExcludeObj = {};
-      this.sentencesToSave.forEach((sent, index) => {
-        idExcludeObj["_id[nin][".concat(index, "]")] = sent.data._id;
-      });
-
-      const searchParams = _objectSpread(_objectSpread({}, this.view.getFilterState()), {}, {
-        page: this.page,
-        limit: this.limit
-      });
-
-      const sents = await _models.SentenceModel.loadFromServer(searchParams);
-      this.updateSentences(sents);
+      this.refetchData(this.view.getFilterState());
     });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref6) => {
@@ -29996,6 +30001,19 @@ class CreateTaskChooseSentenceController extends Controller {
       page: this.page,
       limit: this.limit
     }).then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+  }
+
+  async refetchData(filterData) {
+    const searchParams = _objectSpread(_objectSpread({}, filterData), {}, {
+      page: this.page,
+      limit: this.limit
+    });
+
+    this.waitingForData = true;
+    const sents = await _models.SentenceModel.loadFromServer(searchParams);
+    this.waitingForData = false;
+    this.view.page = this.page;
+    this.updateSentences(sents);
   }
 
   updateSentences(sentences) {
