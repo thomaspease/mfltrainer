@@ -54,6 +54,10 @@ tr:nth-child(even) {
   background-color: #f6f7fb;
 }
 
+tr.disabled {
+  opacity: 50%;
+}
+
 td {
   line-height: 1.42857;
   vertical-align: middle;

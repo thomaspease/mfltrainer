@@ -12,8 +12,10 @@ class APIFeatures {
 
     // ADVANCED QUERY
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //This is a regular expression - searching for those terms in order to preplace them.
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt|nin)\b/g, (match) => `$${match}`); //This is a regular expression - searching for those terms in order to preplace them.
     //The \b is to find an exact match, and the g is to make it do multiple matches.
+    console.log(queryObj);
+    console.log(queryStr);
     this.query = this.query.find(JSON.parse(queryStr));
 
     return this; // You do this so it still has access to the other objects once it has been called

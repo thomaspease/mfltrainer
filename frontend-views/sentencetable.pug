@@ -1,10 +1,13 @@
-mixin row(sentence, isSaved)
-    tr
+mixin row(sentence, options)
+    tr(class=(options.disabled ? 'disabled' : ''))
         td
-            if isSaved
+            if options.saved
                 input(type="checkbox" checked data-sentence_id=sentence.data._id)
             else
-                input(type="checkbox" data-sentence_id=sentence.data._id)
+                if !options.disabled
+                    input(type="checkbox" data-sentence_id=sentence.data._id)
+                else
+                    input(type="checkbox" disabled)
         each field in fields
             td
                 =sentence.data[field]
@@ -23,6 +26,6 @@ table.sentence-table
                 th
                     =field
         each sentence in saved
-            +row(sentence, true)
+            +row(sentence, {saved: true})
         each sentence in sentences
-            +row(sentence, false)
+            +row(sentence, {disabled: savedIds.includes(sentence.data._id)})

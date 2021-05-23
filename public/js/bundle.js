@@ -1816,22 +1816,22 @@ function sentencetableTemplate(locals) {
 
   try {
     var pug_debug_sources = {
-      "frontend-views\u002F\u002Fsentencetable.pug": "mixin row(sentence, isSaved)\n    tr\n        td\n            if isSaved\n                input(type=\"checkbox\" checked data-sentence_id=sentence.data._id)\n            else\n                input(type=\"checkbox\" data-sentence_id=sentence.data._id)\n        each field in fields\n            td\n                =sentence.data[field]\n  \n\ntable.sentence-table\n    colgroup\n        col.selected-toggle.narrow\n        each field in fields\n            col(class=(fieldClasses[field] || ''))\n    tbody\n        tr\n            th\n                -\u002F\u002F empty\n            each field in fields\n                th\n                    =field\n        each sentence in saved\n            +row(sentence, true)\n        each sentence in sentences\n            +row(sentence, false)\n"
+      "frontend-views\u002F\u002Fsentencetable.pug": "mixin row(sentence, options)\n    tr(class=(options.disabled ? 'disabled' : ''))\n        td\n            if options.saved\n                input(type=\"checkbox\" checked data-sentence_id=sentence.data._id)\n            else\n                if !options.disabled\n                    input(type=\"checkbox\" data-sentence_id=sentence.data._id)\n                else\n                    input(type=\"checkbox\" disabled)\n        each field in fields\n            td\n                =sentence.data[field]\n  \n\ntable.sentence-table\n    colgroup\n        col.selected-toggle.narrow\n        each field in fields\n            col(class=(fieldClasses[field] || ''))\n    tbody\n        tr\n            th\n                -\u002F\u002F empty\n            each field in fields\n                th\n                    =field\n        each sentence in saved\n            +row(sentence, {saved: true})\n        each sentence in sentences\n            +row(sentence, {disabled: savedIds.includes(sentence.data._id)})\n"
     };
     ;
     var locals_for_with = locals || {};
-    (function (fieldClasses, fields, saved, sentences) {
+    (function (fieldClasses, fields, saved, savedIds, sentences) {
       ;
       pug_debug_line = 1;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
 
-      pug_mixins["row"] = _pug_interp = function pug_interp(sentence, isSaved) {
+      pug_mixins["row"] = _pug_interp = function pug_interp(sentence, options) {
         var block = this && this.block,
             attributes = this && this.attributes || {};
         ;
         pug_debug_line = 2;
         pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-        pug_html = pug_html + "\u003Ctr\u003E";
+        pug_html = pug_html + "\u003Ctr" + pug_attr("class", pug_classes([options.disabled ? 'disabled' : ''], [true]), false, false) + "\u003E";
         ;
         pug_debug_line = 3;
         pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
@@ -1840,7 +1840,7 @@ function sentencetableTemplate(locals) {
         pug_debug_line = 4;
         pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
 
-        if (isSaved) {
+        if (options.saved) {
           ;
           pug_debug_line = 5;
           pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
@@ -1849,12 +1849,23 @@ function sentencetableTemplate(locals) {
           ;
           pug_debug_line = 7;
           pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-          pug_html = pug_html + "\u003Cinput" + (" type=\"checkbox\"" + pug_attr("data-sentence_id", sentence.data._id, true, false)) + "\u002F\u003E";
+
+          if (!options.disabled) {
+            ;
+            pug_debug_line = 8;
+            pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
+            pug_html = pug_html + "\u003Cinput" + (" type=\"checkbox\"" + pug_attr("data-sentence_id", sentence.data._id, true, false)) + "\u002F\u003E";
+          } else {
+            ;
+            pug_debug_line = 10;
+            pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
+            pug_html = pug_html + "\u003Cinput" + (" type=\"checkbox\"" + pug_attr("disabled", true, true, false)) + "\u002F\u003E";
+          }
         }
 
         pug_html = pug_html + "\u003C\u002Ftd\u003E";
         ;
-        pug_debug_line = 8;
+        pug_debug_line = 11;
         pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // iterate fields
 
         ;
@@ -1865,11 +1876,11 @@ function sentencetableTemplate(locals) {
             for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
               var field = $$obj[pug_index0];
               ;
-              pug_debug_line = 9;
+              pug_debug_line = 12;
               pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
               pug_html = pug_html + "\u003Ctd\u003E";
               ;
-              pug_debug_line = 10;
+              pug_debug_line = 13;
               pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
               pug_html = pug_html + pug_escape(null == (_pug_interp = sentence.data[field]) ? "" : _pug_interp) + "\u003C\u002Ftd\u003E";
             }
@@ -1880,11 +1891,11 @@ function sentencetableTemplate(locals) {
               $$l++;
               var field = $$obj[pug_index0];
               ;
-              pug_debug_line = 9;
+              pug_debug_line = 12;
               pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
               pug_html = pug_html + "\u003Ctd\u003E";
               ;
-              pug_debug_line = 10;
+              pug_debug_line = 13;
               pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
               pug_html = pug_html + pug_escape(null == (_pug_interp = sentence.data[field]) ? "" : _pug_interp) + "\u003C\u002Ftd\u003E";
             }
@@ -1894,19 +1905,19 @@ function sentencetableTemplate(locals) {
       };
 
       ;
-      pug_debug_line = 13;
+      pug_debug_line = 16;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Ctable class=\"sentence-table\"\u003E";
       ;
-      pug_debug_line = 14;
+      pug_debug_line = 17;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Ccolgroup\u003E";
       ;
-      pug_debug_line = 15;
+      pug_debug_line = 18;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Ccol class=\"selected-toggle narrow\"\u002F\u003E";
       ;
-      pug_debug_line = 16;
+      pug_debug_line = 19;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // iterate fields
 
       ;
@@ -1917,7 +1928,7 @@ function sentencetableTemplate(locals) {
           for (var pug_index1 = 0, $$l = $$obj.length; pug_index1 < $$l; pug_index1++) {
             var field = $$obj[pug_index1];
             ;
-            pug_debug_line = 17;
+            pug_debug_line = 20;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + "\u003Ccol" + pug_attr("class", pug_classes([fieldClasses[field] || ''], [true]), false, false) + "\u002F\u003E";
           }
@@ -1928,7 +1939,7 @@ function sentencetableTemplate(locals) {
             $$l++;
             var field = $$obj[pug_index1];
             ;
-            pug_debug_line = 17;
+            pug_debug_line = 20;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + "\u003Ccol" + pug_attr("class", pug_classes([fieldClasses[field] || ''], [true]), false, false) + "\u002F\u003E";
           }
@@ -1936,24 +1947,24 @@ function sentencetableTemplate(locals) {
       }).call(this);
       pug_html = pug_html + "\u003C\u002Fcolgroup\u003E";
       ;
-      pug_debug_line = 18;
+      pug_debug_line = 21;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Ctbody\u003E";
       ;
-      pug_debug_line = 19;
+      pug_debug_line = 22;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Ctr\u003E";
       ;
-      pug_debug_line = 20;
+      pug_debug_line = 23;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
       pug_html = pug_html + "\u003Cth\u003E";
       ;
-      pug_debug_line = 21;
+      pug_debug_line = 24;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // empty
 
       pug_html = pug_html + "\u003C\u002Fth\u003E";
       ;
-      pug_debug_line = 22;
+      pug_debug_line = 25;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // iterate fields
 
       ;
@@ -1964,11 +1975,11 @@ function sentencetableTemplate(locals) {
           for (var pug_index2 = 0, $$l = $$obj.length; pug_index2 < $$l; pug_index2++) {
             var field = $$obj[pug_index2];
             ;
-            pug_debug_line = 23;
+            pug_debug_line = 26;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + "\u003Cth\u003E";
             ;
-            pug_debug_line = 24;
+            pug_debug_line = 27;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + pug_escape(null == (_pug_interp = field) ? "" : _pug_interp) + "\u003C\u002Fth\u003E";
           }
@@ -1979,11 +1990,11 @@ function sentencetableTemplate(locals) {
             $$l++;
             var field = $$obj[pug_index2];
             ;
-            pug_debug_line = 23;
+            pug_debug_line = 26;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + "\u003Cth\u003E";
             ;
-            pug_debug_line = 24;
+            pug_debug_line = 27;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
             pug_html = pug_html + pug_escape(null == (_pug_interp = field) ? "" : _pug_interp) + "\u003C\u002Fth\u003E";
           }
@@ -1991,7 +2002,7 @@ function sentencetableTemplate(locals) {
       }).call(this);
       pug_html = pug_html + "\u003C\u002Ftr\u003E";
       ;
-      pug_debug_line = 25;
+      pug_debug_line = 28;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // iterate saved
 
       ;
@@ -2002,9 +2013,11 @@ function sentencetableTemplate(locals) {
           for (var pug_index3 = 0, $$l = $$obj.length; pug_index3 < $$l; pug_index3++) {
             var sentence = $$obj[pug_index3];
             ;
-            pug_debug_line = 26;
+            pug_debug_line = 29;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-            pug_mixins["row"](sentence, true);
+            pug_mixins["row"](sentence, {
+              saved: true
+            });
           }
         } else {
           var $$l = 0;
@@ -2013,14 +2026,16 @@ function sentencetableTemplate(locals) {
             $$l++;
             var sentence = $$obj[pug_index3];
             ;
-            pug_debug_line = 26;
+            pug_debug_line = 29;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-            pug_mixins["row"](sentence, true);
+            pug_mixins["row"](sentence, {
+              saved: true
+            });
           }
         }
       }).call(this);
       ;
-      pug_debug_line = 27;
+      pug_debug_line = 30;
       pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug"; // iterate sentences
 
       ;
@@ -2031,9 +2046,11 @@ function sentencetableTemplate(locals) {
           for (var pug_index4 = 0, $$l = $$obj.length; pug_index4 < $$l; pug_index4++) {
             var sentence = $$obj[pug_index4];
             ;
-            pug_debug_line = 28;
+            pug_debug_line = 31;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-            pug_mixins["row"](sentence, false);
+            pug_mixins["row"](sentence, {
+              disabled: savedIds.includes(sentence.data._id)
+            });
           }
         } else {
           var $$l = 0;
@@ -2042,14 +2059,16 @@ function sentencetableTemplate(locals) {
             $$l++;
             var sentence = $$obj[pug_index4];
             ;
-            pug_debug_line = 28;
+            pug_debug_line = 31;
             pug_debug_filename = "frontend-views\u002F\u002Fsentencetable.pug";
-            pug_mixins["row"](sentence, false);
+            pug_mixins["row"](sentence, {
+              disabled: savedIds.includes(sentence.data._id)
+            });
           }
         }
       }).call(this);
       pug_html = pug_html + "\u003C\u002Ftbody\u003E\u003C\u002Ftable\u003E";
-    }).call(this, "fieldClasses" in locals_for_with ? locals_for_with.fieldClasses : typeof fieldClasses !== "undefined" ? fieldClasses : undefined, "fields" in locals_for_with ? locals_for_with.fields : typeof fields !== "undefined" ? fields : undefined, "saved" in locals_for_with ? locals_for_with.saved : typeof saved !== "undefined" ? saved : undefined, "sentences" in locals_for_with ? locals_for_with.sentences : typeof sentences !== "undefined" ? sentences : undefined);
+    }).call(this, "fieldClasses" in locals_for_with ? locals_for_with.fieldClasses : typeof fieldClasses !== "undefined" ? fieldClasses : undefined, "fields" in locals_for_with ? locals_for_with.fields : typeof fields !== "undefined" ? fields : undefined, "saved" in locals_for_with ? locals_for_with.saved : typeof saved !== "undefined" ? saved : undefined, "savedIds" in locals_for_with ? locals_for_with.savedIds : typeof savedIds !== "undefined" ? savedIds : undefined, "sentences" in locals_for_with ? locals_for_with.sentences : typeof sentences !== "undefined" ? sentences : undefined);
   } catch (err) {
     pug_rethrow(err, pug_debug_filename, pug_debug_line, pug_debug_sources[pug_debug_filename]);
   }
@@ -29005,10 +29024,21 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     super(element);
     this.elements.tableParent = this.root.querySelector('.sentence-table-holder');
     this.elements.saveButton = this.root.querySelector('button.set-tasks-button-choose-sentences');
+    this.elements.previousPage = this.root.querySelector('.previous-page');
+    this.elements.nextPage = this.root.querySelector('.next-page');
+    this.elements.pageNum = this.root.querySelector('.page-num');
     this.getFilterElements().forEach(el => {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.previousPage.addEventListener('click', evt => {
+      evt.preventDefault();
+      this.trigger('change_page', -1);
+    });
+    this.elements.nextPage.addEventListener('click', evt => {
+      evt.preventDefault();
+      this.trigger('change_page', 1);
+    });
     this.elements.tableParent.addEventListener('change', evt => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
         const sentenceId = evt.target.dataset.sentence_id;
@@ -29028,9 +29058,13 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   updateFilters() {
+    this.trigger('filter_update', this.getFilterState());
+  }
+
+  getFilterState() {
     const filterState = {};
     this.getFilterElements().filter(el => el.value != '').forEach(el => filterState[el.name] = el.value);
-    this.trigger('filter_update', filterState);
+    return filterState;
   }
 
   updateDisplay(sentences, toSave) {
@@ -29041,12 +29075,26 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
       tense: 'narrow',
       level: 'narrow'
     };
+    const savedIds = toSave.map(sent => {
+      return sent.data._id;
+    });
     this.elements.tableParent.innerHTML = (0, _sentencetable.sentencetableTemplate)({
       fields,
       sentences,
       saved: toSave,
+      savedIds,
       fieldClasses
     });
+  }
+
+  get page() {
+    return this._page;
+  }
+
+  set page(value) {
+    this._page = value;
+    this.elements.pageNum.innerText = this._page;
+    return this._page;
   }
 
 } // TRAINING + REVISION VIEW
@@ -29296,11 +29344,11 @@ class Model {
     } catch (err) {
       throw new ModelApiError(err.response.data.message);
     }
-  } // expects searchParams to be of type URLSearchParams
+  } // expects searchParams to be a plain object (i.e., not a URLSearchParams)
 
 
   static async loadFromServer(searchParams) {
-    const response = await this.sendApiRequest(this.apiUrl() + '?' + searchParams.toString(), 'GET');
+    const response = await this.sendApiRequest(this.apiUrl() + '?' + new URLSearchParams(searchParams).toString(), 'GET');
     const objects = response.data.data.map(row => new this(row));
     return objects;
   }
@@ -29907,11 +29955,31 @@ class CreateTaskChooseSentenceController extends Controller {
 
   constructor(viewBaseElement) {
     super(viewBaseElement);
+    this.page = 1;
+    this.limit = 10;
+    this.waitingForData = false;
     this.view.on('filter_update', async filterData => {
-      const searchParams = new URLSearchParams(_objectSpread({}, filterData));
-      const sents = await _models.SentenceModel.loadFromServer(searchParams);
-      const saveIds = this.sentencesToSave.map(sent => sent.data._id);
-      this.updateSentences(sents.filter(sent => !saveIds.includes(sent.data._id)));
+      // always reset to the first page when updating the filter
+      this.page = 1;
+      this.refetchData(filterData);
+    });
+    this.view.on('change_page', async offset => {
+      // don't let the user go below 1 or above the max page
+      if (this.page <= 1 && offset < 0) {
+        return;
+      }
+
+      if (offset > 0 && this.sentences.length == 0) {
+        return;
+      } // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+
+
+      if (this.waitingForData) {
+        return;
+      }
+
+      this.page += offset;
+      this.refetchData(this.view.getFilterState());
     });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref6) => {
@@ -29929,7 +29997,23 @@ class CreateTaskChooseSentenceController extends Controller {
     this.view.on('save', this.save.bind(this));
     this.sentences = [];
 
-    _models.SentenceModel.fetchAll().then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+    _models.SentenceModel.loadFromServer({
+      page: this.page,
+      limit: this.limit
+    }).then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+  }
+
+  async refetchData(filterData) {
+    const searchParams = _objectSpread(_objectSpread({}, filterData), {}, {
+      page: this.page,
+      limit: this.limit
+    });
+
+    this.waitingForData = true;
+    const sents = await _models.SentenceModel.loadFromServer(searchParams);
+    this.waitingForData = false;
+    this.view.page = this.page;
+    this.updateSentences(sents);
   }
 
   updateSentences(sentences) {

@@ -369,6 +369,9 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.saveButton = this.root.querySelector(
       'button.set-tasks-button-choose-sentences'
     );
+    this.elements.previousPage = this.root.querySelector('.previous-page');
+    this.elements.nextPage = this.root.querySelector('.next-page');
+    this.elements.pageNum = this.root.querySelector('.page-num');
 
     this.getFilterElements().forEach((el) => {
       el.addEventListener('change', this.updateFilters.bind(this));
@@ -377,6 +380,15 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.saveButton.addEventListener('click', () =>
       this.trigger('save', {})
     );
+
+    this.elements.previousPage.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      this.trigger('change_page', -1);
+    })
+    this.elements.nextPage.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      this.trigger('change_page', 1);
+    })
 
     this.elements.tableParent.addEventListener('change', (evt) => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
@@ -396,12 +408,16 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   updateFilters() {
+    this.trigger('filter_update', this.getFilterState());
+  }
+
+  getFilterState() {
     const filterState = {};
     this.getFilterElements()
       .filter((el) => el.value != '')
       .forEach((el) => (filterState[el.name] = el.value));
 
-    this.trigger('filter_update', filterState);
+    return filterState;
   }
 
   updateDisplay(sentences, toSave) {
@@ -420,12 +436,26 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
       level: 'narrow',
     };
 
+    const savedIds = toSave.map((sent) => {
+      return sent.data._id;
+    })
+
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
       sentences,
       saved: toSave,
+      savedIds,
       fieldClasses,
     });
+  }
+
+  get page() {
+    return this._page;
+  }
+  set page(value) {
+    this._page = value;
+    this.elements.pageNum.innerText = this._page;
+    return this._page;
   }
 }
 
