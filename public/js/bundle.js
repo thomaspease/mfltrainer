@@ -28669,7 +28669,7 @@ module.exports = require('./lib/axios');
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteView = exports.TrainingView = exports.CreateTaskChooseSentenceView = exports.CreateTaskRandomView = exports.AudioEditorView = exports.CreateSentenceFormView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
+exports.DeleteView = exports.TrainingView = exports.CreateTaskChooseSentenceView = exports.CreateTaskRandomView = exports.AudioEditorView = exports.CreateSentenceFormView = exports.TagInputView = exports.SignupFormView = exports.LoginFormView = exports.DataParserView = exports.AlertView = exports.LogoutView = void 0;
 
 var _diff = require("diff");
 
@@ -28842,6 +28842,41 @@ class SignupFormView extends FormView {} // CREATE SENTENCE VIEWS --------
 
 
 exports.SignupFormView = SignupFormView;
+
+class TagInputView extends View {
+  constructor(element) {
+    super(element);
+    this.elements.visibleInput = this.root.querySelector('.visible-input');
+    this.elements.taglist = this.root.querySelector('input.taglist');
+    this.elements.tagHolder = this.root.querySelector('.tag-holder');
+    this.tags = [];
+    this.elements.visibleInput.addEventListener('keydown', evt => {
+      if (evt.key == 'Enter') {
+        evt.preventDefault();
+        this.selectTag();
+      }
+    }); // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
+
+    this.root.addEventListener('click', evt => {
+      this.elements.visibleInput.focus();
+      evt.preventDefault();
+    });
+  }
+
+  selectTag() {
+    const tag = this.elements.visibleInput.innerText.trim();
+    this.tags.push(tag);
+    this.elements.taglist.value = JSON.stringify(this.tags);
+    const tagLabel = document.createElement('span');
+    tagLabel.innerText = tag;
+    tagLabel.classList.add('form__tag');
+    this.elements.tagHolder.append(tagLabel);
+    this.elements.visibleInput.innerText = '';
+  }
+
+}
+
+exports.TagInputView = TagInputView;
 
 class CreateSentenceFormView extends FormView {}
 
@@ -29568,7 +29603,7 @@ exports.DeleteModel = DeleteModel;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.TagInputController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -29680,6 +29715,15 @@ class SignupController extends Controller {
 }
 
 exports.SignupController = SignupController;
+
+class TagInputController extends Controller {
+  getViewClass() {
+    return _views.TagInputView;
+  }
+
+}
+
+exports.TagInputController = TagInputController;
 
 class CreateSentenceController extends Controller {
   getViewClass() {

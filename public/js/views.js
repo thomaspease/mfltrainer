@@ -94,6 +94,14 @@ class FormView extends View {
 
       // TODO design question: should we handle situations where there's multiple inputs with the same name? (turn it into an array? ignore them?)
       data[name] = el.value;
+
+      if (el.dataset.parseAs) {
+        switch(el.dataset.parseAs) {
+          case 'json':
+            data[name] = JSON.parse(data[name]);
+            break;
+        }
+      }
     });
 
     return data;
@@ -152,6 +160,47 @@ export class LoginFormView extends FormView {}
 export class SignupFormView extends FormView {}
 
 // CREATE SENTENCE VIEWS --------
+
+export class TagInputView extends View {
+  constructor(element) {
+    super(element);
+
+    this.elements.visibleInput = this.root.querySelector('.visible-input');
+    this.elements.taglist = this.root.querySelector('input.taglist');
+    this.elements.tagHolder = this.root.querySelector('.tag-holder');
+    this.elements.tagMenu = this.root.querySelector('.tag-menu');
+
+    this.tags = [];
+
+    this.elements.visibleInput.addEventListener('keydown', (evt) => {
+      if (evt.key == 'Enter') {
+        evt.preventDefault();
+        this.selectTag();
+      } else {
+        // TODO add prediction code here
+      }
+    })
+
+    // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
+    this.root.addEventListener('click', (evt) => {
+      this.elements.visibleInput.focus();
+      evt.preventDefault();
+    })
+  }
+
+  selectTag() {
+    const tag = this.elements.visibleInput.innerText.trim();
+    this.tags.push(tag);
+    this.elements.taglist.value = JSON.stringify(this.tags);
+
+    const tagLabel = document.createElement('span');
+    tagLabel.innerText = tag;
+    tagLabel.classList.add('form__tag');
+    this.elements.tagHolder.append(tagLabel);
+
+    this.elements.visibleInput.innerText = '';
+  }
+}
 
 export class CreateSentenceFormView extends FormView {}
 
