@@ -1,6 +1,8 @@
 import { diffWords } from 'diff';
 
 import { sentencetableTemplate } from './templates/sentencetable';
+import { menulistTemplate } from './templates/menulist';
+import { tagTemplate } from './templates/tag';
 
 import WaveformPlaylist from 'waveform-playlist';
 
@@ -172,12 +174,29 @@ export class TagInputView extends View {
 
     this.tags = [];
 
+    this.prediction = JSON.parse(this.root.querySelector('.tag-predictions').value).map((tag) => {
+      return {
+        tag,
+        lowercase: tag.toLowerCase(),
+      }
+    })
+
+    this.elements.tagMenu.addEventListener('click', (evt) => {
+      if (evt.target.tagName == 'LI') {
+        this.selectTag(evt.target.innerText);
+      }
+    })
+
     this.elements.visibleInput.addEventListener('keydown', (evt) => {
       if (evt.key == 'Enter') {
         evt.preventDefault();
         this.selectTag();
       } else {
-        // TODO add prediction code here
+        // using a setTimeout to make sure that the rest of the event loop has time to process
+        // otherwise, we'd probably get the *old* text value when checking current text
+        setTimeout(() => {
+          this.updatePrediction();
+        }, 1);
       }
     })
 
@@ -188,8 +207,32 @@ export class TagInputView extends View {
     })
   }
 
-  selectTag() {
-    const tag = this.elements.visibleInput.innerText.trim();
+  updatePrediction() {
+    const text = this.elements.visibleInput.innerText.trim().toLowerCase();
+    if (text) {
+      const predictedTags = this.prediction.filter((val) => val.lowercase.includes(text));
+      const bestTags = [];
+      const otherTags = [];
+      predictedTags.forEach((val) => {
+        if (val.lowercase.startsWith(text)) {
+          bestTags.push(val.tag);
+        } else {
+          otherTags.push(val.tag);
+        }
+      })
+      this.elements.tagMenu.innerHTML = menulistTemplate({
+        items: [...bestTags, ...otherTags]
+      });
+      this.elements.tagMenu.style.display = 'block';
+    } else {
+      this.elements.tagMenu.style.display = 'none';
+    }
+  }
+
+  selectTag(tag) {
+    if (!tag) {
+      tag = this.elements.visibleInput.innerText.trim();
+    }
     this.tags.push(tag);
     this.elements.taglist.value = JSON.stringify(this.tags);
 
@@ -199,6 +242,7 @@ export class TagInputView extends View {
     this.elements.tagHolder.append(tagLabel);
 
     this.elements.visibleInput.innerText = '';
+    this.updatePrediction();
   }
 }
 

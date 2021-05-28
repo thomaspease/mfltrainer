@@ -2076,6 +2076,244 @@ function sentencetableTemplate(locals) {
   ;
   return pug_html;
 }
+},{}],"templates/menulist.js":[function(require,module,exports) {
+var global = arguments[3];
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.menulistTemplate = menulistTemplate;
+
+function pug_escape(e) {
+  var a = "" + e,
+      t = pug_match_html.exec(a);
+  if (!t) return e;
+  var r,
+      c,
+      n,
+      s = "";
+
+  for (r = t.index, c = 0; r < a.length; r++) {
+    switch (a.charCodeAt(r)) {
+      case 34:
+        n = "&quot;";
+        break;
+
+      case 38:
+        n = "&amp;";
+        break;
+
+      case 60:
+        n = "&lt;";
+        break;
+
+      case 62:
+        n = "&gt;";
+        break;
+
+      default:
+        continue;
+    }
+
+    c !== r && (s += a.substring(c, r)), c = r + 1, s += n;
+  }
+
+  return c !== r ? s + a.substring(c, r) : s;
+}
+
+var pug_match_html = /["&<>]/;
+
+function pug_rethrow(n, e, r, t) {
+  if (!(n instanceof Error)) throw n;
+  if (!("undefined" == typeof window && e || t)) throw n.message += " on line " + r, n;
+
+  try {
+    t = t || global["require"]("fs").readFileSync(e, "utf8");
+  } catch (e) {
+    pug_rethrow(n, null, r);
+  }
+
+  var i = 3,
+      a = t.split("\n"),
+      o = Math.max(r - i, 0),
+      h = Math.min(a.length, r + i),
+      i = a.slice(o, h).map(function (n, e) {
+    var t = e + o + 1;
+    return (t == r ? "  > " : "    ") + t + "| " + n;
+  }).join("\n");
+  throw n.path = e, n.message = (e || "Pug") + ":" + r + "\n" + i + "\n\n" + n.message, n;
+}
+
+function menulistTemplate(locals) {
+  var pug_html = "",
+      pug_mixins = {},
+      pug_interp;
+  var pug_debug_filename, pug_debug_line;
+
+  try {
+    var pug_debug_sources = {
+      "frontend-views\u002F\u002Fmenulist.pug": "ul\n    each item in items\n        li= item\n"
+    };
+    ;
+    var locals_for_with = locals || {};
+    (function (items) {
+      ;
+      pug_debug_line = 1;
+      pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug";
+      pug_html = pug_html + "\u003Cul\u003E";
+      ;
+      pug_debug_line = 2;
+      pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug"; // iterate items
+
+      ;
+      (function () {
+        var $$obj = items;
+
+        if ('number' == typeof $$obj.length) {
+          for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
+            var item = $$obj[pug_index0];
+            ;
+            pug_debug_line = 3;
+            pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug";
+            pug_html = pug_html + "\u003Cli\u003E";
+            ;
+            pug_debug_line = 3;
+            pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug";
+            pug_html = pug_html + pug_escape(null == (pug_interp = item) ? "" : pug_interp) + "\u003C\u002Fli\u003E";
+          }
+        } else {
+          var $$l = 0;
+
+          for (var pug_index0 in $$obj) {
+            $$l++;
+            var item = $$obj[pug_index0];
+            ;
+            pug_debug_line = 3;
+            pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug";
+            pug_html = pug_html + "\u003Cli\u003E";
+            ;
+            pug_debug_line = 3;
+            pug_debug_filename = "frontend-views\u002F\u002Fmenulist.pug";
+            pug_html = pug_html + pug_escape(null == (pug_interp = item) ? "" : pug_interp) + "\u003C\u002Fli\u003E";
+          }
+        }
+      }).call(this);
+      pug_html = pug_html + "\u003C\u002Ful\u003E";
+    }).call(this, "items" in locals_for_with ? locals_for_with.items : typeof items !== "undefined" ? items : undefined);
+  } catch (err) {
+    pug_rethrow(err, pug_debug_filename, pug_debug_line, pug_debug_sources[pug_debug_filename]);
+  }
+
+  ;
+  return pug_html;
+}
+},{}],"templates/tag.js":[function(require,module,exports) {
+var global = arguments[3];
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.tagTemplate = tagTemplate;
+
+function pug_escape(e) {
+  var a = "" + e,
+      t = pug_match_html.exec(a);
+  if (!t) return e;
+  var r,
+      c,
+      n,
+      s = "";
+
+  for (r = t.index, c = 0; r < a.length; r++) {
+    switch (a.charCodeAt(r)) {
+      case 34:
+        n = "&quot;";
+        break;
+
+      case 38:
+        n = "&amp;";
+        break;
+
+      case 60:
+        n = "&lt;";
+        break;
+
+      case 62:
+        n = "&gt;";
+        break;
+
+      default:
+        continue;
+    }
+
+    c !== r && (s += a.substring(c, r)), c = r + 1, s += n;
+  }
+
+  return c !== r ? s + a.substring(c, r) : s;
+}
+
+var pug_match_html = /["&<>]/;
+
+function pug_rethrow(n, e, r, t) {
+  if (!(n instanceof Error)) throw n;
+  if (!("undefined" == typeof window && e || t)) throw n.message += " on line " + r, n;
+
+  try {
+    t = t || global["require"]("fs").readFileSync(e, "utf8");
+  } catch (e) {
+    pug_rethrow(n, null, r);
+  }
+
+  var i = 3,
+      a = t.split("\n"),
+      o = Math.max(r - i, 0),
+      h = Math.min(a.length, r + i),
+      i = a.slice(o, h).map(function (n, e) {
+    var t = e + o + 1;
+    return (t == r ? "  > " : "    ") + t + "| " + n;
+  }).join("\n");
+  throw n.path = e, n.message = (e || "Pug") + ":" + r + "\n" + i + "\n\n" + n.message, n;
+}
+
+function tagTemplate(locals) {
+  var pug_html = "",
+      pug_mixins = {},
+      pug_interp;
+  var pug_debug_filename, pug_debug_line;
+
+  try {
+    var pug_debug_sources = {
+      "frontend-views\u002F\u002Ftag.pug": "span.form__tag\n    =tag\n    span.delete x\n"
+    };
+    ;
+    var locals_for_with = locals || {};
+    (function (tag) {
+      ;
+      pug_debug_line = 1;
+      pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
+      pug_html = pug_html + "\u003Cspan class=\"form__tag\"\u003E";
+      ;
+      pug_debug_line = 2;
+      pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
+      pug_html = pug_html + pug_escape(null == (pug_interp = tag) ? "" : pug_interp);
+      ;
+      pug_debug_line = 3;
+      pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
+      pug_html = pug_html + "\u003Cspan class=\"delete\"\u003E";
+      ;
+      pug_debug_line = 3;
+      pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
+      pug_html = pug_html + "x\u003C\u002Fspan\u003E\u003C\u002Fspan\u003E";
+    }).call(this, "tag" in locals_for_with ? locals_for_with.tag : typeof tag !== "undefined" ? tag : undefined);
+  } catch (err) {
+    pug_rethrow(err, pug_debug_filename, pug_debug_line, pug_debug_sources[pug_debug_filename]);
+  }
+
+  ;
+  return pug_html;
+}
 },{}],"../../node_modules/lodash.assign/index.js":[function(require,module,exports) {
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -28675,6 +28913,10 @@ var _diff = require("diff");
 
 var _sentencetable = require("./templates/sentencetable");
 
+var _menulist = require("./templates/menulist");
+
+var _tag = require("./templates/tag");
+
 var _waveformPlaylist = _interopRequireDefault(require("waveform-playlist"));
 
 var _audioEncoder = _interopRequireDefault(require("audio-encoder"));
@@ -28776,6 +29018,14 @@ class FormView extends View {
       const name = el.name ? el.name : el.id; // TODO design question: should we handle situations where there's multiple inputs with the same name? (turn it into an array? ignore them?)
 
       data[name] = el.value;
+
+      if (el.dataset.parseAs) {
+        switch (el.dataset.parseAs) {
+          case 'json':
+            data[name] = JSON.parse(data[name]);
+            break;
+        }
+      }
     });
     return data;
   }
@@ -28849,11 +29099,29 @@ class TagInputView extends View {
     this.elements.visibleInput = this.root.querySelector('.visible-input');
     this.elements.taglist = this.root.querySelector('input.taglist');
     this.elements.tagHolder = this.root.querySelector('.tag-holder');
+    this.elements.tagMenu = this.root.querySelector('.tag-menu');
     this.tags = [];
+    this.prediction = JSON.parse(this.root.querySelector('.tag-predictions').value).map(tag => {
+      return {
+        tag,
+        lowercase: tag.toLowerCase()
+      };
+    });
+    this.elements.tagMenu.addEventListener('click', evt => {
+      if (evt.target.tagName == 'LI') {
+        this.selectTag(evt.target.innerText);
+      }
+    });
     this.elements.visibleInput.addEventListener('keydown', evt => {
       if (evt.key == 'Enter') {
         evt.preventDefault();
         this.selectTag();
+      } else {
+        // using a setTimeout to make sure that the rest of the event loop has time to process
+        // otherwise, we'd probably get the *old* text value when checking current text
+        setTimeout(() => {
+          this.updatePrediction();
+        }, 1);
       }
     }); // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
 
@@ -28863,8 +29131,34 @@ class TagInputView extends View {
     });
   }
 
-  selectTag() {
-    const tag = this.elements.visibleInput.innerText.trim();
+  updatePrediction() {
+    const text = this.elements.visibleInput.innerText.trim().toLowerCase();
+
+    if (text) {
+      const predictedTags = this.prediction.filter(val => val.lowercase.includes(text));
+      const bestTags = [];
+      const otherTags = [];
+      predictedTags.forEach(val => {
+        if (val.lowercase.startsWith(text)) {
+          bestTags.push(val.tag);
+        } else {
+          otherTags.push(val.tag);
+        }
+      });
+      this.elements.tagMenu.innerHTML = (0, _menulist.menulistTemplate)({
+        items: [...bestTags, ...otherTags]
+      });
+      this.elements.tagMenu.style.display = 'block';
+    } else {
+      this.elements.tagMenu.style.display = 'none';
+    }
+  }
+
+  selectTag(tag) {
+    if (!tag) {
+      tag = this.elements.visibleInput.innerText.trim();
+    }
+
     this.tags.push(tag);
     this.elements.taglist.value = JSON.stringify(this.tags);
     const tagLabel = document.createElement('span');
@@ -28872,6 +29166,7 @@ class TagInputView extends View {
     tagLabel.classList.add('form__tag');
     this.elements.tagHolder.append(tagLabel);
     this.elements.visibleInput.innerText = '';
+    this.updatePrediction();
   }
 
 }
@@ -29327,7 +29622,7 @@ class DeleteView extends View {
 }
 
 exports.DeleteView = DeleteView;
-},{"diff":"../../node_modules/diff/dist/diff.js","./templates/sentencetable":"templates/sentencetable.js","waveform-playlist":"../../node_modules/waveform-playlist/lib/app.js","audio-encoder":"../../node_modules/audio-encoder/src/index.js","file-saver":"../../node_modules/file-saver/dist/FileSaver.min.js","axios":"../../node_modules/axios/index.js"}],"models.js":[function(require,module,exports) {
+},{"diff":"../../node_modules/diff/dist/diff.js","./templates/sentencetable":"templates/sentencetable.js","./templates/menulist":"templates/menulist.js","./templates/tag":"templates/tag.js","waveform-playlist":"../../node_modules/waveform-playlist/lib/app.js","audio-encoder":"../../node_modules/audio-encoder/src/index.js","file-saver":"../../node_modules/file-saver/dist/FileSaver.min.js","axios":"../../node_modules/axios/index.js"}],"models.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

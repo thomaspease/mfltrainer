@@ -24,10 +24,14 @@ block content
                     .form__group
                         label.form__label Grammar
                         div.form__input(data-controller="TagInputController")
-                            input.taglist(type="hidden" data-parse-as="json")
+                            -// the .tag-predictions input needs to NOT have a 'name' parameter
+                            input.tag-predictions(type="hidden" value=JSON.stringify(grammar))
+                            input.taglist(type="hidden" name="grammar" data-parse-as="json")
                             span.tag-holder
-                            span.visible-input(contenteditable)
-                        input#grammar.form__input(name='grammar', type='text', placeholder='Grammar', required)
+                            span.form__menu-holder
+                                span.visible-input(contenteditable)
+                                div.tag-menu
+                        -//input#grammar.form__input(name='grammar', type='text', placeholder='Grammar', required)
                     .form__group(data-controller="AudioEditorController" data-expose-controller-as="audioEditor")
                         button.init(type="button") initialize audio editor
                         div.editor-container
