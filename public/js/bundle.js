@@ -2285,7 +2285,7 @@ function tagTemplate(locals) {
 
   try {
     var pug_debug_sources = {
-      "frontend-views\u002F\u002Ftag.pug": "span.form__tag\n    =tag\n    span.delete x\n"
+      "frontend-views\u002F\u002Ftag.pug": "span.form__tag\n    =tag\n    span.remove\n"
     };
     ;
     var locals_for_with = locals || {};
@@ -2301,11 +2301,7 @@ function tagTemplate(locals) {
       ;
       pug_debug_line = 3;
       pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
-      pug_html = pug_html + "\u003Cspan class=\"delete\"\u003E";
-      ;
-      pug_debug_line = 3;
-      pug_debug_filename = "frontend-views\u002F\u002Ftag.pug";
-      pug_html = pug_html + "x\u003C\u002Fspan\u003E\u003C\u002Fspan\u003E";
+      pug_html = pug_html + "\u003Cspan class=\"remove\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fspan\u003E";
     }).call(this, "tag" in locals_for_with ? locals_for_with.tag : typeof tag !== "undefined" ? tag : undefined);
   } catch (err) {
     pug_rethrow(err, pug_debug_filename, pug_debug_line, pug_debug_sources[pug_debug_filename]);
@@ -29123,6 +29119,18 @@ class TagInputView extends View {
           this.updatePrediction();
         }, 1);
       }
+    });
+    this.elements.tagHolder.addEventListener('click', evt => {
+      console.log(evt);
+      evt.preventDefault();
+
+      if (evt.target.classList.contains('remove')) {
+        const tagEl = evt.target.closest('.form__tag');
+        const tagStr = tagEl.innerText;
+        tagEl.remove();
+        this.tags = this.tags.filter(t => t != tagStr);
+        this.elements.taglist.value = JSON.stringify(this.tags);
+      }
     }); // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
 
     this.root.addEventListener('click', evt => {
@@ -29161,9 +29169,11 @@ class TagInputView extends View {
 
     this.tags.push(tag);
     this.elements.taglist.value = JSON.stringify(this.tags);
-    const tagLabel = document.createElement('span');
-    tagLabel.innerText = tag;
-    tagLabel.classList.add('form__tag');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = (0, _tag.tagTemplate)({
+      tag
+    });
+    const tagLabel = tmp.firstChild;
     this.elements.tagHolder.append(tagLabel);
     this.elements.visibleInput.innerText = '';
     this.updatePrediction();

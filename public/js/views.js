@@ -200,6 +200,18 @@ export class TagInputView extends View {
       }
     })
 
+    this.elements.tagHolder.addEventListener('click', (evt) => {
+      console.log(evt);
+      evt.preventDefault();
+      if (evt.target.classList.contains('remove')) {
+        const tagEl = evt.target.closest('.form__tag');
+        const tagStr = tagEl.innerText;
+        tagEl.remove();
+        this.tags = this.tags.filter((t) => t != tagStr);
+        this.elements.taglist.value = JSON.stringify(this.tags);
+      }
+    })
+
     // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
     this.root.addEventListener('click', (evt) => {
       this.elements.visibleInput.focus();
@@ -236,9 +248,9 @@ export class TagInputView extends View {
     this.tags.push(tag);
     this.elements.taglist.value = JSON.stringify(this.tags);
 
-    const tagLabel = document.createElement('span');
-    tagLabel.innerText = tag;
-    tagLabel.classList.add('form__tag');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = tagTemplate({tag})
+    const tagLabel = tmp.firstChild;
     this.elements.tagHolder.append(tagLabel);
 
     this.elements.visibleInput.innerText = '';
