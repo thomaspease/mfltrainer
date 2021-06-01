@@ -23,7 +23,15 @@ block content
                         input#tense.form__input(name='tense', type='text', placeholder='Tense', required)
                     .form__group
                         label.form__label Grammar
-                        input#grammar.form__input(name='grammar', type='text', placeholder='Grammar', required)
+                        div.form__input(data-controller="TagInputController")
+                            -// the .tag-predictions input needs to NOT have a 'name' parameter
+                            input.tag-predictions(type="hidden" value=JSON.stringify(grammar))
+                            input.taglist(type="hidden" name="grammar" data-parse-as="json")
+                            span.tag-holder
+                            span.form__menu-holder
+                                span.visible-input(contenteditable)
+                                div.tag-menu
+                        -//input#grammar.form__input(name='grammar', type='text', placeholder='Grammar', required)
                     .form__group(data-controller="AudioEditorController" data-expose-controller-as="audioEditor")
                         button.init(type="button") initialize audio editor
                         div.editor-container

@@ -463,15 +463,43 @@ a:hover {
   transition: all 0.3s;
   border-radius: 4px; }
 
-.form__input:focus {
+.form__input:focus,
+.form__input .visible-input:focus {
   outline: none;
   border-bottom: 3px solid #55c57a; }
 
-.form__input:focus:invalid {
+.form__input:focus:invalid,
+.form__input .visible-input:focus:invalid {
   border-bottom: 3px solid #ff7730; }
 
 .form__input::-webkit-input-placeholder {
   color: #bbb; }
+
+.form__tag {
+  background-color: #dddddd;
+  padding: 0.4rem;
+  border-radius: 0.7rem;
+  margin-right: 0.4rem; }
+  .form__tag .remove {
+    margin-left: 5px;
+    padding: 2px;
+    color: #fff;
+    width: 2rem;
+    height: 2rem;
+    display: inline-block;
+    background: #f34642 url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBkPSJNNDI0LjU2MiA3OC4wMjJ2NDAuMDMySDg3LjQzOFY3OC4wMjJoOTQuOTM4YzE1LjQ2NCAwIDI4LTEyLjU0NiAyOC0yOC4wMjJoOTEuMjUgYzAgMTUuNSAxMi41IDI4IDI4IDI4LjAyMkg0MjQuNTYyeiBNNDA2LjMzNCAxNDguMDc5VjQ2MkgxMDUuNjY2VjE0OC4wNzlINDA2LjMzNHogTTE5Ny4zMzMgMjEwLjUgYzAtOC4yOTEtNi43MTYtMTUuMDEyLTE1LTE1LjAxMnMtMTUgNi43MjEtMTUgMTUuMDEydjE5MC4xNTNjMCA4LjMgNi43IDE1IDE1IDE1LjAxMnMxNS02LjcyMSAxNS0xNS4wMTJWMjEwLjQ2MnogTTI3MSAyMTAuNDYyYzAtOC4yOTEtNi43MTYtMTUuMDEyLTE1LTE1LjAxMnMtMTUgNi43MjEtMTUgMTUuMDEydjE5MC4xNTNjMCA4LjMgNi43IDE1IDE1IDE1LjAxMnMxNS02LjcyMSAxNS0xNS4wMTIgVjIxMC40NjJ6IE0zNDQuNjY3IDIxMC40NjJjMC04LjI5MS02LjcxNi0xNS4wMTItMTUtMTUuMDEycy0xNSA2LjcyMS0xNSAxNS4wMTJ2MTkwLjE1M2MwIDguMyA2LjcgMTUgMTUgMTUgczE1LTYuNzIxIDE1LTE1LjAxMlYyMTAuNDYyeiIgc3R5bGU9ImZpbGw6ICNGRkY7Ii8+PC9zdmc+") no-repeat;
+    background-size: 15px; }
+
+.form__menu-holder {
+  position: relative; }
+  .form__menu-holder .tag-menu {
+    background-color: #dddddd;
+    padding: 0.4rem;
+    border-radius: 0.7rem;
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    z-index: 10; }
 
 .form__label {
   display: block;

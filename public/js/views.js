@@ -1,6 +1,8 @@
 import { diffWords } from 'diff';
 
 import { sentencetableTemplate } from './templates/sentencetable';
+import { menulistTemplate } from './templates/menulist';
+import { tagTemplate } from './templates/tag';
 
 import WaveformPlaylist from 'waveform-playlist';
 
@@ -94,6 +96,14 @@ class FormView extends View {
 
       // TODO design question: should we handle situations where there's multiple inputs with the same name? (turn it into an array? ignore them?)
       data[name] = el.value;
+
+      if (el.dataset.parseAs) {
+        switch(el.dataset.parseAs) {
+          case 'json':
+            data[name] = JSON.parse(data[name]);
+            break;
+        }
+      }
     });
 
     return data;
@@ -152,6 +162,101 @@ export class LoginFormView extends FormView {}
 export class SignupFormView extends FormView {}
 
 // CREATE SENTENCE VIEWS --------
+
+export class TagInputView extends View {
+  constructor(element) {
+    super(element);
+
+    this.elements.visibleInput = this.root.querySelector('.visible-input');
+    this.elements.taglist = this.root.querySelector('input.taglist');
+    this.elements.tagHolder = this.root.querySelector('.tag-holder');
+    this.elements.tagMenu = this.root.querySelector('.tag-menu');
+
+    this.tags = [];
+
+    this.prediction = JSON.parse(this.root.querySelector('.tag-predictions').value).map((tag) => {
+      return {
+        tag,
+        lowercase: tag.toLowerCase(),
+      }
+    })
+
+    this.elements.tagMenu.addEventListener('click', (evt) => {
+      if (evt.target.tagName == 'LI') {
+        this.selectTag(evt.target.innerText);
+      }
+    })
+
+    this.elements.visibleInput.addEventListener('keydown', (evt) => {
+      if (evt.key == 'Enter') {
+        evt.preventDefault();
+        this.selectTag();
+      } else {
+        // using a setTimeout to make sure that the rest of the event loop has time to process
+        // otherwise, we'd probably get the *old* text value when checking current text
+        setTimeout(() => {
+          this.updatePrediction();
+        }, 1);
+      }
+    })
+
+    this.elements.tagHolder.addEventListener('click', (evt) => {
+      console.log(evt);
+      evt.preventDefault();
+      if (evt.target.classList.contains('remove')) {
+        const tagEl = evt.target.closest('.form__tag');
+        const tagStr = tagEl.innerText;
+        tagEl.remove();
+        this.tags = this.tags.filter((t) => t != tagStr);
+        this.elements.taglist.value = JSON.stringify(this.tags);
+      }
+    })
+
+    // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
+    this.root.addEventListener('click', (evt) => {
+      this.elements.visibleInput.focus();
+      evt.preventDefault();
+    })
+  }
+
+  updatePrediction() {
+    const text = this.elements.visibleInput.innerText.trim().toLowerCase();
+    if (text) {
+      const predictedTags = this.prediction.filter((val) => val.lowercase.includes(text));
+      const bestTags = [];
+      const otherTags = [];
+      predictedTags.forEach((val) => {
+        if (val.lowercase.startsWith(text)) {
+          bestTags.push(val.tag);
+        } else {
+          otherTags.push(val.tag);
+        }
+      })
+      this.elements.tagMenu.innerHTML = menulistTemplate({
+        items: [...bestTags, ...otherTags]
+      });
+      this.elements.tagMenu.style.display = 'block';
+    } else {
+      this.elements.tagMenu.style.display = 'none';
+    }
+  }
+
+  selectTag(tag) {
+    if (!tag) {
+      tag = this.elements.visibleInput.innerText.trim();
+    }
+    this.tags.push(tag);
+    this.elements.taglist.value = JSON.stringify(this.tags);
+
+    const tmp = document.createElement('div');
+    tmp.innerHTML = tagTemplate({tag})
+    const tagLabel = tmp.firstChild;
+    this.elements.tagHolder.append(tagLabel);
+
+    this.elements.visibleInput.innerText = '';
+    this.updatePrediction();
+  }
+}
 
 export class CreateSentenceFormView extends FormView {}
 

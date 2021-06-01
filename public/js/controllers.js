@@ -1,6 +1,7 @@
 import {
   LoginFormView,
   TrainingView,
+  TagInputView,
   CreateSentenceFormView,
   AudioEditorView,
   DataParserView,
@@ -104,6 +105,12 @@ export class SignupController extends Controller {
         }
       }
     );
+  }
+}
+
+export class TagInputController extends Controller {
+  getViewClass() {
+    return TagInputView;
   }
 }
 

@@ -67,11 +67,16 @@ exports.getSignupForm = (req, res) => {
   });
 };
 
-exports.getCreateSentenceForm = (req, res) => {
+exports.getCreateSentenceForm = catchAsync(async (req, res) => {
+  // if we end up putting more queries in here, put them in a Promise.all for parallelism (see getSetTasksForm)
+  await Sentence.distinct('grammar').then(
+    (values) => (res.locals.grammar = values)
+  );
+
   res.status(200).render('teacher/create/createsentences', {
     title: 'Create sentences',
   });
-};
+});
 
 exports.getSetTasksForm = catchAsync(async (req, res, next) => {
   const fieldValues = {};
