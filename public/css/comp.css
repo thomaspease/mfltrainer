@@ -500,6 +500,8 @@ a:hover {
     top: 2rem;
     left: 0;
     z-index: 10; }
+    .form__menu-holder .tag-menu li.active {
+      background-color: #eeeeee; }
 
 .form__label {
   display: block;

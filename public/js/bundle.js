@@ -29103,22 +29103,15 @@ class TagInputView extends View {
         lowercase: tag.toLowerCase()
       };
     });
+    this.currentPrediction = [];
+    this.selectionIndex = 0;
     this.elements.tagMenu.addEventListener('click', evt => {
       if (evt.target.tagName == 'LI') {
         this.selectTag(evt.target.innerText);
       }
     });
     this.elements.visibleInput.addEventListener('keydown', evt => {
-      if (evt.key == 'Enter') {
-        evt.preventDefault();
-        this.selectTag();
-      } else {
-        // using a setTimeout to make sure that the rest of the event loop has time to process
-        // otherwise, we'd probably get the *old* text value when checking current text
-        setTimeout(() => {
-          this.updatePrediction();
-        }, 1);
-      }
+      this.handleKeydown(evt);
     });
     this.elements.tagHolder.addEventListener('click', evt => {
       console.log(evt);
@@ -29126,10 +29119,7 @@ class TagInputView extends View {
 
       if (evt.target.classList.contains('remove')) {
         const tagEl = evt.target.closest('.form__tag');
-        const tagStr = tagEl.innerText;
-        tagEl.remove();
-        this.tags = this.tags.filter(t => t != tagStr);
-        this.elements.taglist.value = JSON.stringify(this.tags);
+        this.removeTagByElement(tagEl);
       }
     }); // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
 
@@ -29139,11 +29129,86 @@ class TagInputView extends View {
     });
   }
 
+  handleKeydown(evt) {
+    if (evt.key == 'Enter') {
+      evt.preventDefault();
+      this.selectTag();
+    } else if (evt.key == 'ArrowDown') {
+      evt.preventDefault();
+      this.incrementSelectedPrediction();
+    } else if (evt.key == 'ArrowUp') {
+      evt.preventDefault();
+      this.decrementSelectedPrediction();
+    } else {
+      // this one *might* change the text, so we need it in the outer `else`
+      if (evt.key == 'Backspace') {
+        if (this.elements.visibleInput.innerText == '') {
+          evt.preventDefault();
+          const tags = document.querySelectorAll('.form__tag');
+
+          if (tags.length > 0) {
+            this.removeTagByElement(tags[tags.length - 1]);
+          }
+        }
+      } else {
+        // using a setTimeout to make sure that the rest of the event loop has time to process
+        // otherwise, we'd probably get the *old* text value when checking current text
+        setTimeout(() => {
+          this.updatePrediction();
+        }, 1);
+      }
+    }
+  }
+
+  removeTagByElement(tagEl) {
+    const tagStr = tagEl.innerText;
+    tagEl.remove();
+    this.tags = this.tags.filter(t => t != tagStr);
+    this.elements.taglist.value = JSON.stringify(this.tags);
+  }
+
+  incrementSelectedPrediction() {
+    if (this.selectionIndex >= this.currentPrediction.length) {
+      return;
+    }
+
+    if (!this.isSelectingPrediction) {
+      this.isSelectingPrediction = true;
+      this.selectionIndex = 0;
+    } else {
+      this.selectionIndex += 1;
+    }
+
+    this.updateSelectedListItem();
+  }
+
+  decrementSelectedPrediction() {
+    if (this.selectionIndex == 0) {
+      this.isSelectingPrediction = false;
+    } else {
+      this.selectionIndex -= 1;
+    }
+
+    this.updateSelectedListItem();
+  }
+
+  updateSelectedListItem() {
+    Array.from(this.elements.tagMenu.querySelectorAll('li.active')).forEach(el => el.classList.remove('active'));
+
+    if (this.isSelectingPrediction) {
+      // nth-child is 1-indexed
+      this.elements.tagMenu.querySelector('li:nth-child(' + (this.selectionIndex + 1) + ')').classList.add('active');
+    }
+  }
+
   updatePrediction() {
     const text = this.elements.visibleInput.innerText.trim().toLowerCase();
 
     if (text) {
       const predictedTags = this.prediction.filter(val => val.lowercase.includes(text));
+      this.currentPrediction = predictedTags;
+      this.isSelectingPrediction = false;
+      this.selectionIndex = 0;
       const bestTags = [];
       const otherTags = [];
       predictedTags.forEach(val => {
@@ -29164,7 +29229,11 @@ class TagInputView extends View {
 
   selectTag(tag) {
     if (!tag) {
-      tag = this.elements.visibleInput.innerText.trim();
+      if (this.isSelectingPrediction) {
+        tag = this.currentPrediction[this.selectionIndex].tag;
+      } else {
+        tag = this.elements.visibleInput.innerText.trim();
+      }
     }
 
     this.tags.push(tag);
