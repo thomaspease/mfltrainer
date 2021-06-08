@@ -29436,6 +29436,7 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.previousPage = this.root.querySelector('.previous-page');
     this.elements.nextPage = this.root.querySelector('.next-page');
     this.elements.pageNum = this.root.querySelector('.page-num');
+    this.elements.maxPageNum = this.root.querySelector('.max-page-num');
     this.getFilterElements().forEach(el => {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
@@ -29504,6 +29505,16 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     this._page = value;
     this.elements.pageNum.innerText = this._page;
     return this._page;
+  }
+
+  get maxPage() {
+    return this._maxPage;
+  }
+
+  set maxPage(value) {
+    this._maxPage = value;
+    this.elements.maxPageNum.innerText = this._maxPage;
+    return this._maxPage;
   }
 
 } // TRAINING + REVISION VIEW
@@ -29759,11 +29770,15 @@ class Model {
   static async loadFromServer(searchParams) {
     const response = await this.sendApiRequest(this.apiUrl() + '?' + new URLSearchParams(searchParams).toString(), 'GET');
     const objects = response.data.data.map(row => new this(row));
-    return objects;
+    const maxPage = response.data.maxPage;
+    return {
+      objects,
+      maxPage
+    };
   }
 
   static async fetchAll() {
-    return await this.loadFromServer(new URLSearchParams({}));
+    return (await this.loadFromServer(new URLSearchParams({}))).objects;
   } // default API URL and database name (i.e., table), which will work for *most* classes
 
 
@@ -30122,7 +30137,7 @@ class CreateSentenceController extends Controller {
         } = await this.children.audioEditor.save();
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
         this.view.clearFormData({
-          keep: ["vivaRef", "tense", "grammar"]
+          keep: ['vivaRef', 'tense', 'grammar']
         });
         this.children.audioEditor.clear();
 
@@ -30374,6 +30389,7 @@ class CreateTaskChooseSentenceController extends Controller {
   constructor(viewBaseElement) {
     super(viewBaseElement);
     this.page = 1;
+    this.maxPage = 1;
     this.limit = 10;
     this.waitingForData = false;
     this.view.on('filter_update', async filterData => {
@@ -30387,7 +30403,7 @@ class CreateTaskChooseSentenceController extends Controller {
         return;
       }
 
-      if (offset > 0 && this.sentences.length == 0) {
+      if (offset > 0 && this.page >= this.maxPage) {
         return;
       } // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
 
@@ -30418,7 +30434,7 @@ class CreateTaskChooseSentenceController extends Controller {
     _models.SentenceModel.loadFromServer({
       page: this.page,
       limit: this.limit
-    }).then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+    }).then(data => this.updateSentences(data)).catch(err => _views.AlertView.show('error', err));
   }
 
   async refetchData(filterData) {
@@ -30428,15 +30444,21 @@ class CreateTaskChooseSentenceController extends Controller {
     });
 
     this.waitingForData = true;
-    const sents = await _models.SentenceModel.loadFromServer(searchParams);
+    const data = await _models.SentenceModel.loadFromServer(searchParams);
     this.waitingForData = false;
     this.view.page = this.page;
-    this.updateSentences(sents);
+    this.updateSentences(data);
   }
 
-  updateSentences(sentences) {
-    this.sentences = sentences;
-    this.view.updateDisplay(sentences, this.sentencesToSave);
+  updateSentences(_ref8) {
+    let {
+      objects,
+      maxPage
+    } = _ref8;
+    this.sentences = objects;
+    this.maxPage = maxPage;
+    this.view.updateDisplay(this.sentences, this.sentencesToSave);
+    this.view.maxPage = maxPage;
   }
 
   async save() {

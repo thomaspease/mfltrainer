@@ -48,11 +48,12 @@ class Model {
     );
 
     const objects = response.data.data.map((row) => new this(row));
-    return objects;
+    const maxPage = response.data.maxPage;
+    return {objects, maxPage};
   }
 
   static async fetchAll() {
-    return await this.loadFromServer(new URLSearchParams({}));
+    return (await this.loadFromServer(new URLSearchParams({}))).objects;
   }
 
   // default API URL and database name (i.e., table), which will work for *most* classes

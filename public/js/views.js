@@ -543,6 +543,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.previousPage = this.root.querySelector('.previous-page');
     this.elements.nextPage = this.root.querySelector('.next-page');
     this.elements.pageNum = this.root.querySelector('.page-num');
+    this.elements.maxPageNum = this.root.querySelector('.max-page-num');
 
     this.getFilterElements().forEach((el) => {
       el.addEventListener('change', this.updateFilters.bind(this));
@@ -627,6 +628,15 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     this._page = value;
     this.elements.pageNum.innerText = this._page;
     return this._page;
+  }
+
+  get maxPage() {
+    return this._maxPage;
+  }
+  set maxPage(value) {
+    this._maxPage = value;
+    this.elements.maxPageNum.innerText = this._maxPage;
+    return this._maxPage;
   }
 }
 
