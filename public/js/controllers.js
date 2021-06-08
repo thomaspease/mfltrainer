@@ -123,16 +123,9 @@ export class CreateSentenceController extends Controller {
     super(...args);
 
     this.view.onFormData(
-      async ({
-        sentence,
-        translation,
-        level,
-        vivaRef,
-        tense,
-        grammar,
-      }) => {
+      async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
         try {
-          const {audioUrl} = await this.children.audioEditor.save();
+          const { audioUrl } = await this.children.audioEditor.save();
           const res = await CreateSentenceModel.create(
             sentence,
             translation,
@@ -142,7 +135,7 @@ export class CreateSentenceController extends Controller {
             grammar,
             audioUrl
           );
-          this.view.clearFormData({keep:["vivaRef", "tense", "grammar"]});
+          this.view.clearFormData({ keep: ['vivaRef', 'tense', 'grammar'] });
           this.children.audioEditor.clear();
           if (res) {
             AlertView.show('success', 'Sentence created');
@@ -169,7 +162,9 @@ export class AudioEditorController extends Controller {
     this.view.on('save_file', async (blob) => {
       const { url } = await SentenceModel.uploadAudioFile(blob);
       // knitting together event-based and promise-based code
-      this._saveRequests.forEach((saveRequest) => saveRequest({audioUrl: url}));
+      this._saveRequests.forEach((saveRequest) =>
+        saveRequest({ audioUrl: url })
+      );
       this._saveRequests = [];
       AlertView.show('success', 'File uploaded successfully.');
     });
@@ -179,7 +174,7 @@ export class AudioEditorController extends Controller {
     this.view.save();
     const prom = new Promise((resolve, reject) => {
       this._saveRequests.push(resolve);
-    })
+    });
     return prom;
   }
 
@@ -325,7 +320,7 @@ export class ReviseController extends Controller {
 
     this.studentSentences = sentenceData.map((doc) => {
       return new StudentSentenceModel(doc);
-    })
+    });
 
     this.initialCount = this.studentSentences.length;
 
@@ -360,13 +355,16 @@ export class ReviseController extends Controller {
     };
 
     if (isCorrect) {
-      toUpdate.correctAttempts = studentSentenceObject.data.correctAttempts + 1 || 1;
+      toUpdate.correctAttempts =
+        studentSentenceObject.data.correctAttempts + 1 || 1;
       toUpdate.retestDays = studentSentenceObject.data.retestDays * 3;
     } else {
-      toUpdate.incorrectAttempts = studentSentenceObject.data.incorrectAttempts + 1 || 1;
+      toUpdate.incorrectAttempts =
+        studentSentenceObject.data.incorrectAttempts + 1 || 1;
       toUpdate.retestDays = 1;
     }
-    toUpdate.retestOn = toUpdate.lastTestedOn + (toUpdate.retestDays * 24 * 60 * 60 * 1000);
+    toUpdate.retestOn =
+      toUpdate.lastTestedOn + toUpdate.retestDays * 24 * 60 * 60 * 1000;
 
     studentSentenceObject.update(toUpdate);
   }
@@ -379,7 +377,7 @@ export class ReviseController extends Controller {
       return;
     }
 
-    const {sentence, exercise} = this.studentSentences[0];
+    const { sentence, exercise } = this.studentSentences[0];
 
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
@@ -423,7 +421,7 @@ export class CreateTaskChooseSentenceController extends Controller {
 
       this.page += offset;
       this.refetchData(this.view.getFilterState());
-    })
+    });
 
     this.sentencesToSave = [];
     this.view.on('add_sentence', ({ sentenceId }) => {
@@ -440,7 +438,7 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.view.on('save', this.save.bind(this));
 
     this.sentences = [];
-    SentenceModel.loadFromServer({page: this.page, limit: this.limit})
+    SentenceModel.loadFromServer({ page: this.page, limit: this.limit })
       .then((sent) => this.updateSentences(sent))
       .catch((err) => AlertView.show('error', err));
   }
@@ -457,9 +455,7 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.waitingForData = false;
 
     this.view.page = this.page;
-    this.updateSentences(
-      sents
-    );
+    this.updateSentences(sents);
   }
 
   updateSentences(sentences) {
