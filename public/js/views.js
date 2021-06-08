@@ -553,6 +553,10 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
       this.trigger('save', {})
     );
 
+    this.elements.pageNum.addEventListener('change', () => {
+      this.trigger('select_page', this.page-0);
+    })
+
     this.elements.previousPage.addEventListener('click', (evt) => {
       evt.preventDefault();
       this.trigger('change_page', -1);
@@ -622,11 +626,11 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   get page() {
-    return this._page;
+    return this.elements.pageNum.value;
   }
   set page(value) {
     this._page = value;
-    this.elements.pageNum.innerText = this._page;
+    this.elements.pageNum.value = this._page;
     return this._page;
   }
 
@@ -636,6 +640,11 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   set maxPage(value) {
     this._maxPage = value;
     this.elements.maxPageNum.innerText = this._maxPage;
+    const optionHTML = Array(this._maxPage).fill('').map((_, i) => {
+      const index = i+1;
+      return `<option value=${index} ${index == this.page ? 'selected' : ''}>${index}</option>`;
+    }).join('');
+    this.elements.pageNum.innerHTML = optionHTML;
     return this._maxPage;
   }
 }

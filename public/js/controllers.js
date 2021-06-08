@@ -424,6 +424,17 @@ export class CreateTaskChooseSentenceController extends Controller {
       this.refetchData(this.view.getFilterState());
     });
 
+    this.view.on('select_page', async(page) => {
+      // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+      if (this.waitingForData) {
+        return;
+      }
+
+      console.log(JSON.stringify(page));
+      this.page = page;
+      this.refetchData(this.view.getFilterState());
+    })
+
     this.sentencesToSave = [];
     this.view.on('add_sentence', ({ sentenceId }) => {
       this.sentencesToSave.push(
@@ -463,8 +474,8 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.sentences = objects;
     this.maxPage = maxPage;
 
-    this.view.updateDisplay(this.sentences, this.sentencesToSave);
     this.view.maxPage = maxPage;
+    this.view.updateDisplay(this.sentences, this.sentencesToSave);
   }
 
   async save() {

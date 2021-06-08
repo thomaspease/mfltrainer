@@ -55,7 +55,8 @@ block content
                     div.paging(style="font-size:200%;")
                         a.previous-page <
                         |page: 
-                        span.page-num 1
+                        select.page-num
+                          option(value=1 selected) 1
                         =" of "
                         span.max-page-num 1
                         a.next-page >

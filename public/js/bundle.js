@@ -29441,6 +29441,9 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.pageNum.addEventListener('change', () => {
+      this.trigger('select_page', this.page - 0);
+    });
     this.elements.previousPage.addEventListener('click', evt => {
       evt.preventDefault();
       this.trigger('change_page', -1);
@@ -29498,12 +29501,12 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   get page() {
-    return this._page;
+    return this.elements.pageNum.value;
   }
 
   set page(value) {
     this._page = value;
-    this.elements.pageNum.innerText = this._page;
+    this.elements.pageNum.value = this._page;
     return this._page;
   }
 
@@ -29514,6 +29517,11 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
   set maxPage(value) {
     this._maxPage = value;
     this.elements.maxPageNum.innerText = this._maxPage;
+    const optionHTML = Array(this._maxPage).fill('').map((_, i) => {
+      const index = i + 1;
+      return "<option value=".concat(index, " ").concat(index == this.page ? 'selected' : '', ">").concat(index, "</option>");
+    }).join('');
+    this.elements.pageNum.innerHTML = optionHTML;
     return this._maxPage;
   }
 
@@ -30415,6 +30423,16 @@ class CreateTaskChooseSentenceController extends Controller {
       this.page += offset;
       this.refetchData(this.view.getFilterState());
     });
+    this.view.on('select_page', async page => {
+      // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+      if (this.waitingForData) {
+        return;
+      }
+
+      console.log(JSON.stringify(page));
+      this.page = page;
+      this.refetchData(this.view.getFilterState());
+    });
     this.sentencesToSave = [];
     this.view.on('add_sentence', (_ref6) => {
       let {
@@ -30457,8 +30475,8 @@ class CreateTaskChooseSentenceController extends Controller {
     } = _ref8;
     this.sentences = objects;
     this.maxPage = maxPage;
-    this.view.updateDisplay(this.sentences, this.sentencesToSave);
     this.view.maxPage = maxPage;
+    this.view.updateDisplay(this.sentences, this.sentencesToSave);
   }
 
   async save() {
