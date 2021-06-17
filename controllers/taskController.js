@@ -70,22 +70,23 @@ exports.deleteTaskStudentTasksAndObjectIdReferences = catchAsync(
     }
 
     //Loops through studentTaskList, finding the relevant student to each studentTask, and then pulling the reference to the task
-    studentTaskList.forEach((e) => {
-      User.findByIdAndUpdate(
-        { _id: e.user },
-        { $pull: { tasks: req.params.id } },
-        (err, user) => {
-          if (err) {
-            return next(
-              new AppError(
-                'No Object ID references could be pulled from User documents',
-                404
-              )
-            );
-          }
-        }
-      );
-    });
+    // SHOULDN'T BE NEEDED ANYMORE
+    // studentTaskList.forEach((e) => {
+    //   User.findByIdAndUpdate(
+    //     { _id: e.user },
+    //     { $pull: { tasks: req.params.id } },
+    //     (err, user) => {
+    //       if (err) {
+    //         return next(
+    //           new AppError(
+    //             'No Object ID references could be pulled from User documents',
+    //             404
+    //           )
+    //         );
+    //       }
+    //     }
+    //   );
+    // });
 
     res.status(204).json({
       status: 'success',
