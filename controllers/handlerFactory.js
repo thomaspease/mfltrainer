@@ -74,13 +74,20 @@ exports.getAll = (Model) =>
       .sort()
       .limitFields()
       .paginate();
+    const countFeatures = new APIFeatures(Model.find(filter), req.query)
+      .filter();
     // const doc = await features.query.explain();
-    const doc = await features.query;
+    
+    // using `await Promise.all` in order to let these queries proceed in parallel rather than in sequence
+    const [doc, totalCount] = await Promise.all([features.query, countFeatures.query.count()]);
 
     // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: doc.length,
       data: doc,
+      totalCount,
+      page: features.page,
+      maxPage: Math.ceil(totalCount / features.limit),
     });
   });

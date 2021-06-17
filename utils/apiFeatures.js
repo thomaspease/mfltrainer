@@ -47,6 +47,10 @@ class APIFeatures {
     const limit = this.queryString.limit * 1 || 100; //The double line is setting the default value to 1/100
     const skip = (page - 1) * limit;
 
+    // use these to provide feedback to the handler about what parameters we chose
+    this.page = page;
+    this.limit = limit;
+
     this.query = this.query.skip(skip).limit(limit); //The skip skips a number of results, hence why you need the skip formula when you request a page
 
     return this;

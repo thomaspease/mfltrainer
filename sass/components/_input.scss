@@ -58,6 +58,10 @@
     top: 2rem;
     left: 0;
     z-index: 10;
+
+    li.active {
+      background-color: #eeeeee;
+    }
   }
 }
 

@@ -396,6 +396,7 @@ export class CreateTaskChooseSentenceController extends Controller {
     super(viewBaseElement);
 
     this.page = 1;
+    this.maxPage = 1;
     this.limit = 10;
     this.waitingForData = false;
 
@@ -410,7 +411,7 @@ export class CreateTaskChooseSentenceController extends Controller {
       if (this.page <= 1 && offset < 0) {
         return;
       }
-      if (offset > 0 && this.sentences.length == 0) {
+      if (offset > 0 && this.page >= this.maxPage) {
         return;
       }
 
@@ -422,6 +423,17 @@ export class CreateTaskChooseSentenceController extends Controller {
       this.page += offset;
       this.refetchData(this.view.getFilterState());
     });
+
+    this.view.on('select_page', async(page) => {
+      // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+      if (this.waitingForData) {
+        return;
+      }
+
+      console.log(JSON.stringify(page));
+      this.page = page;
+      this.refetchData(this.view.getFilterState());
+    })
 
     this.sentencesToSave = [];
     this.view.on('add_sentence', ({ sentenceId }) => {
@@ -439,7 +451,7 @@ export class CreateTaskChooseSentenceController extends Controller {
 
     this.sentences = [];
     SentenceModel.loadFromServer({ page: this.page, limit: this.limit })
-      .then((sent) => this.updateSentences(sent))
+      .then((data) => this.updateSentences(data))
       .catch((err) => AlertView.show('error', err));
   }
 
@@ -451,17 +463,19 @@ export class CreateTaskChooseSentenceController extends Controller {
     };
 
     this.waitingForData = true;
-    const sents = await SentenceModel.loadFromServer(searchParams);
+    const data = await SentenceModel.loadFromServer(searchParams);
     this.waitingForData = false;
 
     this.view.page = this.page;
-    this.updateSentences(sents);
+    this.updateSentences(data);
   }
 
-  updateSentences(sentences) {
-    this.sentences = sentences;
+  updateSentences({objects, maxPage}) {
+    this.sentences = objects;
+    this.maxPage = maxPage;
 
-    this.view.updateDisplay(sentences, this.sentencesToSave);
+    this.view.maxPage = maxPage;
+    this.view.updateDisplay(this.sentences, this.sentencesToSave);
   }
 
   async save() {

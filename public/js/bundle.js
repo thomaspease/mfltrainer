@@ -29103,22 +29103,15 @@ class TagInputView extends View {
         lowercase: tag.toLowerCase()
       };
     });
+    this.currentPrediction = [];
+    this.selectionIndex = 0;
     this.elements.tagMenu.addEventListener('click', evt => {
       if (evt.target.tagName == 'LI') {
         this.selectTag(evt.target.innerText);
       }
     });
     this.elements.visibleInput.addEventListener('keydown', evt => {
-      if (evt.key == 'Enter') {
-        evt.preventDefault();
-        this.selectTag();
-      } else {
-        // using a setTimeout to make sure that the rest of the event loop has time to process
-        // otherwise, we'd probably get the *old* text value when checking current text
-        setTimeout(() => {
-          this.updatePrediction();
-        }, 1);
-      }
+      this.handleKeydown(evt);
     });
     this.elements.tagHolder.addEventListener('click', evt => {
       console.log(evt);
@@ -29126,10 +29119,7 @@ class TagInputView extends View {
 
       if (evt.target.classList.contains('remove')) {
         const tagEl = evt.target.closest('.form__tag');
-        const tagStr = tagEl.innerText;
-        tagEl.remove();
-        this.tags = this.tags.filter(t => t != tagStr);
-        this.elements.taglist.value = JSON.stringify(this.tags);
+        this.removeTagByElement(tagEl);
       }
     }); // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
 
@@ -29139,11 +29129,86 @@ class TagInputView extends View {
     });
   }
 
+  handleKeydown(evt) {
+    if (evt.key == 'Enter') {
+      evt.preventDefault();
+      this.selectTag();
+    } else if (evt.key == 'ArrowDown') {
+      evt.preventDefault();
+      this.incrementSelectedPrediction();
+    } else if (evt.key == 'ArrowUp') {
+      evt.preventDefault();
+      this.decrementSelectedPrediction();
+    } else {
+      // this one *might* change the text, so we need it in the outer `else`
+      if (evt.key == 'Backspace') {
+        if (this.elements.visibleInput.innerText == '') {
+          evt.preventDefault();
+          const tags = document.querySelectorAll('.form__tag');
+
+          if (tags.length > 0) {
+            this.removeTagByElement(tags[tags.length - 1]);
+          }
+        }
+      } else {
+        // using a setTimeout to make sure that the rest of the event loop has time to process
+        // otherwise, we'd probably get the *old* text value when checking current text
+        setTimeout(() => {
+          this.updatePrediction();
+        }, 1);
+      }
+    }
+  }
+
+  removeTagByElement(tagEl) {
+    const tagStr = tagEl.innerText;
+    tagEl.remove();
+    this.tags = this.tags.filter(t => t != tagStr);
+    this.elements.taglist.value = JSON.stringify(this.tags);
+  }
+
+  incrementSelectedPrediction() {
+    if (this.selectionIndex >= this.currentPrediction.length) {
+      return;
+    }
+
+    if (!this.isSelectingPrediction) {
+      this.isSelectingPrediction = true;
+      this.selectionIndex = 0;
+    } else {
+      this.selectionIndex += 1;
+    }
+
+    this.updateSelectedListItem();
+  }
+
+  decrementSelectedPrediction() {
+    if (this.selectionIndex == 0) {
+      this.isSelectingPrediction = false;
+    } else {
+      this.selectionIndex -= 1;
+    }
+
+    this.updateSelectedListItem();
+  }
+
+  updateSelectedListItem() {
+    Array.from(this.elements.tagMenu.querySelectorAll('li.active')).forEach(el => el.classList.remove('active'));
+
+    if (this.isSelectingPrediction) {
+      // nth-child is 1-indexed
+      this.elements.tagMenu.querySelector('li:nth-child(' + (this.selectionIndex + 1) + ')').classList.add('active');
+    }
+  }
+
   updatePrediction() {
     const text = this.elements.visibleInput.innerText.trim().toLowerCase();
 
     if (text) {
       const predictedTags = this.prediction.filter(val => val.lowercase.includes(text));
+      this.currentPrediction = predictedTags;
+      this.isSelectingPrediction = false;
+      this.selectionIndex = 0;
       const bestTags = [];
       const otherTags = [];
       predictedTags.forEach(val => {
@@ -29164,7 +29229,11 @@ class TagInputView extends View {
 
   selectTag(tag) {
     if (!tag) {
-      tag = this.elements.visibleInput.innerText.trim();
+      if (this.isSelectingPrediction) {
+        tag = this.currentPrediction[this.selectionIndex].tag;
+      } else {
+        tag = this.elements.visibleInput.innerText.trim();
+      }
     }
 
     this.tags.push(tag);
@@ -29367,10 +29436,14 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
     this.elements.previousPage = this.root.querySelector('.previous-page');
     this.elements.nextPage = this.root.querySelector('.next-page');
     this.elements.pageNum = this.root.querySelector('.page-num');
+    this.elements.maxPageNum = this.root.querySelector('.max-page-num');
     this.getFilterElements().forEach(el => {
       el.addEventListener('change', this.updateFilters.bind(this));
     });
     this.elements.saveButton.addEventListener('click', () => this.trigger('save', {}));
+    this.elements.pageNum.addEventListener('change', () => {
+      this.trigger('select_page', this.page - 0);
+    });
     this.elements.previousPage.addEventListener('click', evt => {
       evt.preventDefault();
       this.trigger('change_page', -1);
@@ -29428,13 +29501,28 @@ class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   get page() {
-    return this._page;
+    return this.elements.pageNum.value;
   }
 
   set page(value) {
     this._page = value;
-    this.elements.pageNum.innerText = this._page;
+    this.elements.pageNum.value = this._page;
     return this._page;
+  }
+
+  get maxPage() {
+    return this._maxPage;
+  }
+
+  set maxPage(value) {
+    this._maxPage = value;
+    this.elements.maxPageNum.innerText = this._maxPage;
+    const optionHTML = Array(this._maxPage).fill('').map((_, i) => {
+      const index = i + 1;
+      return "<option value=".concat(index, " ").concat(index == this.page ? 'selected' : '', ">").concat(index, "</option>");
+    }).join('');
+    this.elements.pageNum.innerHTML = optionHTML;
+    return this._maxPage;
   }
 
 } // TRAINING + REVISION VIEW
@@ -29690,11 +29778,15 @@ class Model {
   static async loadFromServer(searchParams) {
     const response = await this.sendApiRequest(this.apiUrl() + '?' + new URLSearchParams(searchParams).toString(), 'GET');
     const objects = response.data.data.map(row => new this(row));
-    return objects;
+    const maxPage = response.data.maxPage;
+    return {
+      objects,
+      maxPage
+    };
   }
 
   static async fetchAll() {
-    return await this.loadFromServer(new URLSearchParams({}));
+    return (await this.loadFromServer(new URLSearchParams({}))).objects;
   } // default API URL and database name (i.e., table), which will work for *most* classes
 
 
@@ -30053,7 +30145,7 @@ class CreateSentenceController extends Controller {
         } = await this.children.audioEditor.save();
         const res = await _models.CreateSentenceModel.create(sentence, translation, level, vivaRef, tense, grammar, audioUrl);
         this.view.clearFormData({
-          keep: ["vivaRef", "tense", "grammar"]
+          keep: ['vivaRef', 'tense', 'grammar']
         });
         this.children.audioEditor.clear();
 
@@ -30305,6 +30397,7 @@ class CreateTaskChooseSentenceController extends Controller {
   constructor(viewBaseElement) {
     super(viewBaseElement);
     this.page = 1;
+    this.maxPage = 1;
     this.limit = 10;
     this.waitingForData = false;
     this.view.on('filter_update', async filterData => {
@@ -30318,7 +30411,7 @@ class CreateTaskChooseSentenceController extends Controller {
         return;
       }
 
-      if (offset > 0 && this.sentences.length == 0) {
+      if (offset > 0 && this.page >= this.maxPage) {
         return;
       } // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
 
@@ -30328,6 +30421,16 @@ class CreateTaskChooseSentenceController extends Controller {
       }
 
       this.page += offset;
+      this.refetchData(this.view.getFilterState());
+    });
+    this.view.on('select_page', async page => {
+      // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
+      if (this.waitingForData) {
+        return;
+      }
+
+      console.log(JSON.stringify(page));
+      this.page = page;
       this.refetchData(this.view.getFilterState());
     });
     this.sentencesToSave = [];
@@ -30349,7 +30452,7 @@ class CreateTaskChooseSentenceController extends Controller {
     _models.SentenceModel.loadFromServer({
       page: this.page,
       limit: this.limit
-    }).then(sent => this.updateSentences(sent)).catch(err => _views.AlertView.show('error', err));
+    }).then(data => this.updateSentences(data)).catch(err => _views.AlertView.show('error', err));
   }
 
   async refetchData(filterData) {
@@ -30359,15 +30462,21 @@ class CreateTaskChooseSentenceController extends Controller {
     });
 
     this.waitingForData = true;
-    const sents = await _models.SentenceModel.loadFromServer(searchParams);
+    const data = await _models.SentenceModel.loadFromServer(searchParams);
     this.waitingForData = false;
     this.view.page = this.page;
-    this.updateSentences(sents);
+    this.updateSentences(data);
   }
 
-  updateSentences(sentences) {
-    this.sentences = sentences;
-    this.view.updateDisplay(sentences, this.sentencesToSave);
+  updateSentences(_ref8) {
+    let {
+      objects,
+      maxPage
+    } = _ref8;
+    this.sentences = objects;
+    this.maxPage = maxPage;
+    this.view.maxPage = maxPage;
+    this.view.updateDisplay(this.sentences, this.sentencesToSave);
   }
 
   async save() {
