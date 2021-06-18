@@ -150,6 +150,20 @@ exports.getTask = catchAsync(async (req, res, next) => {
   });
 });
 
+//TEACHER STUDENT MANAGEMENT
+exports.getClass = catchAsync(async (req, res, next) => {
+  //Find class
+  const classData = await Class.findById(req.params.class).populate('tasks');
+
+  const students = await User.find({ class: req.params.class, role: 'user' });
+
+  res.status(200).render('teacher/manage-individual/managestudent', {
+    title: classData.name,
+    classData,
+    students,
+  });
+});
+
 exports.getAccount = catchAsync(async (req, res, next) => {
   res.status(200).render('account', {
     title: 'Your account',

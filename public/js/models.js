@@ -17,7 +17,11 @@ class Model {
       this.data[key] = newData[key];
     }
 
-    this.constructor.sendApiRequest(`${this.constructor.apiUrl()}/${this.data._id}`, 'PATCH', newData);
+    this.constructor.sendApiRequest(
+      `${this.constructor.apiUrl()}/${this.data._id}`,
+      'PATCH',
+      newData
+    );
   }
 
   // can throw, catch in the Controller layer
@@ -49,7 +53,7 @@ class Model {
 
     const objects = response.data.data.map((row) => new this(row));
     const maxPage = response.data.maxPage;
-    return {objects, maxPage};
+    return { objects, maxPage };
   }
 
   static async fetchAll() {
@@ -149,7 +153,9 @@ export class StudentSentenceModel extends Model {
     super(data);
 
     if (this.data.sentence) {
-      this.data.sentence = new SentenceModel(this.data.sentence).subclassAs(this.data.exercise);
+      this.data.sentence = new SentenceModel(this.data.sentence).subclassAs(
+        this.data.exercise
+      );
     }
   }
 
