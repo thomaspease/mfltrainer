@@ -151,7 +151,7 @@ exports.getTask = catchAsync(async (req, res, next) => {
 });
 
 //TEACHER STUDENT MANAGEMENT
-exports.getClass = catchAsync(async (req, res, next) => {
+exports.getStudent = catchAsync(async (req, res, next) => {
   //Find class
   const classData = await Class.findById(req.params.class).populate('tasks');
 
