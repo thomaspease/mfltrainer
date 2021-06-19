@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/usermodel');
+const Task = require('../models/taskmodel');
 const Class = require('../models/classmodel');
 const StudentTask = require('../models/studenttaskmodel');
 const catchAsync = require('../utils/catchAsync');
@@ -59,6 +60,19 @@ exports.signup = catchAsync(async (req, res, next) => {
       }
     }
   );
+
+  //Find tasks due in future for class being assigned to, and create studenttasks for newuser
+  const futureTasks = await Task.find({
+    class: classData[0]._id,
+    dueDate: { $gte: Date.now() },
+  });
+
+  futureTasks.forEach(async (el) => {
+    await StudentTask.create({
+      user: newUser._id,
+      task: el._id,
+    });
+  });
 
   createSendToken(newUser, 201, res);
 });
