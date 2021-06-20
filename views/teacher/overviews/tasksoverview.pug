@@ -1,10 +1,11 @@
 extends ../../base
 
-mixin row(name, completed, due, id)
+mixin row(name, setclass, completed, due, id)
     tr(name=id)
         td.td-left
             a.truncate-text.table--task(href=`/manage-tasks/${id}`) #{name}
             a.delete(data-controller="DeleteController")
+        td #{setclass}
         td #{completed}
         td #{due}
 
@@ -17,10 +18,11 @@ block content
                     thead
                         tr
                             th Task 
+                            th Class
                             th Completed 
                             th.td-right Due
                             
                     tbody
                         each task in tasks
-                            +row(task.name, task.completed, task.dueDate.toDateString(), task.id)
+                            +row(task.name, task.class[0].name, task.completed, task.dueDate.toDateString(), task.id)
 

@@ -126,7 +126,9 @@ exports.getClass = catchAsync(async (req, res, next) => {
 
 //TEACHER TASK MANAGEMENT
 exports.manageMyTasks = catchAsync(async (req, res, next) => {
-  const tasks = await Task.find({ teacher: res.locals.user._id });
+  const tasks = await Task.find({ teacher: res.locals.user._id }).populate(
+    'class'
+  );
 
   res.status(200).render('teacher/overviews/tasksoverview', {
     title: 'My tasks',
