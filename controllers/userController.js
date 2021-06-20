@@ -99,6 +99,7 @@ exports.deleteUserAndData = catchAsync(async (req, res, next) => {
     user: req.params.id,
   });
   await StudentSentence.deleteMany({ user: req.params.id });
+
   await User.findByIdAndUpdate(
     { _id: user.class },
     { $pull: { students: req.params.id } },

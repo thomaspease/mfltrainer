@@ -74,11 +74,18 @@ class FormView extends View {
     this.root.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      this.root.querySelectorAll('input[type=hidden][required]')
-      const missingHiddenFields = Array.from(this.root.querySelectorAll('input[type=hidden][required]')).filter(el => !el.value)
+      this.root.querySelectorAll('input[type=hidden][required]');
+      const missingHiddenFields = Array.from(
+        this.root.querySelectorAll('input[type=hidden][required]')
+      ).filter((el) => !el.value);
 
       if (missingHiddenFields.length > 0) {
-        AlertView.show('error', `The following additional fields are missing: ${missingHiddenFields.map(el => el.dataset.humanName || el.name).join(', ')}`)
+        AlertView.show(
+          'error',
+          `The following additional fields are missing: ${missingHiddenFields
+            .map((el) => el.dataset.humanName || el.name)
+            .join(', ')}`
+        );
         return;
       }
 
@@ -98,7 +105,7 @@ class FormView extends View {
       data[name] = el.value;
 
       if (el.dataset.parseAs) {
-        switch(el.dataset.parseAs) {
+        switch (el.dataset.parseAs) {
           case 'json':
             data[name] = JSON.parse(data[name]);
             break;
@@ -174,12 +181,14 @@ export class TagInputView extends View {
 
     this.tags = [];
 
-    this.prediction = JSON.parse(this.root.querySelector('.tag-predictions').value).map((tag) => {
+    this.prediction = JSON.parse(
+      this.root.querySelector('.tag-predictions').value
+    ).map((tag) => {
       return {
         tag,
         lowercase: tag.toLowerCase(),
-      }
-    })
+      };
+    });
 
     this.currentPrediction = [];
     this.selectionIndex = 0;
@@ -188,11 +197,11 @@ export class TagInputView extends View {
       if (evt.target.tagName == 'LI') {
         this.selectTag(evt.target.innerText);
       }
-    })
+    });
 
     this.elements.visibleInput.addEventListener('keydown', (evt) => {
       this.handleKeydown(evt);
-    })
+    });
 
     this.elements.tagHolder.addEventListener('click', (evt) => {
       console.log(evt);
@@ -201,13 +210,13 @@ export class TagInputView extends View {
         const tagEl = evt.target.closest('.form__tag');
         this.removeTagByElement(tagEl);
       }
-    })
+    });
 
     // we need to add onclick to (most) child elements to make this work right, otherwise the text entry box could get focused erroneously
     this.root.addEventListener('click', (evt) => {
       this.elements.visibleInput.focus();
       evt.preventDefault();
-    })
+    });
   }
 
   handleKeydown(evt) {
@@ -227,7 +236,7 @@ export class TagInputView extends View {
           evt.preventDefault();
           const tags = document.querySelectorAll('.form__tag');
           if (tags.length > 0) {
-            this.removeTagByElement(tags[tags.length-1])
+            this.removeTagByElement(tags[tags.length - 1]);
           }
         }
       } else {
@@ -271,17 +280,23 @@ export class TagInputView extends View {
   }
 
   updateSelectedListItem() {
-    Array.from(this.elements.tagMenu.querySelectorAll('li.active')).forEach((el) => el.classList.remove('active'));
+    Array.from(
+      this.elements.tagMenu.querySelectorAll('li.active')
+    ).forEach((el) => el.classList.remove('active'));
     if (this.isSelectingPrediction) {
       // nth-child is 1-indexed
-      this.elements.tagMenu.querySelector('li:nth-child(' + (this.selectionIndex + 1) + ')').classList.add('active');
+      this.elements.tagMenu
+        .querySelector('li:nth-child(' + (this.selectionIndex + 1) + ')')
+        .classList.add('active');
     }
   }
 
   updatePrediction() {
     const text = this.elements.visibleInput.innerText.trim().toLowerCase();
     if (text) {
-      const predictedTags = this.prediction.filter((val) => val.lowercase.includes(text));
+      const predictedTags = this.prediction.filter((val) =>
+        val.lowercase.includes(text)
+      );
       this.currentPrediction = predictedTags;
       this.isSelectingPrediction = false;
       this.selectionIndex = 0;
@@ -293,9 +308,9 @@ export class TagInputView extends View {
         } else {
           otherTags.push(val.tag);
         }
-      })
+      });
       this.elements.tagMenu.innerHTML = menulistTemplate({
-        items: [...bestTags, ...otherTags]
+        items: [...bestTags, ...otherTags],
       });
       this.elements.tagMenu.style.display = 'block';
     } else {
@@ -315,7 +330,7 @@ export class TagInputView extends View {
     this.elements.taglist.value = JSON.stringify(this.tags);
 
     const tmp = document.createElement('div');
-    tmp.innerHTML = tagTemplate({tag})
+    tmp.innerHTML = tagTemplate({ tag });
     const tagLabel = tmp.firstChild;
     this.elements.tagHolder.append(tagLabel);
 
@@ -554,17 +569,17 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
     );
 
     this.elements.pageNum.addEventListener('change', () => {
-      this.trigger('select_page', this.page-0);
-    })
+      this.trigger('select_page', this.page - 0);
+    });
 
     this.elements.previousPage.addEventListener('click', (evt) => {
       evt.preventDefault();
       this.trigger('change_page', -1);
-    })
+    });
     this.elements.nextPage.addEventListener('click', (evt) => {
       evt.preventDefault();
       this.trigger('change_page', 1);
-    })
+    });
 
     this.elements.tableParent.addEventListener('change', (evt) => {
       if (evt.target.tagName == 'INPUT' && evt.target.type == 'checkbox') {
@@ -614,7 +629,7 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
 
     const savedIds = toSave.map((sent) => {
       return sent.data._id;
-    })
+    });
 
     this.elements.tableParent.innerHTML = sentencetableTemplate({
       fields,
@@ -640,10 +655,15 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   set maxPage(value) {
     this._maxPage = value;
     this.elements.maxPageNum.innerText = this._maxPage;
-    const optionHTML = Array(this._maxPage).fill('').map((_, i) => {
-      const index = i+1;
-      return `<option value=${index} ${index == this.page ? 'selected' : ''}>${index}</option>`;
-    }).join('');
+    const optionHTML = Array(this._maxPage)
+      .fill('')
+      .map((_, i) => {
+        const index = i + 1;
+        return `<option value=${index} ${
+          index == this.page ? 'selected' : ''
+        }>${index}</option>`;
+      })
+      .join('');
     this.elements.pageNum.innerHTML = optionHTML;
     return this._maxPage;
   }
@@ -848,7 +868,12 @@ export class DeleteView extends View {
             row = row.parentNode;
           }
 
-          this.trigger('delete', row.getAttribute('name'), row);
+          this.trigger(
+            'delete',
+            row.getAttribute('name'),
+            row,
+            row.getAttribute('collection')
+          );
         }
         return false;
       }

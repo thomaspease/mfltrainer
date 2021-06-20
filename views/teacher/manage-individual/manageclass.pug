@@ -1,10 +1,10 @@
 extends ../../base
 
-mixin row(name, completed, due, id, url)
-    tr(name=id)
+mixin row(name, completed, due, id, url, collection)
+    tr(name=id, collection=collection)
         td.td-left
             a.truncate-text.table--task(href=`/${url}/${id}`) #{name}
-            a.delete(data-controller="DeleteController")
+            a.delete(data-controller="DeleteTaskController")
         td #{completed}
         td #{due}
 
@@ -23,7 +23,7 @@ block content
                         
                 tbody
                     each task in classData.tasks
-                        +row(task.name, task.completed, task.dueDate.toDateString(), task.id, 'manage-tasks')
+                        +row(task.name, task.completed, task.dueDate.toDateString(), task.id, 'manage-tasks', 'tasks')
             br
             h2.heading-secondary Students
             table
@@ -35,5 +35,5 @@ block content
                         
                 tbody
                     each student in students
-                        +row(student.name, "", "", student.id, 'manage-student')
+                        +row(student.name, "", "", student.id, 'manage-student', 'users')
 

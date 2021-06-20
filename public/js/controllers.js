@@ -424,7 +424,7 @@ export class CreateTaskChooseSentenceController extends Controller {
       this.refetchData(this.view.getFilterState());
     });
 
-    this.view.on('select_page', async(page) => {
+    this.view.on('select_page', async (page) => {
       // don't let the user spam-click (might cause things to go a little weird, an editable value would be better)
       if (this.waitingForData) {
         return;
@@ -433,7 +433,7 @@ export class CreateTaskChooseSentenceController extends Controller {
       console.log(JSON.stringify(page));
       this.page = page;
       this.refetchData(this.view.getFilterState());
-    })
+    });
 
     this.sentencesToSave = [];
     this.view.on('add_sentence', ({ sentenceId }) => {
@@ -470,7 +470,7 @@ export class CreateTaskChooseSentenceController extends Controller {
     this.updateSentences(data);
   }
 
-  updateSentences({objects, maxPage}) {
+  updateSentences({ objects, maxPage }) {
     this.sentences = objects;
     this.maxPage = maxPage;
 
@@ -505,14 +505,14 @@ export class DeleteController extends Controller {
   getViewClass() {
     return DeleteView;
   }
+
   constructor(...args) {
     super(...args);
 
-    this.view.on('delete', async (id, row) => {
+    this.view.on('delete', async (id, row, collection) => {
       try {
-        console.log(id);
         const deleteTask = await DeleteModel.sendApiRequest(
-          `/api/v1/tasks/${id}`,
+          `/api/v1/${collection}/${id}`,
           'DELETE'
         );
 
@@ -524,3 +524,5 @@ export class DeleteController extends Controller {
     });
   }
 }
+
+export class DeleteTaskController extends DeleteController {}
