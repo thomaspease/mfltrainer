@@ -1,4 +1,5 @@
 const User = require('../models/usermodel');
+const Class = require('../models/classmodel');
 const StudentTask = require('../models/studenttaskmodel');
 const StudentSentence = require('../models/studentsentencemodel');
 const catchAsync = require('../utils/catchAsync');
@@ -95,31 +96,21 @@ exports.deleteUserAndData = catchAsync(async (req, res, next) => {
   if (!userDoc) {
     return next(new AppError('No User found with that ID', 404));
   }
+
   await StudentTask.deleteMany({
     user: req.params.id,
   });
   await StudentSentence.deleteMany({ user: req.params.id });
 
-  await User.findByIdAndUpdate(
+  await Class.findByIdAndUpdate(
     { _id: user.class },
     { $pull: { students: req.params.id } },
     (err) => {
       if (err) {
-        new AppError('Could not add student to class');
+        new AppError('Could not remove student from class');
       }
     }
   );
-
-  // //This is an attempt to force the deletion to wait until the studenttasks have been found
-  // if (studentTaskList) {
-  //   const studentTasksDoc = await StudentTask.deleteMany({
-  //     task: req.params.id,
-  //   });
-
-  //   if (!studentTasksDoc) {
-  //     return next(new AppError('No studentTasks could be found', 404));
-  //   }
-  // }
 
   res.status(204).json({
     status: 'success',
