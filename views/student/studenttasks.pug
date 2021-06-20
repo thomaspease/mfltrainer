@@ -11,6 +11,9 @@ mixin row(name, exercise, completed, due, id)
 block user-content
     main.main
         div.card-container
+            
+            h2.heading-secondary.ma-bt-md Revise
+            a.btn.btn--green.ma-bt-md(href='/revise') Revise(#{reviseCount})
             h2.heading-secondary.ma-bt-md My tasks
             div.card
                 table

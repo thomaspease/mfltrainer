@@ -8,10 +8,16 @@ const catchAsync = require('../utils/catchAsync');
 //const AppError = require('../utils/appError');
 
 exports.displayTasks = catchAsync(async (req, res, next) => {
-  //At the moment tasks coming from isLoggedin and being stored in locals.studentTasks\
+  //At the moment tasks coming from isLoggedin and being stored in locals.studentTasks
+
+  const reviseCount = await StudentSentence.find({
+    student: res.locals.user._id,
+    retestOn: { $lte: Date.now() },
+  }).count();
 
   res.status(200).render('student/studenttasks', {
     title: 'Tasks',
+    reviseCount,
   });
 });
 
