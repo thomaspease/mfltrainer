@@ -1,4 +1,4 @@
-import { diffWords } from 'diff';
+import { runDiff } from './diff_logic';
 
 import { sentencetableTemplate } from './templates/sentencetable';
 import { menulistTemplate } from './templates/menulist';
@@ -755,16 +755,21 @@ export class TrainingView extends FormView {
   handleStudentAnswer({ student_answer }) {
     // CALCULATE VARIOUS DATA (maybe could live outside of the View layer?)
 
-    function normalize(str) {
+    function stripNonLetterNumber(str) {
       // normalize to ONLY letters and numbers (cross-language), lowercase
       // this'll require fairly modern JS, incidentally
       return str.replace(/[^\p{Letter}\p{Number}]/giu, '').toLowerCase();
     }
 
-    // TODO DESIGN QUESTION: where should isCorrect be calculated? what code owns that logic?
-    const isCorrect = normalize(student_answer) == normalize(this.answer);
+    const diffs = runDiff(this.answer, student_answer)
 
-    const diffs = diffWords(this.answer, student_answer, { ignoreCase: true });
+    // the answer is correct if there are no differences, OR if the only differences are punctuation/etc.
+    const differencesOnly = diffs
+      .filter((diff) => diff.added || diff.removed)
+      .map((diff) => ({...diff, value: stripNonLetterNumber(diff.value)}))
+      .filter((diff) => diff.value)
+    ;
+    const isCorrect = differencesOnly.length == 0;
 
     // DISPLAY CALCULATED DATA
     {
