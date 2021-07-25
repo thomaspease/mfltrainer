@@ -15,7 +15,7 @@ const sentenceSchema = mongoose.Schema({
   },
   level: {
     type: Number,
-    required: [true, 'A sentence must have a GCSE level'],
+    required: [true, 'A sentence must have a level'],
   },
   vivaRef: {
     type: Number,
