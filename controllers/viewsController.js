@@ -144,7 +144,7 @@ exports.manageMyTasks = catchAsync(async (req, res, next) => {
 
 exports.getTask = catchAsync(async (req, res, next) => {
   //Find class
-  const task = await Task.findById(req.params.task);
+  const task = await Task.findById(req.params.task).populate('class');
 
   //Find studentTasks
   const studentTasks = await StudentTask.find({
