@@ -1,23 +1,28 @@
 extends ../../base 
 
-mixin row(name, completed, percentCorrect)
-    tr  
-        td.td-left #{name}
+mixin row(name, completed, due, percentCorrect, id, url, collection)
+    tr(name=id, collection=collection)
+        td.td-left
+            a.truncate-text.table--task(href=`/${url}/${id}`) #{name}
+            a.delete(data-controller="DeleteController")
         td #{completed}
         td #{percentCorrect}
+        td #{due}
 
 block content
     main.main
         div.card-container
-            h2.heading-secondary.ma-bt-md #{task.name}
-            div.card
-                table
-                    thead
-                        tr
-                            th Name 
-                            th Completed 
-                            th.td-right Correct %
-                            
-                    tbody
-                        each studentTask in studentTasks
-                            +row(studentTask.user[0].name, studentTask.completed, studentTask.percentCorrect)
+            h2.heading-secondary #{studentData.name} - #{studentData.class[0].name}
+            table
+                thead
+                    tr
+                        th Task 
+                        th Completed 
+                        th Percent Correct
+                        th.td-right Due
+                        
+                tbody
+                    each task in studentTasks
+                        +row(task.task[0].name, task.completed, task.task[0].dueDate.toDateString(), task.percentCorrect, task.id, 'manage-tasks', 'studenttasks')
+            
+    

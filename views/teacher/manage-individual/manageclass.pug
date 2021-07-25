@@ -4,7 +4,7 @@ mixin row(name, completed, due, id, url, collection)
     tr(name=id, collection=collection)
         td.td-left
             a.truncate-text.table--task(href=`/${url}/${id}`) #{name}
-            a.delete(data-controller="DeleteTaskController")
+            a.delete(data-controller="DeleteController")
         td #{completed}
         td #{due}
 

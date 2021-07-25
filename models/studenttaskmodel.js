@@ -22,6 +22,14 @@ const studentTaskSchema = mongoose.Schema({
   wrongCount: Number,
 });
 
+//To round incoming percentCorrects
+studentTaskSchema.pre('save', function (next) {
+  if (!this.isModified('percentCorrect')) return next();
+
+  this.percentCorrect = Math.round(this.percentCorrect);
+  next();
+});
+
 const StudentTask = mongoose.model(
   'StudentTask',
   studentTaskSchema,

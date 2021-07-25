@@ -30000,7 +30000,7 @@ exports.DeleteModel = DeleteModel;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeleteTaskController = exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.TagInputController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
+exports.DeleteController = exports.CreateTaskChooseSentenceController = exports.ReviseController = exports.TrainController = exports.CreateTaskRandomController = exports.AudioEditorController = exports.CreateSentenceController = exports.TagInputController = exports.SignupController = exports.LogoutController = exports.LoginController = void 0;
 
 var _views = require("./views.js");
 
@@ -30521,10 +30521,6 @@ class DeleteController extends Controller {
 }
 
 exports.DeleteController = DeleteController;
-
-class DeleteTaskController extends DeleteController {}
-
-exports.DeleteTaskController = DeleteTaskController;
 },{"./views.js":"views.js","./models.js":"models.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 

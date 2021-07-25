@@ -524,5 +524,3 @@ export class DeleteController extends Controller {
     });
   }
 }
-
-export class DeleteTaskController extends DeleteController {}

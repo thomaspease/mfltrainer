@@ -14,11 +14,8 @@ router
 router
   .route('/:id')
   .get(studentTaskController.getStudentTask)
-  .patch(studentTaskController.updateStudentTask);
-
-router
-  .route('/:id')
-  .delete(studentTaskController.deleteStudentTaskAndObjectIdRef);
+  .patch(studentTaskController.updateStudentTask)
+  .delete(studentTaskController.deleteStudentTask);
 
 router
   .route('/save-results/:id')
@@ -26,10 +23,6 @@ router
     studentSentenceController.createStudentSentencesDuringTraining,
     studentTaskController.updateStudentTask
   );
-
-router
-  .route('/delete-reference-in-user-doc/:id')
-  .delete(studentTaskController.deleteObjectIdRef);
 
 // router.route('/teacher-set').post(taskController.teacherSetTask);
 

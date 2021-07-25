@@ -49,6 +49,13 @@ router.get(
   viewsController.getTask
 );
 
+//SEE INDIVIDUAL STUDENT
+router.get(
+  '/manage-student/:student',
+  authController.protect,
+  viewsController.getStudent
+);
+
 router.get('/me', authController.protect, viewsController.getAccount);
 
 router.get('/privacy', authController.isLoggedIn, viewsController.privacy);
