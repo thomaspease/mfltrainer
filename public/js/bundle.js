@@ -1760,7 +1760,7 @@ class Synonym {
 } // ADD NEW SYNONYMS HERE
 
 
-const synonyms = [new Synonym("isn't", "is not"), new Synonym("it's", "it is")]; // using an encoding which consists only of numbers and punctuation, in order to avoid the risk of an accidental double-replacement
+const synonyms = [new Synonym("isn't", 'is not'), new Synonym("it's", 'it is'), new Synonym("wasn't", 'was not'), new Synonym("didn't", 'did not'), new Synonym('on weekends', 'on the weekend'), new Synonym('vacation', 'holidays'), new Synonym('lots', 'a lot of'), new Synonym('relax', 'rest')]; // using an encoding which consists only of numbers and punctuation, in order to avoid the risk of an accidental double-replacement
 
 function encode(str) {
   return str.split('').map(c => c.charCodeAt(0)).join(',');
@@ -3045,7 +3045,7 @@ function keys(object) {
 
 module.exports = assign;
 
-},{}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/global/document.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -3067,7 +3067,7 @@ if (typeof document !== 'undefined') {
 
 module.exports = doccy;
 
-},{"min-document":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
+},{"min-document":"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../../node_modules/is-object/index.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function isObject(x) {
@@ -28266,7 +28266,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"./../utils":"../../node_modules/axios/lib/utils.js","./../core/settle":"../../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../../node_modules/axios/lib/helpers/cookies.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -28575,7 +28575,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../.nvm/versions/node/v14.16.0/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -29641,7 +29641,8 @@ class TrainingView extends FormView {
     this.elements.submit_button = this.root.querySelector('button[type=submit]');
     this.elements.next_button = this.root.querySelector('button[type=button].btn-next');
     this.elements.audio = this.root.querySelector('audio.sentence-audio');
-    this.elements.playAudio = this.root.querySelector('.play-audio'); // define some groups of elements
+    this.elements.playAudio = this.root.querySelector('.play-audio');
+    this.elements.accentbuttons = Array.from(this.root.querySelectorAll('.btn-accent')); // define some groups of elements
 
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']); // prep DOM
@@ -29656,7 +29657,13 @@ class TrainingView extends FormView {
       this.clearAnswerText();
       this.elements.input.focus();
       this.trigger('next');
-    }); // global hotkeys (should be fine, though?)
+    }); //Accent buttons
+
+    this.elements.accentbuttons.forEach(button => button.addEventListener('click', evt => {
+      evt.preventDefault();
+      this.elements.input.value += evt.srcElement.name;
+      this.elements.input.focus();
+    })); // global hotkeys (should be fine, though?)
 
     document.addEventListener('keydown', evt => {
       if (evt.key == '[') {
@@ -30395,6 +30402,7 @@ class TrainController extends Controller {
     this.view.prompt = sentence.prompt;
     this.view.answer = sentence.answer;
     this.view.audioUrl = sentence.data.audioUrl;
+    this.view.elements.audio.play();
   }
 
   async sendResultsToServer() {

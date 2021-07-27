@@ -698,6 +698,10 @@ export class TrainingView extends FormView {
     this.elements.audio = this.root.querySelector('audio.sentence-audio');
     this.elements.playAudio = this.root.querySelector('.play-audio');
 
+    this.elements.accentbuttons = Array.from(
+      this.root.querySelectorAll('.btn-accent')
+    );
+
     // define some groups of elements
     this.defineElementGroup('feedback', ['answer_feedback', 'next_button']);
     this.defineElementGroup('dataEntry', ['input', 'submit_button']);
@@ -718,6 +722,15 @@ export class TrainingView extends FormView {
 
       this.trigger('next');
     });
+
+    //Accent buttons
+    this.elements.accentbuttons.forEach((button) =>
+      button.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        this.elements.input.value += evt.srcElement.name;
+        this.elements.input.focus();
+      })
+    );
 
     // global hotkeys (should be fine, though?)
     document.addEventListener('keydown', (evt) => {
@@ -762,14 +775,13 @@ export class TrainingView extends FormView {
     }
 
     // returns a pair of diffs with slightly different text (because we want to show different text in two places)
-    const diffs = runDiff(this.answer, student_answer)
+    const diffs = runDiff(this.answer, student_answer);
 
     // the answer is correct if there are no differences, OR if the only differences are punctuation/etc.
     const differencesOnly = diffs.student
       .filter((diff) => diff.added || diff.removed)
-      .map((diff) => ({...diff, value: stripNonLetterNumber(diff.value)}))
-      .filter((diff) => diff.value)
-    ;
+      .map((diff) => ({ ...diff, value: stripNonLetterNumber(diff.value) }))
+      .filter((diff) => diff.value);
     const isCorrect = differencesOnly.length == 0;
 
     // DISPLAY CALCULATED DATA

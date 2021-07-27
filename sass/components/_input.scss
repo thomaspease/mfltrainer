@@ -46,7 +46,7 @@
   }
 }
 
-.form__menu-holder{
+.form__menu-holder {
   position: relative;
 
   .tag-menu {
@@ -70,4 +70,8 @@
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 0.1rem;
+}
+
+.form__input-grammar {
+  min-height: 44px;
 }

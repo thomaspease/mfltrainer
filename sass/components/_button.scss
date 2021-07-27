@@ -124,3 +124,63 @@
   top: 25rem;
   left: 25%;
 }
+
+.init {
+  display: inline-block;
+  padding: 1rem 1.2rem;
+  border: 0.1em solid $color-background-grey;
+  margin: 1rem 0 1rem 0;
+  border-radius: 0.12em;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-weight: 600;
+  color: $color-background-grey;
+  text-align: center;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.init:hover {
+  background-color: $color-background-grey;
+  color: white;
+}
+
+.btn-playrecord {
+  display: inline-block;
+  padding: 1rem 1.2rem;
+  border: 0.1em solid $color-background-grey;
+  margin: 1rem;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-weight: 600;
+  color: $color-background-grey;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.btn-playrecord:hover {
+  background-color: $color-background-grey;
+  color: white;
+}
+
+.btn-accent {
+  padding: 0;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  position: relative;
+  margin: 0 0 0 12px;
+  border-radius: 50% !important;
+  border: 2px solid transparent;
+  opacity: 1;
+  background: #f7f7f7;
+  color: #226337;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.btn-accent:hover {
+  background: #e2e2e2;
+}
