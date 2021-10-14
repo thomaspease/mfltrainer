@@ -384,7 +384,15 @@ export class AudioEditorView extends View {
   }
 
   save() {
-    this.ee.emit('startaudiorendering', 'buffer');
+    try {
+      this.ee.emit('startaudiorendering', 'buffer');
+      // if the recording hasn't been written out within 10 seconds, it's probably stalled / hung
+      this.recordingStalledTimer = setTimeout(() => {
+        throw new Error("Audio recording seems to be stalled")
+      }, 10 * 1000)
+    } catch(e) {
+      throw new Error("Please take an audio recording, in order to submit sentences");
+    }
   }
 
   clear() {
@@ -414,6 +422,9 @@ export class AudioEditorView extends View {
     });
 
     this.ee.on('audiorenderingfinished', (type, data) => {
+      if (this.recordingStalledTimer) {
+        clearTimeout(this.recordingStalledTimer);
+      }
       try {
         const start = Math.floor(this.start * data.sampleRate) || 0;
         const length =
@@ -431,6 +442,7 @@ export class AudioEditorView extends View {
           this.trigger('save_file', blob);
         });
       } catch (err) {
+        console.error(err);
         AlertView.show('error', err);
       }
     });
