@@ -399,18 +399,27 @@ export class AudioEditorView extends View {
     this.ee.emit('clear');
   }
 
-  setupEditor() {
-    this.hideElement('init');
-    this.showElement('main_block');
+  async setupEditor() {
     this.playlist = WaveformPlaylist({
       container: this.root.querySelector('.audio-editor'),
       state: 'select',
     });
     this.ee = this.playlist.getEventEmitter();
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => this.playlist.initRecorder(stream));
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.playlist.initRecorder(stream);
+    } catch(err) {
+      console.error(err);
+      AlertView.show('error', "Could not initialize the audio recording device. This may be a browser permissions issue - check whether microphone access is allowed.");
+
+      // abort, but don't throw (since if we threw, it would spam the AlertView modal)
+      return;
+    }
+
+    // only change DOM *after* we've successfully gotten audio recording initialized
+    this.hideElement('init');
+    this.showElement('main_block');
 
     this.playlist.load([]).then(() => {
       this.ee.emit('zoomin');
