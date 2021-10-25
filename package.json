@@ -1,59 +1,59 @@
 {
-	"name": "langauges-app-proto",
-	"version": "1.0.0",
-	"description": "langauges proto",
-	"main": "index.js",
-	"scripts": {
-		"watch:js": "parcel watch --no-hmr /js ./public/js/app.js --out-dir ./public/js --out-file bundle.js --public-url /js",
-		"build:js": "parcel watch ./public/js/app.js --out-dir ./public/js --out-file bundle.js",
-		"build:frontend-pug": "./build-frontend-pug.sh",
-		"watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
-		"start": "node server.js",
-		"serve": "nodemon server.js"
-	},
-	"author": "tom",
-	"license": "ISC",
-	"browserslist": [
-		"since 2017-06"
-	],
-	"devDependencies": {
-		"@babel/core": "^7.12.10",
-		"@babel/preset-env": "^7.12.11",
-		"node-sass": "^5.0.0",
-		"prettier": "^2.2.1"
-	},
-	"dependencies": {
-		"audio-encoder": "^1.0.2",
-		"aws-sdk": "^2.889.0",
-		"axios": "^0.19.2",
-		"bcryptjs": "^2.4.3",
-		"cookie-parser": "^1.4.5",
-		"core-js": "^3.6.5",
-		"diff": "^5.0.0",
-		"dotenv": "^8.2.0",
-		"express": "^4.17.1",
-		"express-mongo-sanitize": "^2.0.1",
-		"express-rate-limit": "^5.2.3",
-		"file-saver": "^2.0.5",
-		"helmet": "^4.2.0",
-		"hpp": "^0.2.3",
-		"jsonwebtoken": "^8.5.1",
-		"mongoose": "^5.11.8",
-		"morgan": "^1.10.0",
-		"nodemailer": "^6.4.17",
-		"nodemon": "^2.0.6",
-		"pug": "^3.0.0",
-		"pug-cli": "^1.0.0-alpha6",
-		"random-words": "^1.1.1",
-		"regenerator-runtime": "^0.13.7",
-		"slugify": "^1.4.6",
-		"templates": "^1.2.9",
-		"validator": "^13.5.2",
-		"waveform-playlist": "^3.2.4",
-		"xss-clean": "^0.1.1"
-	},
-	"engines": {
-		"node": "14.x",
-		"npm": "6.14.x"
-	}
+  "name": "langauges-app-proto",
+  "version": "1.0.0",
+  "description": "langauges proto",
+  "main": "./public/js/bundle.js",
+  "scripts": {
+    "watch:js": "parcel watch ./public/js/app.js --dist-dir ./public/js --public-url /js",
+    "build:js": "parcel watch ./public/js/app.js",
+    "build:frontend-pug": "./build-frontend-pug.sh",
+    "watch:sass": "node-sass ./sass/main.scss ./public/css/comp.css -w",
+    "start": "node server.js",
+    "serve": "nodemon server.js"
+  },
+  "author": "tom",
+  "license": "ISC",
+  "browserslist": [
+    "since 2017-06"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "node-sass": "^5.0.0",
+    "prettier": "^2.2.1"
+  },
+  "dependencies": {
+    "audio-encoder": "^1.0.2",
+    "aws-sdk": "^2.889.0",
+    "axios": "^0.23.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
+    "core-js": "^3.6.5",
+    "diff": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.0.1",
+    "express-rate-limit": "^5.2.3",
+    "file-saver": "^2.0.5",
+    "helmet": "^4.2.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.8",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.4.17",
+    "nodemon": "^2.0.6",
+    "pug": "^3.0.0",
+    "pug-cli": "^1.0.0-alpha6",
+    "random-words": "^1.1.1",
+    "regenerator-runtime": "^0.13.7",
+    "slugify": "^1.4.6",
+    "templates": "^1.2.9",
+    "validator": "^13.5.2",
+    "waveform-playlist": "^3.2.4",
+    "xss-clean": "^0.1.1"
+  },
+  "engines": {
+    "node": "14.x",
+    "npm": "6.14.x"
+  }
 }
