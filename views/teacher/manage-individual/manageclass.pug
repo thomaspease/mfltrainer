@@ -22,7 +22,7 @@ block content
                         th.td-right Due
                         
                 tbody
-                    each task in classData.tasks
+                    each task in classTasks
                         +row(task.name, task.completed, task.dueDate.toDateString(), task.id, 'manage-tasks', 'tasks')
             br
             h2.heading-secondary Students

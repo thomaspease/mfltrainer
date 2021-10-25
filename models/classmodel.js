@@ -32,12 +32,6 @@ const classSchema = mongoose.Schema(
         ref: 'User',
       },
     ],
-    tasks: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Task',
-      },
-    ],
     classCode: String,
   },
   {
