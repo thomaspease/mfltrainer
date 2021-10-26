@@ -14,16 +14,23 @@ router.get(
   authController.protect,
   viewsController.getCreateSentenceForm
 );
+
 router.get(
-  '/create-task',
+  '/choose-create-task',
   authController.protect,
-  viewsController.getSetTasksForm
+  viewsController.getChooseCreateTasks
+);
+
+router.get(
+  '/create-task-select',
+  authController.protect,
+  viewsController.getCreateTasksSelectForm
 );
 
 router.get(
   '/create-task-random',
   authController.protect,
-  viewsController.getSetTasksRandomForm
+  viewsController.getCreateTasksRandomForm
 );
 
 router.get(

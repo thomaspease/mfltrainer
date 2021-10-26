@@ -84,7 +84,7 @@ exports.getCreateSentenceForm = catchAsync(async (req, res) => {
   });
 });
 
-exports.getSetTasksForm = catchAsync(async (req, res, next) => {
+exports.getCreateTasksSelectForm = catchAsync(async (req, res, next) => {
   const fieldValues = {};
 
   // doing an `await Promise.all` so that we can get each DB query in-flight at the same time (less chance of bottlenecking), rather than having to stagger them
@@ -98,15 +98,21 @@ exports.getSetTasksForm = catchAsync(async (req, res, next) => {
     Sentence.distinct('tense').then((values) => (fieldValues.tense = values)),
   ]);
 
-  res.status(200).render('teacher/create/settasks', {
+  res.status(200).render('teacher/create/createtasksselect', {
     title: 'Create tasks',
     fieldValues,
   });
 });
 
-exports.getSetTasksRandomForm = catchAsync(async (req, res, next) => {
-  res.status(200).render('teacher/create/settasksrandom', {
+exports.getCreateTasksRandomForm = catchAsync(async (req, res, next) => {
+  res.status(200).render('teacher/create/createtasksrandom', {
     title: 'Create tasks',
+  });
+});
+
+exports.getChooseCreateTasks = catchAsync(async (req, res, next) => {
+  res.status(200).render('teacher/overviews/choosecreatetasks', {
+    title: 'Choose task creation',
   });
 });
 
