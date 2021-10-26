@@ -20,4 +20,4 @@ block content
                             
                     tbody
                         each studentTask in studentTasks
-                            +row(studentTask.user[0].name, studentTask.completed, studentTask.percentCorrect)
+                            +row(studentTask.user.name, studentTask.completed, studentTask.percentCorrect)

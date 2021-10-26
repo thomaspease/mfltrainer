@@ -25,12 +25,6 @@ const classSchema = mongoose.Schema(
       ref: 'Teacher',
       required: [true, 'A class must have a Teacher!'],
     },
-    students: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-      },
-    ],
     classCode: String,
   },
   {

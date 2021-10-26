@@ -28,9 +28,7 @@ exports.doExercise = catchAsync(async (req, res, next) => {
   );
 
   // Request the task so sentences can be populated
-  const task = await Task.findById(studentTask.task[0].id).populate(
-    'sentences'
-  );
+  const task = await Task.findById(studentTask.task.id).populate('sentences');
 
   //Render template and pass in sentences
   res.status(200).render('student/train', {

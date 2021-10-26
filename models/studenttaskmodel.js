@@ -1,18 +1,14 @@
 const mongoose = require('mongoose');
 
 const studentTaskSchema = mongoose.Schema({
-  task: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Task',
-    },
-  ],
-  user: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-    },
-  ],
+  task: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Task',
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+  },
   completed: {
     type: Boolean,
     default: false,

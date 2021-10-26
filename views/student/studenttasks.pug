@@ -26,7 +26,7 @@ block user-content
                             
                     tbody
                         each task in studentTasks
-                            +row(task.task[0].name, task.task[0].exercise, task.completed, task.task[0].dueDate.toDateString(), task.id)
+                            +row(task.task.name, task.task.exercise, task.completed, task.task.dueDate.toDateString(), task.id)
 
 
                     

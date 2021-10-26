@@ -91,7 +91,6 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUserAndData = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
   const userDoc = await User.findByIdAndDelete(req.params.id);
   if (!userDoc) {
     return next(new AppError('No User found with that ID', 404));
@@ -101,16 +100,6 @@ exports.deleteUserAndData = catchAsync(async (req, res, next) => {
     user: req.params.id,
   });
   await StudentSentence.deleteMany({ user: req.params.id });
-
-  await Class.findByIdAndUpdate(
-    { _id: user.class },
-    { $pull: { students: req.params.id } },
-    (err) => {
-      if (err) {
-        new AppError('Could not remove student from class');
-      }
-    }
-  );
 
   res.status(204).json({
     status: 'success',

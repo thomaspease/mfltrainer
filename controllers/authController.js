@@ -44,7 +44,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const newUser = await User.create({
-    name: req.body.name,
+    name: req.body.name
+      .toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '), //Capitalizes first letters of name
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
