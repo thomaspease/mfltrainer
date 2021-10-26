@@ -115,9 +115,18 @@ exports.getChooseCreateTasks = catchAsync(async (req, res, next) => {
 });
 
 //TEACHER CLASS MANAGEMENT
+exports.getCreateClassForm = catchAsync(async (req, res, next) => {
+  res.status(200).render('teacher/create/createclasses', {
+    title: 'Create class',
+  });
+});
+
 exports.manageMyClasses = catchAsync(async (req, res, next) => {
+  const classData = await Class.find({ teacher: req.user.id });
+
   res.status(200).render('teacher/overviews/classesoverview', {
     title: 'My classes',
+    classData,
   });
 });
 

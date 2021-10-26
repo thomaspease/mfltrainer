@@ -341,6 +341,8 @@ export class TagInputView extends View {
 
 export class CreateSentenceFormView extends FormView {}
 
+export class CreateClassFormView extends FormView {}
+
 export class AudioEditorView extends View {
   constructor(element) {
     super(element);
@@ -388,10 +390,12 @@ export class AudioEditorView extends View {
       this.ee.emit('startaudiorendering', 'buffer');
       // if the recording hasn't been written out within 10 seconds, it's probably stalled / hung
       this.recordingStalledTimer = setTimeout(() => {
-        throw new Error("Audio recording seems to be stalled")
-      }, 10 * 1000)
-    } catch(e) {
-      throw new Error("Please take an audio recording, in order to submit sentences");
+        throw new Error('Audio recording seems to be stalled');
+      }, 10 * 1000);
+    } catch (e) {
+      throw new Error(
+        'Please take an audio recording, in order to submit sentences'
+      );
     }
   }
 
@@ -409,9 +413,12 @@ export class AudioEditorView extends View {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.playlist.initRecorder(stream);
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-      AlertView.show('error', "Could not initialize the audio recording device. This may be a browser permissions issue - check whether microphone access is allowed.");
+      AlertView.show(
+        'error',
+        'Could not initialize the audio recording device. This may be a browser permissions issue - check whether microphone access is allowed.'
+      );
 
       // abort, but don't throw (since if we threw, it would spam the AlertView modal)
       return;

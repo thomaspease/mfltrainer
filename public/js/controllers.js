@@ -11,16 +11,19 @@ import {
   CreateTaskRandomView,
   CreateTaskChooseSentenceView,
   DeleteView,
+  CreateClassFormView,
 } from './views.js';
 import {
   AuthModel,
   SentenceModel,
   CreateSentenceModel,
+  CreateClassModel,
   StudentResultsModel,
   StudentSentenceModel,
   CreateTaskModel,
   DeleteModel,
 } from './models.js';
+import { Model } from 'mongoose';
 
 // parent class for controllers. Not much needs to be in here, I don't think, so leave it empty.
 class Controller {
@@ -145,6 +148,39 @@ export class CreateSentenceController extends Controller {
         }
       }
     );
+  }
+}
+
+export class CreateClassController extends Controller {
+  getViewClass() {
+    return CreateClassFormView;
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    this.view.onFormData(async ({ name, year, band, set }) => {
+      const data = {
+        name,
+        year,
+        band,
+        set,
+        teacher: DataParserView.get('user'),
+      };
+      try {
+        const res = await CreateClassModel.sendApiRequest(
+          '/api/v1/classes',
+          'POST',
+          data
+        );
+        if (res) {
+          this.view.clearFormData();
+          AlertView.show('success', 'Class created');
+        }
+      } catch (err) {
+        AlertView.show('error', err.message);
+      }
+    });
   }
 }
 

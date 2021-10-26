@@ -1,0 +1,27 @@
+extends ../../base
+
+mixin js-value(name, value)
+    -// TODO: move this mixin into a global pug file (maybe `base.pug`? or a mixins helper file?)
+    input.js-value(type="hidden" name=name value=JSON.stringify(value))
+
+block content
+  main.main
+    .card-container
+      h2.heading-secondary Create a class
+      form.card.create-class-form(data-controller="CreateClassController")
+        .card__details
+          .form__group
+              label.form__label(for='email') Class name
+              input#name.form__input(name='name', type='text', placeholder='9p/Sp3', required)
+          .form__group
+              label.form__label(for='password') Class year
+              input#year.form__input(name='year', type='number', placeholder=9, required)
+          .form__group
+              label.form__label Class band
+              input#band.form__input(name='band', type='text', placeholder='q', required)
+          .form__group
+              label.form__label Class set
+              input#set.form__input(name='set', type='number', placeholder=3, required)
+          .form__group
+              button.btn.btn--green Submit
+      +js-value('user', user._id)

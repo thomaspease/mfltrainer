@@ -16,6 +16,12 @@ router.get(
 );
 
 router.get(
+  '/create-class',
+  authController.protect,
+  viewsController.getCreateClassForm
+);
+
+router.get(
   '/choose-create-task',
   authController.protect,
   viewsController.getChooseCreateTasks
