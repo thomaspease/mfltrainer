@@ -51,16 +51,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     class: classData[0]._id,
   });
 
-  Class.findByIdAndUpdate(
-    { _id: classData[0]._id },
-    { $push: { students: newUser.id } },
-    (err, user) => {
-      if (err) {
-        new AppError('Could not add student to class');
-      }
-    }
-  );
-
   //Find tasks due in future for class being assigned to, and create studenttasks for newuser
   const futureTasks = await Task.find({
     class: classData[0]._id,

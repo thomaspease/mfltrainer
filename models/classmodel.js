@@ -20,12 +20,11 @@ const classSchema = mongoose.Schema(
       type: String,
       required: [true, 'A class must have a set!'],
     },
-    teacher: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Teacher',
-      },
-    ],
+    teacher: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Teacher',
+      required: [true, 'A class must have a Teacher!'],
+    },
     students: [
       {
         type: mongoose.Schema.ObjectId,
