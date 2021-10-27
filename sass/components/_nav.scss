@@ -53,10 +53,9 @@
   }
 }
 
-@media only screen and (max-width: 37.5em) {
-  .nav__el:not(:last-child) {
-    margin-right: 0;
-    margin-bottom: 1.2rem;
+@media only screen and (max-width: 30rem) {
+  .nav__el {
+    margin-bottom: 0;
   }
 }
 

@@ -78,6 +78,21 @@
   }
 }
 
+@media only screen and (max-width: 30rem) {
+  .card {
+    padding: 2rem;
+  }
+
+  .card__exercise {
+    grid-template-rows: repeat(5, min-content);
+    grid-template-areas: 'prompt audio' 'student-answer student-answer' 'accents none' 'submit submit' 'correct-answer counts';
+  }
+
+  .main {
+    grid-column: 1;
+  }
+}
+
 .sentence-table {
   table-layout: fixed;
   $narrow-width: 85px;
@@ -91,13 +106,5 @@
     $size: 25px;
     width: $size;
     height: $size;
-  }
-}
-
-//These media queries (also one in button) presumably need to be done better
-@media only screen and (max-width: 40em) {
-  .card__exercise {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, min-content);
   }
 }

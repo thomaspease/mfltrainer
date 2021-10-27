@@ -35,6 +35,13 @@ body {
   .main {
     padding: 4rem 0rem; } }
 
+@media only screen and (max-width: 30rem) {
+  .container {
+    grid-template-columns: 1fr; }
+  .main {
+    grid-column: 1;
+    padding: 0.5rem; } }
+
 ul {
   padding-left: 1.5rem; }
 
@@ -126,10 +133,9 @@ a:hover {
   .nav__el:visited--me {
     grid-row: 7 / 8; }
 
-@media only screen and (max-width: 37.5em) {
-  .nav__el:not(:last-child) {
-    margin-right: 0;
-    margin-bottom: 1.2rem; } }
+@media only screen and (max-width: 30rem) {
+  .nav__el {
+    margin-bottom: 0; } }
 
 .nav__el--loginout {
   grid-column: logout; }
@@ -493,6 +499,15 @@ a:hover {
   .card__create-task-chosen .grid-filters {
     grid-template-areas: 'vivaRef tense grammar'; }
 
+@media only screen and (max-width: 30rem) {
+  .card {
+    padding: 2rem; }
+  .card__exercise {
+    grid-template-rows: repeat(5, min-content);
+    grid-template-areas: 'prompt audio' 'student-answer student-answer' 'accents none' 'submit submit' 'correct-answer counts'; }
+  .main {
+    grid-column: 1; } }
+
 .sentence-table {
   table-layout: fixed; }
   .sentence-table .narrow {
@@ -502,11 +517,6 @@ a:hover {
   .sentence-table input[type='checkbox'] {
     width: 25px;
     height: 25px; }
-
-@media only screen and (max-width: 40em) {
-  .card__exercise {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, min-content); } }
 
 .form__input {
   display: block;
