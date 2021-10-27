@@ -22,7 +22,7 @@ block content
                     div.select-class
                         label.form__label Class
                         select.select-css.task-details(name='class')
-                            each classes in user.class
+                            each classes in user.classes
                                 option(value= classes.id) #{classes.name}
                     div.select-exercise-type
                         label.form__label Type of exercise

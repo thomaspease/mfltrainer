@@ -9,6 +9,6 @@ mixin classcard(className, classId)
 block content
   main.main
     .classlist-container
-      each group in classData
+      each group in user.classes
         +classcard(group.name, group.id)
         

@@ -30321,9 +30321,10 @@ const synonyms = [
   new Synonym("wasn't", 'was not'),
   new Synonym("didn't", 'did not'),
   new Synonym('on weekends', 'on the weekend'),
-  new Synonym('vacation', 'holidays'),
-  new Synonym('lots', 'a lot of'),
+  new Synonym('holiday', 'holidays', 'vacation'),
+  new Synonym('lots', 'a lot'),
   new Synonym('relax', 'rest'),
+  new Synonym('which', 'that'),
 ];
 
 // using an encoding which consists only of numbers and punctuation, in order to avoid the risk of an accidental double-replacement

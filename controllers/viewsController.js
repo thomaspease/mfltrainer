@@ -122,11 +122,8 @@ exports.getCreateClassForm = catchAsync(async (req, res, next) => {
 });
 
 exports.manageMyClasses = catchAsync(async (req, res, next) => {
-  const classData = await Class.find({ teacher: req.user.id });
-
   res.status(200).render('teacher/overviews/classesoverview', {
     title: 'My classes',
-    classData,
   });
 });
 

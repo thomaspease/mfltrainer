@@ -139,6 +139,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   //GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
   res.locals.user = currentUser;
+
+  //Add classdata to user
+  const classData = await Class.find({ teacher: req.user.id });
+  req.user.classes = classData;
+  res.locals.user.classes = classData;
+
   next();
 });
 

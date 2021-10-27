@@ -6,12 +6,10 @@ const taskSchema = mongoose.Schema({
     required: true,
   },
   dueDate: Date,
-  teacher: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-    },
-  ],
+  teacher: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+  },
   exercise: {
     type: String,
     enum: ['gapped', 'translation', 'transcription'],
@@ -23,12 +21,10 @@ const taskSchema = mongoose.Schema({
       ref: 'Sentence',
     },
   ],
-  class: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Class',
-    },
-  ],
+  class: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Class',
+  },
 });
 
 taskSchema.pre('save', function (next) {
