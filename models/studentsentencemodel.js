@@ -5,7 +5,7 @@ const studentSentenceSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     unique: false,
     required: true,
-    ref: "Sentence",
+    ref: 'Sentence',
   },
   student: {
     type: mongoose.Schema.ObjectId,
@@ -14,7 +14,7 @@ const studentSentenceSchema = mongoose.Schema({
   },
   exercise: {
     type: String,
-    enum: ['gapped', 'translation', 'transcription'],
+    enum: ['gapped', 'translation', 'transcription', 'translationToTl'],
     required: true,
   },
   correctAttempts: {
@@ -40,10 +40,13 @@ const studentSentenceSchema = mongoose.Schema({
   retestDays: {
     type: Number,
     required: true,
-  }
+  },
 });
 
-studentSentenceSchema.index({sentence:1, student:1, exercise: 1}, {unique:true})
+studentSentenceSchema.index(
+  { sentence: 1, student: 1, exercise: 1 },
+  { unique: true }
+);
 
 const StudentSentence = mongoose.model(
   'StudentSentence',

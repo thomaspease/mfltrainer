@@ -30594,6 +30594,8 @@ class SentenceModel extends Model {
         return new GappedSentenceModel(this.data);
       case 'translation':
         return new TranslationSentenceModel(this.data);
+      case 'translationToTl':
+        return new TranslationToTlSentenceModel(this.data);
       case 'transcription':
         return new TranscriptionSentenceModel(this.data);
     }
@@ -30660,6 +30662,15 @@ class GappedSentenceModel extends SentenceModel {
 }
 
 class TranslationSentenceModel extends SentenceModel {}
+
+class TranslationToTlSentenceModel extends SentenceModel {
+  get prompt() {
+    return this.data.translation;
+  }
+  get answer() {
+    return this.data.sentence;
+  }
+}
 
 class TranscriptionSentenceModel extends SentenceModel {
   get prompt() {
