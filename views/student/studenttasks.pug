@@ -1,7 +1,7 @@
 extends ../base
 
 mixin row(name, exercise, completed, due, id)
-    tr  
+    tr
         td.td-left
             a.truncate-text(href=`/train/${id}`) #{name}
         td #{exercise}

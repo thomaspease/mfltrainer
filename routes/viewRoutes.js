@@ -71,6 +71,6 @@ router.get(
 
 router.get('/me', authController.protect, viewsController.getAccount);
 
-router.get('/privacy', authController.isLoggedIn, viewsController.privacy);
+router.get('/privacyyyyy', authController.isLoggedIn, viewsController.privacy);
 
 module.exports = router;

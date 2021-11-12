@@ -35,12 +35,17 @@ const synonyms = [
   new Synonym("isn't", 'is not'),
   new Synonym("it's", 'it is'),
   new Synonym("wasn't", 'was not'),
+  new Synonym("wouldn't", 'would not'),
   new Synonym("didn't", 'did not'),
   new Synonym('on weekends', 'on the weekend'),
   new Synonym('holiday', 'holidays', 'vacation'),
   new Synonym('lots', 'a lot'),
   new Synonym('relax', 'rest'),
   new Synonym('which', 'that'),
+  new Synonym('dad', 'father'),
+  new Synonym('ten', 'ten years old'),
+  new Synonym('it rains', "it's raining", 'it is raining'),
+  new Synonym('television', 'tv'),
 ];
 
 // using an encoding which consists only of numbers and punctuation, in order to avoid the risk of an accidental double-replacement
