@@ -23,6 +23,6 @@ block content
                         
                 tbody
                     each task in studentTasks
-                        +row(task.task[0].name, task.completed, task.task[0].dueDate.toDateString(), task.percentCorrect, task.id, 'manage-tasks', 'studenttasks')
+                        +row(task.task.name, task.completed, task.task.dueDate.toDateString(), task.percentCorrect, task.id, 'manage-tasks', 'studenttasks')
             
     
