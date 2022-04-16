@@ -181,6 +181,10 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
 
     return next();
   }
+  if (!req.cookies.jwt) {
+    res.redirect('/login');
+    return next();
+  }
   next();
 });
 
