@@ -126,13 +126,12 @@ export class CreateSentenceController extends Controller {
     super(...args);
 
     this.view.onFormData(
-      async ({ sentence, translation, level, vivaRef, tense, grammar }) => {
+      async ({ sentence, translation, vivaRef, tense, grammar }) => {
         try {
           const { audioUrl } = await this.children.audioEditor.save();
           const res = await CreateSentenceModel.create(
             sentence,
             translation,
-            level,
             vivaRef,
             tense,
             grammar,

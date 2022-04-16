@@ -492,8 +492,6 @@ export class CreateTaskRandomView extends CreateTaskView {
     //Get inputs (.elements name must match their corresponding switch's name)
     this.elements.vivaRefLow = this.root.querySelector('.vivaref-low');
     this.elements.vivaRefHigh = this.root.querySelector('.vivaref-high');
-    this.elements.levelLow = this.root.querySelector('.level-low');
-    this.elements.levelHigh = this.root.querySelector('.level-high');
 
     this.elements.switches = {};
     this.elements.switches.vivaRefLow = this.root
@@ -501,12 +499,6 @@ export class CreateTaskRandomView extends CreateTaskView {
       .getElementsByTagName('input');
     this.elements.switches.vivaRefHigh = this.root
       .querySelector('.check-vivaref-high')
-      .getElementsByTagName('input');
-    this.elements.switches.levelLow = this.root
-      .querySelector('.check-level-low')
-      .getElementsByTagName('input');
-    this.elements.switches.levelHigh = this.root
-      .querySelector('.check-level-high')
       .getElementsByTagName('input');
 
     const switches = Array.from(
@@ -532,13 +524,8 @@ export class CreateTaskRandomView extends CreateTaskView {
         this.elements.switches.vivaRefHigh[0],
         'vivaRef'
       );
-      const levelRes = this.getUpperLower(
-        this.elements.switches.levelLow[0],
-        this.elements.switches.levelHigh[0],
-        'level'
-      );
       const nonToggleValues = this.getValues('.sentence-details');
-      const paramsObject = { ...vivaRefRes, ...levelRes, ...nonToggleValues };
+      const paramsObject = { ...vivaRefRes, ...nonToggleValues };
       const params = new URLSearchParams(paramsObject);
 
       const searchParams = decodeURIComponent(params.toString());
@@ -640,19 +627,11 @@ export class CreateTaskChooseSentenceView extends CreateTaskView {
   }
 
   updateDisplay(sentences, toSave) {
-    const fields = [
-      'grammar',
-      'vivaRef',
-      'tense',
-      'level',
-      'sentence',
-      'translation',
-    ];
+    const fields = ['grammar', 'vivaRef', 'tense', 'sentence', 'translation'];
     const fieldClasses = {
       grammar: 'narrow',
       vivaRef: 'narrow',
       tense: 'narrow',
-      level: 'narrow',
     };
 
     const savedIds = toSave.map((sent) => {

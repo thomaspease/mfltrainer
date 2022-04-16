@@ -13,10 +13,6 @@ const sentenceSchema = mongoose.Schema({
     unique: true,
     trim: true,
   },
-  level: {
-    type: Number,
-    required: [true, 'A sentence must have a level'],
-  },
   vivaRef: {
     type: Number,
     required: [true, 'A sentence must have a Viva reference'],

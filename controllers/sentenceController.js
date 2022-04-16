@@ -20,14 +20,9 @@ exports.deleteSentence = factory.deleteOne(Sentence);
 exports.sentenceSorter = async (req, res, next) => {
   try {
     const existsTrue = { $exists: true };
-    let level = existsTrue,
-      vivaRef = existsTrue,
+    let vivaRef = existsTrue,
       tense = existsTrue,
       grammar = existsTrue;
-
-    if (req.body.level) {
-      level = JSON.parse(req.body.level);
-    }
 
     if (req.body.vivaRef) {
       vivaRef = JSON.parse(req.body.vivaRef);
@@ -44,7 +39,6 @@ exports.sentenceSorter = async (req, res, next) => {
     const sentences = await Sentence.aggregate([
       {
         $match: {
-          level,
           vivaRef,
           tense,
           grammar,

@@ -4,7 +4,6 @@ import { showAlert } from './alerts';
 export const postSentence = async (
   sentence,
   translation,
-  level,
   vivaRef,
   tense,
   grammar
@@ -16,7 +15,6 @@ export const postSentence = async (
       data: {
         sentence,
         translation,
-        level,
         vivaRef,
         grammar,
         tense,

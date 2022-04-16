@@ -60,8 +60,7 @@
     grid-gap: 1rem;
     grid-template-columns: 1fr 6fr 1fr 6fr;
     grid-template-areas:
-      'label-vivaref-low label-vivaref-low label-vivaref-high label-vivaref-high' 'check-vivaref-low vivaref-low check-vivaref-high vivaref-high' 'label-level-low label-level-low label-level-high label-level-high'
-      'check-level-low level-low check-level-high level-high' 'tense tense grammar grammar' 'button button button button';
+      'label-vivaref-low label-vivaref-low label-vivaref-high label-vivaref-high' 'check-vivaref-low vivaref-low check-vivaref-high vivaref-high' 'tense tense grammar grammar' 'button button button button';
   }
   &__create-task-chosen {
     .grid {

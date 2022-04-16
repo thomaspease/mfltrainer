@@ -112,7 +112,6 @@ export class CreateSentenceModel extends Model {
   static async create(
     sentence,
     translation,
-    level,
     vivaRef,
     tense,
     grammar,
@@ -121,7 +120,6 @@ export class CreateSentenceModel extends Model {
     const data = {
       sentence,
       translation,
-      level,
       vivaRef,
       grammar,
       tense,
